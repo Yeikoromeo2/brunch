@@ -11,7 +11,7 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 - Cada fila es un cliente independiente. Se identifica por `Customer ID`, nunca por el número de fila, porque la hoja puede ordenarse o filtrarse.
 - `Customer ID`, `Tax Reg No` y los teléfonos se tratan como texto.
 - Antes de procesar un Excel real, validarlo con `python3 crm/estructura/validar_cartera.py <archivo.xlsx>`. Si no pasa, no procesarlo.
-- En la base de datos del CRM (Supabase), la tabla de clientes conserva estas 18 columnas con el mismo significado, de modo que el Excel se pueda importar y exportar sin pérdidas.
+- La versión final trabaja directo sobre el Excel en OneDrive (complemento de Excel web). Los reportes y listas se crean como hojas nuevas con las 18 columnas en el mismo orden; nunca se borran datos de la cartera ni hojas anteriores.
 
 ## Tipo de negocio y marcas
 
