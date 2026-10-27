@@ -7,11 +7,18 @@ Este repositorio contiene el firmware brunch y, en `crm/`, el sistema de gestió
 La cartera de clientes es la base de todo el CRM. Su estructura está definida en `crm/estructura/columnas-cartera.json`, con la plantilla original en `crm/estructura/plantilla-cartera.xlsx`.
 
 - Las 18 columnas de `Hoja1` (de `Organization` a `Comentario Créditos`) nunca se agregan, quitan, renombran ni reordenan.
-- El sistema solo escribe en dos columnas: `Ejecutivo` y `Comentario Créditos`. Todo dato adicional (seguimiento, historial, prioridad, motivos, montos) va en hojas o tablas aparte, nunca como columnas nuevas de la cartera.
+- **El archivo original no se modifica.** Lo único que el sistema escribe en él es la columna `Comentario Créditos`, siempre agregando (fecha, usuario y texto) sin borrar lo anterior. No escribe en `Ejecutivo`, no pinta filas, no crea pestañas ni hojas en ese archivo.
+- Todo dato adicional (seguimiento, historial, asignaciones, marcas, ventas, órdenes, teléfonos, reportes) va en un **archivo paralelo de datos** en OneDrive/SharePoint, enlazado por `Customer ID`.
 - Cada fila es un cliente independiente. Se identifica por `Customer ID`, nunca por el número de fila, porque la hoja puede ordenarse o filtrarse.
 - `Customer ID`, `Tax Reg No` y los teléfonos se tratan como texto.
 - Antes de procesar un Excel real, validarlo con `python3 crm/estructura/validar_cartera.py <archivo.xlsx>`. Si no pasa, no procesarlo.
-- La versión final trabaja directo sobre el Excel en OneDrive (complemento de Excel web). Los reportes y listas se crean como hojas nuevas con las 18 columnas en el mismo orden; nunca se borran datos de la cartera ni hojas anteriores.
+- La versión final trabaja sobre el Excel en OneDrive (complemento de Excel web). Los reportes y listas se crean como hojas nuevas **en el archivo paralelo**, con las 18 columnas en el mismo orden; nunca se borran datos ni hojas anteriores.
+
+## Ventas y órdenes (OV)
+
+- Toda venta se registra con su **número de OV** (obligatorio y único) y una línea por marca con su monto.
+- Los montos siempre son **sin IGV**.
+- Al registrar una OV su estado pasa automáticamente a **Despachando**. La alerta sigue activa hasta que alguien la marque como **Terminado**; no se puede desactivar.
 
 ## Tipo de negocio y marcas
 

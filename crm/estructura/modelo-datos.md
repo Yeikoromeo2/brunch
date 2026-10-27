@@ -1,6 +1,9 @@
 # Modelo de datos del Gestor de Cartera
 
-Todo vive en el mismo Excel de OneDrive. La cartera (`Hoja1`) conserva sus 18 columnas sin cambios (ver `columnas-cartera.json`). Lo demás se guarda en pestañas auxiliares, cuyo nombre empieza con `_`. Cada registro se enlaza con la cartera por **Customer ID**, nunca por número de fila.
+Hay **dos archivos** en OneDrive/SharePoint:
+
+1. **Cartera original:** `Hoja1` con sus 18 columnas (ver `columnas-cartera.json`). No se modifica, salvo la columna `Comentario Créditos`, donde el sistema solo agrega comentarios.
+2. **Archivo paralelo de datos** (por ejemplo «Gestor de Cartera - Datos.xlsx»): contiene todas las pestañas de abajo como tablas de Excel. Cada registro se enlaza con la cartera por **Customer ID**, nunca por número de fila.
 
 ## Pestañas auxiliares
 
@@ -36,6 +39,23 @@ La línea de la marca no se repite aquí: se obtiene de `_Marcas`, así un cambi
 | Marca | Nombre único |
 | Línea | Una de las líneas de `marcas.json` («Por definir» si no se sabe) |
 | Activa | SI / NO (las inactivas dejan de ofrecerse, pero se conservan en el historial) |
+
+### `_Ordenes`: una fila por OV
+| Columna | Contenido |
+|---|---|
+| OV | Número de orden de venta (obligatorio, único) |
+| Customer ID | Cliente |
+| Fecha OV | Fecha de la venta |
+| Total sin IGV | Suma de sus líneas en `_Ventas` |
+| Estado | `Despachando` (automático al registrar) · `Incidencia` · `Terminado` · `Anulada` |
+| Ejecutivo | Quien registró la venta |
+| Fecha terminado / Terminado por | Cuándo y quién cerró el proceso |
+| Nota | Observaciones de entrega o recojo |
+
+Mientras una OV no esté en `Terminado` (o `Anulada`), aparece en las notificaciones.
+
+### `_Ventas`: una fila por marca dentro de cada OV
+OV · Customer ID · Fecha OV · Marca · Monto sin IGV · Ejecutivo. La línea de la marca se toma de `_Marcas`.
 
 ### `_Historial`: un movimiento por fila (solo se agrega, nunca se edita)
 Customer ID · Fecha y hora · Usuario · Acción (resultado, comentario, marca, tipo, número corregido…) · Detalle.
