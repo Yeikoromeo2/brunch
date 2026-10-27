@@ -17,3 +17,9 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 
 - Tipo de negocio de cada cliente: Tienda, Oficina o Híbrido. Se sugiere por palabras clave del comentario y se confirma en el panel; se guarda en `_Seguimiento`.
 - El catálogo de marcas está en `crm/estructura/marcas.json` (pestaña `_Marcas`). Las marcas que distribuye cada cliente van en `_ClienteMarcas`, nunca como columnas de la cartera.
+- Cada marca de un cliente lleva su relación (`habitual`, `ocasional`, `interes`), quién la registró y la fecha. Pasados 90 días se marca «por confirmar».
+
+## Visibilidad
+
+- El ejecutivo solo ve su cartera: clientes con su nombre en `Ejecutivo`, en sus filas reservadas o gestionados por él. El administrador ve todo, incluido el mapeo de marcas por ejecutivo.
+- El modelo completo de pestañas auxiliares está en `crm/estructura/modelo-datos.md`.

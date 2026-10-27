@@ -417,7 +417,42 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
 .offer{display:flex;flex-direction:column;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);border-left:3px solid var(--accent);animation:rise .3s both}
 .offer b{font-size:13px}
 .offer span{font-size:11px;color:var(--muted)}
+.bgrp{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.bgrp > small{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.bgrp > small i{width:8px;height:8px;border-radius:50%}
+.bpill{display:inline-flex;align-items:stretch;border:1px solid var(--rc);border-radius:6px;overflow:hidden;background:color-mix(in srgb,var(--rc) 9%,var(--surface));animation:pop .3s}
+.bpill button{border:0;background:transparent;font:500 12px var(--f);padding:0 8px;height:26px;cursor:pointer;color:var(--ink)}
+.bpill button:hover:not(:disabled){background:color-mix(in srgb,var(--rc) 16%,transparent)}
+.bpill button + button{border-left:1px solid color-mix(in srgb,var(--rc) 40%,transparent);color:var(--muted);padding:0 7px}
+.bpill.stale{border-style:dashed}
+.bpill small{font-size:10px;color:var(--warn-ink);margin-left:4px}
+.relseg{display:flex;gap:4px;margin-top:10px}
+.relseg button{flex:1;height:28px;border:1px solid var(--line2);border-radius:6px;background:var(--surface);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;color:var(--ink2)}
+.relseg button i{width:7px;height:7px;border-radius:50%}
+.relseg button.on{border-color:var(--rc);background:color-mix(in srgb,var(--rc) 10%,var(--surface));color:var(--ink)}
 [data-brand]{cursor:pointer}
+#vBrands{overflow:auto;padding:18px 20px;flex-direction:column;gap:14px}
+.bfilters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.modes{display:inline-flex;background:var(--surface3);border-radius:9px;padding:3px;gap:2px}
+.modes button{border:0;background:transparent;height:30px;padding:0 14px;border-radius:7px;cursor:pointer;font-weight:600;color:var(--ink2);display:flex;align-items:center;gap:6px}
+.modes button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.bmap{overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);max-height:calc(100vh - 330px);min-height:260px}
+.bmap table{border-collapse:separate;border-spacing:0;font-size:12px;width:max-content;min-width:100%}
+.bmap th{position:sticky;top:0;z-index:2;background:var(--surface2);text-align:left;padding:8px;border-bottom:1px solid var(--line2);white-space:nowrap;font-size:11px;font-weight:600;color:var(--muted)}
+.bmap th.hc{text-align:center;min-width:56px}
+.bmap td{padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+.bmap td.nm{position:sticky;left:0;background:var(--surface);z-index:1;max-width:240px;overflow:hidden;text-overflow:ellipsis}
+.bmap th.nm{position:sticky;left:0;z-index:3}
+.bmap tr[data-open]{cursor:pointer}
+.bmap tr[data-open]:hover td{background:var(--hover)}
+.bmap td.hc{text-align:center;padding:4px}
+.heat{display:grid;place-items:center;height:26px;min-width:44px;border-radius:5px;font:600 11px var(--fm);color:var(--ink)}
+.heat.h0{color:var(--line2)}
+.heat.dark{color:#fff}
+.bmap .sub2{font-size:11px;color:var(--muted)}
+.bmap .bar2{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--surface3);min-width:120px;gap:2px}
+.bmap .bar2 i{display:block;height:100%}
+.stale-t{color:var(--warn-ink);font-weight:600}
 [data-brand]:hover .lb{color:var(--accent)}
 .field select{max-width:150px}
 
@@ -452,6 +487,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
 #toast.err::before{content:"!";background:rgba(255,255,255,.25)}
 #tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--surface);font-size:12px;padding:7px 10px;border-radius:8px;z-index:300;display:none;white-space:pre;line-height:1.5;box-shadow:var(--shadow-lg)}
 
+@media (max-width:1560px){.hide-md{display:none!important}}
 @media (max-width:1000px){
   #panel{position:absolute;right:0;top:0;bottom:0;z-index:25;box-shadow:var(--shadow-lg);max-width:100%}
   #panel.hide-m{display:none}
@@ -530,17 +566,18 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
 <div class="cover" id="loading" hidden><div style="text-align:center;position:relative"><div class="spin"></div><div id="loadingTx">Cargando cartera…</div></div></div>
 
 <header class="top">
-  <div class="brand"><span class="logo"><svg><use href="#i-list"/></svg></span><span class="hide-sm">Gestor de Cartera<small>Datos de ejemplo</small></span></div>
+  <div class="brand"><span class="logo"><svg><use href="#i-list"/></svg></span><span class="hide-sm hide-md">Gestor de Cartera<small>Datos de ejemplo</small></span></div>
   <div class="sync" id="sync" title="Estado de sincronización"><i></i><span id="syncTx">Sincronizado</span></div>
   <div class="spacer"></div>
   <div class="tabs" id="mainTabs">
     <span class="ind" id="tabInd"></span>
     <button data-tab="day"><svg><use href="#i-home"/></svg><span class="hide-sm">Mi día</span><span class="ct" id="ctDay" hidden></span></button>
     <button class="on" data-tab="list"><svg><use href="#i-list"/></svg><span class="hide-sm">Lista</span></button>
+    <button data-tab="brands"><svg><use href="#i-tag"/></svg><span class="hide-sm">Marcas</span></button>
     <button data-tab="dash"><svg><use href="#i-chart"/></svg><span class="hide-sm">Dashboard</span></button>
     <button data-tab="rep"><svg><use href="#i-file"/></svg><span class="hide-sm">Reportes</span></button>
   </div>
-  <button class="btn" id="bResv" title="Reservar un rango de filas"><svg><use href="#i-flag"/></svg><span class="hide-sm">Reservar filas</span></button>
+  <button class="btn" id="bResv" title="Reservar un rango de filas"><svg><use href="#i-flag"/></svg><span class="hide-sm hide-md">Reservar filas</span></button>
   <span class="vsep hide-sm"></span>
   <button class="btn ghost" id="bReload" title="Recargar datos"><svg><use href="#i-refresh"/></svg></button>
   <button class="btn ghost" id="bPanel" title="Mostrar u ocultar el panel"><svg><use href="#i-panel"/></svg></button>
@@ -558,7 +595,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
       <span style="font-size:11px;color:var(--muted)">Los colores de estado no cambian, para que siempre signifiquen lo mismo.</span>
     </div></span>
   <button class="btn ghost" id="bTheme" title="Tema claro u oscuro"><svg><use href="#i-moon"/></svg></button>
-  <div class="me"><span class="av" id="meAv"></span><span class="hide-sm"><b id="meName"></b> <span class="role" id="meRole"></span></span><button class="btn ghost" id="bOut" title="Salir" style="height:28px;padding:0 6px"><svg><use href="#i-out"/></svg></button></div>
+  <div class="me"><span class="av" id="meAv"></span><span class="hide-sm"><b id="meName"></b> <span class="role hide-md" id="meRole"></span></span><button class="btn ghost" id="bOut" title="Salir" style="height:28px;padding:0 6px"><svg><use href="#i-out"/></svg></button></div>
 </header>
 
 <div class="toolbar" id="toolbar">
@@ -568,6 +605,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
   <div class="field"><label for="fTipo">Tipo</label><select id="fTipo"><option value="">Todos</option><option>Tienda</option><option>Oficina</option><option>Híbrido</option><option value="-">Sin definir</option></select></div>
   <div class="field"><label for="fCat">Línea</label><select id="fCat"><option value="">Todas</option></select></div>
   <div class="field"><label for="fMarca">Marca</label><input id="fMarca" list="dlBrands" placeholder="Todas" style="width:112px"></div>
+  <div class="field"><label for="fRel">Compra</label><select id="fRel"><option value="">Cualquiera</option><option value="habitual">Habitual</option><option value="ocasional">A veces</option><option value="interes">Le interesa</option></select></div>
   <datalist id="dlBrands"></datalist>
   <button class="btn ghost" id="bClear">Limpiar</button>
   <div class="chips" id="chips">
@@ -600,6 +638,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
     <div id="grid" tabindex="0"><div id="ghead"></div><div id="gbody"></div></div>
     <aside id="panel"><div class="p-empty">Selecciona una fila para ver el detalle.</div></aside>
   </section>
+  <section class="view" id="vBrands"></section>
   <section class="view" id="dash"></section>
   <section class="view" id="rep"></section>
 </main>
@@ -643,6 +682,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
           <label class="fl"><span>Código de país</span><input type="text" id="cCC"></label>
           <label class="fl"><span>Dígitos de celular</span><input type="number" id="cLen" min="6" max="12"></label>
         </div>
+        <label class="ck"><input type="checkbox" id="cScope"> Cada ejecutivo ve solo su cartera (asignados, reservados o gestionados por él)</label>
         <label class="ck"><input type="checkbox" id="cLock"> Bloquear el cliente cuando alguien lo gestiona</label>
         <label class="ck"><input type="checkbox" id="cExec"> Escribir el nombre en «Ejecutivo» al gestionar</label>
         <div class="two">
@@ -753,7 +793,7 @@ for (let i = 0; i < N; i++) {
     String(Math.round(Math.pow(rnd(), 2) * 148) * 1000 + 2000), addDays(TODAY, -(800 + Math.floor(rnd() * 1500))), addDays(TODAY, -(3 + Math.floor(rnd() * 420))), c < .3 ? 'A' : c < .65 ? 'B' : 'C', ''];
   v[C.phone] = v[C.phone].replace(/^9(\d{2}) /, (m, a) => '9' + a + ' ');
   ROWS.push({ k, r, v });
-  const t = { rev: false, res: '', int: 0, buy: false, next: '', own: '', first: '', last: '', lastc: '', dep: '', motivo: '', monto: '', fix: '', tipo: '', brands: [], hist: [] };
+  const t = { rev: false, res: '', int: 0, buy: false, next: '', own: '', first: '', last: '', lastc: '', dep: '', motivo: '', monto: '', fix: '', tipo: '', brands: [], bmeta: {}, hist: [] };
   TRACK[k] = t;
   if (rnd() < .58) {
     const who = owner(r), dAgo = Math.floor(rnd() * 14), hm = `${p2(9 + Math.floor(rnd() * 9))}:${p2(Math.floor(rnd() * 60))}`, d = addDays(TODAY, -dAgo) + ' ' + hm, o = rnd();
@@ -769,10 +809,10 @@ for (let i = 0; i < N; i++) {
     const tp = rnd(), tipo = tp < .42 ? 'Tienda' : tp < .72 ? 'Oficina' : 'Híbrido';
     if (rnd() < .6) t.tipo = tipo;
     else if (!v[C.comment] || rnd() < .6) { v[C.comment] = pick(KWC[tipo]); H(v[C.comment], 'msg', 1); }
-    if (rnd() < .85) { const n = 2 + Math.floor(rnd() * 4), set = new Set(); while (set.size < n) set.add(pick(PROFILE[tipo])); t.brands = [...set]; }
+    if (rnd() < .85) { const n = 2 + Math.floor(rnd() * 4), set = new Set(); while (set.size < n) set.add(pick(PROFILE[tipo])); t.brands = [...set]; t.brands.forEach(b => { const x = rnd(); t.bmeta[b] = { rel: x < .6 ? 'habitual' : x < .85 ? 'ocasional' : 'interes', by: who, d: addDays(TODAY, -(dAgo + Math.floor(rnd() * 160))) }; }); }
   }
 }
-let CFG = { cc: '51', mobLen: 9, lockRow: true, writeExec: true, minInt: 2, poll: 20, goal: 40, waMode: 'web', waMsg: '', mailMode: 'outlook', mailSubj: '' };
+let CFG = { cc: '51', mobLen: 9, lockRow: true, writeExec: true, scopeOwn: true, minInt: 2, poll: 20, goal: 40, waMode: 'web', waMsg: '', mailMode: 'outlook', mailSubj: '' };
 let USERS = [{ row: 2, name: 'Ana', role: 'admin', active: true, pin: '1234' }, { row: 3, name: 'Harold', role: 'ejecutivo', active: true, pin: '1111' }, { row: 4, name: 'Luis', role: 'ejecutivo', active: true, pin: '2222' }];
 let ASSIGNS = [{ id: 'rv1', user: 'Harold', from: 2, to: 21, by: 'Ana', date: addDays(TODAY, -10) }, { id: 'rv2', user: 'Luis', from: 22, to: 41, by: 'Ana', date: addDays(TODAY, -10) }];
 const SESS = {}, SHEETS = [];
@@ -780,6 +820,8 @@ let SEQ = 1;
 const who = tk => { const n = SESS[tk]; if (!n) throw new Error('SESION: Tu sesión venció, vuelve a ingresar.'); const u = USERS.find(x => x.name === n && x.active); if (!u) throw new Error('SESION: Usuario inactivo.'); return u; };
 const state = row => ({ k: row.k, r: row.r, v: row.v.slice(), t: JSON.parse(JSON.stringify(TRACK[row.k])) });
 const resvFor = n => ASSIGNS.find(a => n >= a.from && n <= a.to);
+/* cartera visible: el ejecutivo solo ve sus clientes (asignados, reservados o gestionados por él); el administrador ve todo */
+const inScope = (u, r) => u.role === 'admin' || !CFG.scopeOwn || r.v[C.exec] === u.name || TRACK[r.k].own === u.name || (resvFor(r.r) || {}).user === u.name;
 
 const API = {
   api_login(name, pin) {
@@ -789,13 +831,15 @@ const API = {
   },
   api_logout(tk) { delete SESS[tk]; return true; },
   api_load(tk) {
-    const u = who(tk);
-    return { me: { name: u.name, role: u.role }, cfg: CFG, header: HEADER, C, assigns: ASSIGNS, users: USERS.filter(x => x.active).map(x => x.name), seq: SEQ, lastRow: N + 1, today: TODAY, sheet: 'Hoja1',
-      rows: ROWS.map(r => [r.k, r.r, r.v]), track: TRACK, brands: BRANDS, warnings: [] };
+    const u = who(tk), vis = ROWS.filter(r => inScope(u, r)), tr = {};
+    vis.forEach(r => tr[r.k] = TRACK[r.k]);
+    return { me: { name: u.name, role: u.role }, cfg: CFG, scoped: vis.length < ROWS.length, total: ROWS.length, header: HEADER, C, assigns: ASSIGNS, users: USERS.filter(x => x.active).map(x => x.name), seq: SEQ, lastRow: N + 1, today: TODAY, sheet: 'Hoja1',
+      rows: vis.map(r => [r.k, r.r, r.v]), track: tr, brands: BRANDS, warnings: [] };
   },
   api_changes(tk) { who(tk); return { assigns: ASSIGNS, today: TODAY, reload: false, changes: [], seq: SEQ }; },
   api_action(tk, p) {
     const u = who(tk), row = ROWS.find(r => r.k === p.k); if (!row) throw new Error('Cliente no encontrado.');
+    if (!inScope(u, row)) throw new Error('Este cliente no está en tu cartera.');
     const t = TRACK[row.k], now = nowStr();
     if (u.role !== 'admin' && p.op !== 'unlock') {
       const a = resvFor(row.r);
@@ -816,7 +860,7 @@ const API = {
       case 'motivo': t.motivo = p.val || ''; H('Motivo: ' + (p.val || '—'), 'ban'); break;
       case 'monto': t.monto = String(p.val || '').replace(/[^\d.]/g, ''); H('Monto de compra: S/ ' + Number(t.monto || 0).toLocaleString('es-PE'), 'cart'); break;
       case 'tipo': t.tipo = p.val || ''; H('Tipo de negocio: ' + (p.val || 'sin definir'), 'store'); break;
-      case 'brand': { const b = p.val && p.val.b; if (!BRANDS.some(x => x.m === b)) throw new Error('La marca no está en el catálogo.'); t.brands = (t.brands || []).filter(x => x !== b); if (p.val.on) t.brands.push(b); H((p.val.on ? 'Agregó la marca ' : 'Quitó la marca ') + b, 'tag'); break; }
+      case 'brand': { const b = p.val && p.val.b; if (!BRANDS.some(x => x.m === b)) throw new Error('La marca no está en el catálogo.'); const had = t.brands.includes(b); t.brands = t.brands.filter(x => x !== b); t.bmeta = t.bmeta || {}; if (p.val.on) { t.brands.push(b); t.bmeta[b] = { rel: p.val.rel || 'habitual', by: u.name, d: TODAY }; } else delete t.bmeta[b]; const RL = { habitual: 'compra habitualmente', ocasional: 'compra a veces', interes: 'le interesa' }; H(p.val.on ? (had ? 'Actualizó ' + b + ': ' + RL[p.val.rel || 'habitual'] : 'Agregó la marca ' + b + ' (' + RL[p.val.rel || 'habitual'] + ')') : 'Quitó la marca ' + b, 'tag'); break; }
       case 'contact': t.int++; t.lastc = now; t.rev = true; H(p.val ? 'Contactó por ' + p.val : 'Contactó', /WhatsApp/.test(p.val) ? 'wa' : /Correo/.test(p.val) ? 'mail' : 'phone'); break;
       case 'fixphone': H('Corrigió el número: ' + (t.fix || row.v[C.phone]) + ' → ' + p.val, 'pencil'); t.fix = p.val; if (t.res === 'Número errado') t.res = ''; break;
       case 'unlock': if (u.role !== 'admin') throw new Error('Solo el administrador puede liberar.'); t.own = ''; H('Liberó el cliente', 'lock'); SEQ++; return { ok: true, state: state(row) };
@@ -902,7 +946,7 @@ const RES = {
 };
 const RES_LIST = Object.keys(RES);
 const MOTIVOS = ['Precio', 'Ya compra a otro proveedor', 'No lo necesita ahora', 'Problema de crédito', 'Cerró el negocio', 'Otro'];
-const emptyT = () => ({ rev: false, res: '', int: 0, buy: false, next: '', own: '', first: '', last: '', lastc: '', dep: '', motivo: '', monto: '', fix: '', tipo: '', brands: [], hist: [] });
+const emptyT = () => ({ rev: false, res: '', int: 0, buy: false, next: '', own: '', first: '', last: '', lastc: '', dep: '', motivo: '', monto: '', fix: '', tipo: '', brands: [], bmeta: {}, hist: [] });
 const SERIES = ['--s1', '--s2', '--s3', '--s4', '--s5', '--s6', '--s7', '--s8'];
 
 /* ---------- almacenamiento local (solo preferencias) ---------- */
@@ -927,7 +971,7 @@ function call(fn, ...args) {
 
 /* ---------- estado ---------- */
 const S = { token: '', me: null, cfg: {}, header: [], C: {}, rows: [], byKey: new Map(), view: [], active: null, st: 'all', tab: 'list',
-  assigns: [], users: [], seq: 0, lastRow: 0, today: '', pending: 0, cmtT: {}, needReload: false, activity: null, activityAt: 0, rep: { type: 'noc' }, sheets: [], fixOpen: null, phDraft: '', brands: [], catOf: {}, cats: [], catOpen: false };
+  assigns: [], users: [], seq: 0, lastRow: 0, today: '', pending: 0, cmtT: {}, needReload: false, activity: null, activityAt: 0, rep: { type: 'noc' }, sheets: [], fixOpen: null, phDraft: '', brands: [], catOf: {}, cats: [], catOpen: false, addRel: 'habitual', scoped: false, total: 0, bf: { q: '', cat: '', marca: '', rel: '', exec: '', tipo: '', empty: false, mode: 'cli' } };
 
 /* ---------- utilidades ---------- */
 const norm = s => String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
@@ -1040,6 +1084,20 @@ function fillBrandLists() {
   $('#fCat').innerHTML = '<option value="">Todas</option>' + S.cats.map(c => `<option ${c === cur ? 'selected' : ''}>${esc(c)}</option>`).join('');
 }
 const findBrand = q => { const n = norm(q); return n ? S.brands.find(b => norm(b.m) === n) : null; };
+/* relación del canal con cada marca: habitual, a veces o interés; con fecha de la última confirmación */
+const REL = { habitual: { l: 'Compra habitualmente', s: 'Habitual', c: 'var(--s1)' }, ocasional: { l: 'Compra a veces', s: 'A veces', c: 'var(--s2)' }, interes: { l: 'Le interesa', s: 'Interés', c: 'var(--s3)' } };
+const REL_K = Object.keys(REL), STALE = 90;
+const relOf = (r, b) => ((r.t.bmeta || {})[b] || {}).rel || 'habitual';
+const bAge = (r, b) => daysSince(((r.t.bmeta || {})[b] || {}).d);
+const lastBrandDate = r => (r.t.brands || []).map(b => ((r.t.bmeta || {})[b] || {}).d || '').sort().pop() || '';
+const brandsBy = (r, rel) => (r.t.brands || []).filter(b => relOf(r, b) === rel);
+/* condición de marca/línea/relación usada por la lista, la vista Marcas y los reportes */
+function brandMatch(r, cat, mq, rel) {
+  if (!cat && !mq && !rel) return true;
+  const mx = mq ? findBrand(mq) : null;
+  return (r.t.brands || []).some(x => (!cat || S.catOf[x] === cat) && (!mq || (mx ? x === mx.m : norm(x).includes(norm(mq)))) && (!rel || relOf(r, x) === rel));
+}
+const SHORT = { 'Cómputo': 'Cómputo', 'Gaming': 'Gaming', 'Componentes': 'Compon.', 'Almacenamiento y memoria': 'Almacen.', 'Servidores y centro de datos': 'Servid.', 'Redes y conectividad': 'Redes', 'Energía': 'Energía', 'Seguridad electrónica': 'Segur.', 'Hogar inteligente': 'Hogar', 'Punto de venta y código de barras': 'POS', 'Impresión': 'Impres.', 'Colaboración y videoconferencia': 'Colab.', 'Audio profesional': 'Audio pro', 'Audio de consumo': 'Audio', 'Pantallas y monitores': 'Pantallas', 'Accesorios y periféricos': 'Acces.', 'Móviles y wearables': 'Móviles', 'Software y ciberseguridad': 'Software', 'Por definir': 'Otros' };
 
 let toastT;
 function toast(msg, err) { const t = $('#toast'); t.textContent = msg; t.className = 'on' + (err ? ' err' : ''); clearTimeout(toastT); toastT = setTimeout(() => t.className = '', err ? 4500 : 2600); }
@@ -1109,7 +1167,7 @@ async function loadAll(first) {
   try {
     const d = await call('api_load', S.token);
     S.me = d.me; S.cfg = d.cfg; S.header = d.header; S.C = d.C; S.assigns = d.assigns; S.users = d.users;
-    S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false; S.brands = d.brands; fillBrandLists();
+    S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false; S.brands = d.brands; S.scoped = !!d.scoped; S.total = d.total || d.rows.length; fillBrandLists();
     S.rows = d.rows.map(([k, r, v]) => ({ k, r, v, t: Object.assign(emptyT(), d.track[k] || {}), hay: null, _vi: null }));
     S.byKey = new Map(S.rows.map(r => [r.k, r]));
     $('#login').hidden = true;
@@ -1125,7 +1183,7 @@ async function loadAll(first) {
     d.warnings.forEach(w => toast(w, true));
     setSync('', 'Sincronizado');
     startPoll();
-    if (first) toast(`Hola ${S.me.name} · ${fmtN(S.rows.length)} clientes en «${d.sheet}»`);
+    if (first) toast(S.scoped ? `Hola ${S.me.name} · tu cartera: ${fmtN(S.rows.length)} de ${fmtN(S.total)} clientes` : `Hola ${S.me.name} · ${fmtN(S.rows.length)} clientes en «${d.sheet}»`);
   } catch (e) {
     if (!/sesi[oó]n/i.test(e.message)) { toast('No se pudo cargar: ' + e.message, true); if (!S.rows.length) showLogin(e.message); }
   }
@@ -1188,7 +1246,7 @@ function applyLocal(r, p) {
     case 'monto': t.monto = String(p.val || ''); break;
     case 'fixphone': t.fix = p.val; if (t.res === 'Número errado') t.res = ''; break;
     case 'tipo': t.tipo = p.val || ''; break;
-    case 'brand': t.brands = (t.brands || []).filter(x => x !== p.val.b); if (p.val.on) t.brands.push(p.val.b); break;
+    case 'brand': t.brands = (t.brands || []).filter(x => x !== p.val.b); t.bmeta = Object.assign({}, t.bmeta); if (p.val.on) { t.brands.push(p.val.b); t.bmeta[p.val.b] = { rel: p.val.rel || 'habitual', by: S.me.name, d: S.today }; } else delete t.bmeta[p.val.b]; break;
     case 'contact': t.int++; t.lastc = nowStr(); t.rev = true; break;
     case 'unlock': t.own = ''; return;
   }
@@ -1288,13 +1346,16 @@ function act(r, a, n) {
   } else if (a === 'unlock') { if (confirm('¿Liberar este cliente para que otra persona lo pueda gestionar?')) send(r, { op: 'unlock' }); }
   else if (a === 'brandfocus') { const i = $('#pBrand'); if (i) { i.focus(); i.scrollIntoView({ block: 'center' }); } }
   else if (a === 'tipo') { send(r, { op: 'tipo', val: r.t.tipo === n ? '' : n }); }
-  else if (a === 'brand') { const on = !(r.t.brands || []).includes(n); send(r, { op: 'brand', val: { b: n, on } }).then(ok => ok && toast((on ? 'Marca agregada: ' : 'Marca quitada: ') + n)); }
+  else if (a === 'brand') { const on = !(r.t.brands || []).includes(n); send(r, { op: 'brand', val: { b: n, on, rel: S.addRel } }).then(ok => ok && toast(on ? `${n}: ${REL[S.addRel].l.toLowerCase()}` : 'Marca quitada: ' + n)); }
+  else if (a === 'brandrel') { const nx = REL_K[(REL_K.indexOf(relOf(r, n)) + 1) % REL_K.length]; send(r, { op: 'brand', val: { b: n, on: true, rel: nx } }).then(ok => ok && toast(`${n}: ${REL[nx].l.toLowerCase()}`)); }
+  else if (a === 'brandrm') { send(r, { op: 'brand', val: { b: n, on: false } }).then(ok => ok && toast('Marca quitada: ' + n)); }
+  else if (a === 'addrel') { S.addRel = n; renderPanel(true); const i = $('#pBrand'); if (i) i.focus(); }
   else if (a === 'brandadd') {
     const inp = $('#pBrand'), b = inp && findBrand(inp.value);
     if (!b) { if (inp) inp.focus(); return toast('Elige una marca del catálogo (escribe y selecciónala de la lista).', true); }
     inp.value = ''; inp.blur();
-    if ((r.t.brands || []).includes(b.m)) return toast(b.m + ' ya está registrada');
-    send(r, { op: 'brand', val: { b: b.m, on: true } }).then(ok => ok && toast('Marca agregada: ' + b.m));
+    if ((r.t.brands || []).includes(b.m) && relOf(r, b.m) === S.addRel) return toast(b.m + ' ya está registrada');
+    send(r, { op: 'brand', val: { b: b.m, on: true, rel: S.addRel } }).then(ok => ok && toast(`${b.m}: ${REL[S.addRel].l.toLowerCase()}`));
   }
   else if (a === 'offercopy') { const t = recommend(r).map(o => o.m + ' (' + o.c + ')').join(', '); copyText('Ofrecer a ' + val(r, 'legal') + ': ' + t).then(ok => toast(ok ? 'Sugerencias copiadas' : 'No se pudo copiar', !ok)); }
   else if (a === 'fixopen') { if (lk) return toast(lk, true); S.fixOpen = S.fixOpen === r ? null : r; S.phDraft = ''; renderPanel(true); const i = $('#pNewPhone'); if (i) i.focus(); }
@@ -1310,11 +1371,10 @@ function act(r, a, n) {
 function hay(r) { if (r.hay == null) r.hay = norm(r.v.join(' | ') + ' ' + r.t.res + ' ' + r.t.own + ' ' + r.t.fix + ' ' + r.t.tipo + ' ' + (r.t.brands || []).join(' ')) + ' ' + (S.C.phone != null ? (val(r, 'phone') + r.t.fix).replace(/\D/g, '') : ''); return r.hay; }
 function baseRows() {
   const q = norm($('#q').value), a = +$('#fFrom').value || -Infinity, b = +$('#fTo').value || Infinity, hd = UI.hideDep;
-  const tp = $('#fTipo').value, cat = $('#fCat').value, mq = norm($('#fMarca').value), mx = findBrand(mq);
+  const tp = $('#fTipo').value, cat = $('#fCat').value, mq = $('#fMarca').value.trim(), rel = $('#fRel').value;
   return S.rows.filter(r => r.r >= a && r.r <= b && (!hd || !r.t.dep) && (!q || hay(r).includes(q))
     && (!tp || (tp === '-' ? !r.t.tipo : r.t.tipo === tp))
-    && (!cat || (r.t.brands || []).some(x => S.catOf[x] === cat))
-    && (!mq || (r.t.brands || []).some(x => mx ? x === mx.m : norm(x).includes(mq))));
+    && brandMatch(r, cat, mq, rel));
 }
 function counts(rows) {
   const c = { all: rows.length, none: 0, rev: 0, att: 0, buy: 0, noc: 0, agenda: 0, mine: 0, prio: 0 };
@@ -1347,7 +1407,7 @@ function updStrip() {
   $('#sBar').dataset.tip = `Atendidos ${fmtN(c.att)} (${pct(c.att, n)}%)\nRevisados ${fmtN(c.rev)} (${pct(c.rev, n)}%)\nPendientes ${fmtN(c.none)} (${pct(c.none, n)}%)`;
   const mine = S.me ? S.assigns.filter(a => a.user === S.me.name) : [];
   $('#sResv').innerHTML = mine.length ? `<span class="resv">${icon('flag')} Tus filas: ${mine.map(a => a.from + '–' + a.to).join(', ')}</span>` : '';
-  $('#sPos').innerHTML = S.active ? `Ubicado en fila <b>${S.active.r}</b>` : '';
+  $('#sPos').innerHTML = (S.scoped ? `Tu cartera: <b>${fmtN(S.rows.length)}</b> de ${fmtN(S.total)} · ` : '') + (S.active ? `Ubicado en fila <b>${S.active.r}</b>` : '');
 }
 let stripT; function updStripSoon() { clearTimeout(stripT); stripT = setTimeout(() => { const c = counts(baseRows()); $$('#chips [data-n]').forEach(el => el.textContent = fmtN(c[el.dataset.n])); updStrip(); }, 250); }
 
@@ -1376,7 +1436,7 @@ function resHTML(t) {
   if (t.res === 'Volver a llamar' && t.next) h += `<span class="cnt" title="Volver a llamar">${icon('cal')}${ddmm(t.next)}</span>`;
   if (t.buy && t.monto) h += `<span class="cnt" title="Monto de la compra">${money(t.monto)}</span>`;
   if (t.tipo) h += `<span class="ttag" title="Tipo de negocio">${esc(t.tipo)}</span>`;
-  if ((t.brands || []).length) h += `<span class="cnt" title="Marcas: ${esc(t.brands.join(', '))}">${icon('tag')}${t.brands.length}</span>`;
+  if ((t.brands || []).length) h += `<span class="cnt" title="Marcas: ${esc(t.brands.map(b => b + ' (' + REL[((t.bmeta || {})[b] || {}).rel || 'habitual'].s.toLowerCase() + ')').join(', '))}">${icon('tag')}${t.brands.length}</span>`;
   return h;
 }
 function cellHTML(r, c) {
@@ -1518,13 +1578,109 @@ function bizHTML(r, lk, dis) {
     <div class="tipos">${TIPOS.map(x => `<button class="tipo${r.t.tipo === x ? ' on' : ''}${!r.t.tipo && sg && sg.tipo === x ? ' sug' : ''}" data-act="tipo" data-n="${x}" ${dis}>${icon(TIPO_IC[x])}${x}</button>`).join('')}</div>
     ${!r.t.tipo && !sg ? '<div class="hint">Sin pistas en el comentario: pregúntalo en la llamada o escribe #tienda, #oficina o #hibrido.</div>' : ''}</div>
   <div class="p-sec"><h3><span>Marcas que distribuye</span><span style="text-transform:none;letter-spacing:0;font-weight:500">${mine.length} marca${mine.length === 1 ? '' : 's'}</span></h3>
-    ${mine.length ? `<div class="bsel">${mine.map(b => `<button class="bchip on" data-act="brand" data-n="${esc(b)}" title="${esc(S.catOf[b] || '')} · clic para quitar" ${dis}>${esc(b)}<span>×</span></button>`).join('')}</div>` : '<div class="hint" style="margin:0">Aún no se registran marcas para este canal.</div>'}
-    ${lk ? '' : `<div class="badd"><input class="txtin" id="pBrand" list="dlBrands" placeholder="Agregar marca… escribe y elige"><button class="btn" data-act="brandadd">Agregar</button></div>`}
+    ${mine.length ? REL_K.map(k => { const l = brandsBy(r, k); return l.length ? `<div class="bgrp"><small><i style="background:${REL[k].c}"></i>${REL[k].l} · ${l.length}</small><div class="bsel">${l.map(b => { const age = bAge(r, b), m = (r.t.bmeta || {})[b] || {}; return `<span class="bpill${age > STALE ? ' stale' : ''}" style="--rc:${REL[k].c}" title="${esc(S.catOf[b] || '')} · registrado por ${esc(m.by || '—')} el ${esc(m.d || '—')}${age > STALE ? ' · confirmar de nuevo' : ''}"><button data-act="brandrel" data-n="${esc(b)}" ${dis} title="Clic: cambiar a «${REL[REL_K[(REL_K.indexOf(k) + 1) % 3]].s}»">${esc(b)}${age > STALE ? '<small>confirmar</small>' : ''}</button><button data-act="brandrm" data-n="${esc(b)}" ${dis} title="Quitar">×</button></span>`; }).join('')}</div></div>` : ''; }).join('') + '<div class="hint" style="margin:-2px 0 0">Clic en la marca cambia cómo la compra. Las punteadas llevan más de 90 días sin confirmarse.</div>' : '<div class="hint" style="margin:0">Aún no se registran marcas para este canal.</div>'}
+    ${lk ? '' : `<div class="relseg">${REL_K.map(k => `<button class="${S.addRel === k ? 'on' : ''}" style="--rc:${REL[k].c}" data-act="addrel" data-n="${k}"><i style="background:${REL[k].c}"></i>${REL[k].s}</button>`).join('')}</div>
+    <div class="badd" style="margin-top:6px"><input class="txtin" id="pBrand" list="dlBrands" placeholder="Agregar como «${REL[S.addRel].s}»… escribe y elige"><button class="btn" data-act="brandadd">Agregar</button></div>`}
     ${det.length ? `<div class="bdet">${icon('msg')}En el comentario: ${det.map(b => `<button class="bchip" data-act="brand" data-n="${esc(b)}">+ ${esc(b)}</button>`).join('')}</div>` : ''}
     ${lk ? '' : `<details class="bcat" ${S.catOpen ? 'open' : ''}><summary>Ver las ${S.brands.length} marcas por línea</summary>${byCat.map(g => `<div class="cgrp"><b>${esc(g.c)}</b><div>${g.l.map(b => `<button class="bchip${mine.includes(b.m) ? ' on' : ''}" data-act="brand" data-n="${esc(b.m)}">${esc(b.m)}</button>`).join('')}</div></div>`).join('')}</details>`}</div>
   ${rec.length ? `<div class="p-sec"><h3><span>Qué ofrecerle</span><button class="linkbtn" data-act="offercopy">${icon('copy')}Copiar</button></h3>
     <div class="offers">${rec.map((o, i) => `<div class="offer" style="animation-delay:${i * 40}ms"><b>${esc(o.m)}</b><span>${esc(o.why)}${o.peers ? ' · la venden ' + o.peers + ' canales parecidos' : ''}</span></div>`).join('')}</div></div>` : ''}`;
 }
+
+/* ---------- vista Marcas: filtrador y mapeo ---------- */
+function brandRows() {
+  const f = S.bf;
+  return S.rows.filter(r => !r.t.dep
+    && (!f.exec || r.t.own === f.exec || val(r, 'exec') === f.exec || (resvFor(r.r) || {}).user === f.exec)
+    && (!f.tipo || (f.tipo === '-' ? !r.t.tipo : r.t.tipo === f.tipo))
+    && (!f.q || hay(r).includes(norm(f.q))));
+}
+const heatCell = (n, tip) => { const pc = [0, 26, 46, 66, 84][Math.min(n, 4)]; return `<td class="hc"><span class="heat${n ? '' : ' h0'}${n >= 3 ? ' dark' : ''}" style="${n ? `background:color-mix(in srgb,var(--s1) ${pc}%,var(--surface))` : ''}" data-tip="${esc(tip)}">${n || '·'}</span></td>`; };
+function renderBrands(keep) {
+  const el = $('#vBrands'), f = S.bf, admin = isAdmin(), base = brandRows();
+  const mapped = base.filter(r => (r.t.brands || []).length), stale = base.reduce((s, r) => s + (r.t.brands || []).filter(b => bAge(r, b) > STALE).length, 0);
+  const distinct = new Set(base.flatMap(r => r.t.brands || [])).size;
+  const people = admin ? S.users : [S.me.name];
+  const filt = base.filter(r => brandMatch(r, f.cat, f.marca, f.rel) && (f.empty || (f.cat || f.marca || f.rel) ? true : (r.t.brands || []).length));
+  const cats = f.cat ? [f.cat] : S.cats;
+  let body = '';
+  if (f.mode === 'cli') {
+    const list = (f.empty ? base.filter(r => !(r.t.brands || []).length && (!f.cat && !f.marca && !f.rel)) : filt).slice(0, 400);
+    body = list.length ? `<div class="bmap"><table><thead><tr><th class="nm">Cliente</th><th>Ejecutivo</th><th>Tipo</th>${cats.map(c => `<th class="hc" title="${esc(c)}">${esc(SHORT[c] || c)}</th>`).join('')}<th>Habitual</th><th>A veces</th><th>Interés</th><th>Actualizado</th></tr></thead><tbody>
+      ${list.map(r => { const lb = lastBrandDate(r), age = daysSince(lb), st = (r.t.brands || []).some(b => bAge(r, b) > STALE);
+        return `<tr data-open="${esc(r.k)}"><td class="nm"><b>${esc(val(r, 'legal'))}</b><div class="sub2">${esc(val(r, 'id'))} · fila ${r.r}</div></td><td>${esc(r.t.own || val(r, 'exec') || '—')}</td><td>${r.t.tipo ? `<span class="ttag">${esc(r.t.tipo)}</span>` : '<span class="sub2">—</span>'}</td>
+        ${cats.map(c => { const l = (r.t.brands || []).filter(b => S.catOf[b] === c && (!f.rel || relOf(r, b) === f.rel)); return heatCell(l.length, c + (l.length ? ':\n' + l.map(b => b + ' · ' + REL[relOf(r, b)].s.toLowerCase()).join('\n') : ': sin marcas')); }).join('')}
+        <td>${brandsBy(r, 'habitual').length}</td><td>${brandsBy(r, 'ocasional').length}</td><td>${brandsBy(r, 'interes').length}</td>
+        <td class="${st ? 'stale-t' : ''}">${lb ? ddmm(lb) + (st ? ' · confirmar' : '') : '<span class="sub2">sin registro</span>'}</td></tr>`; }).join('')}</tbody></table></div>
+      ${list.length === 400 ? '<div class="hint">Se muestran los primeros 400. Usa los filtros para acotar.</div>' : ''}` : '<div class="card d-empty">No hay clientes con estos filtros.</div>';
+  } else if (f.mode === 'brand') {
+    const bl = S.brands.filter(b => (!f.cat || b.c === f.cat) && (!f.marca || norm(b.m).includes(norm(f.marca))));
+    const st = bl.map(b => { const c = { b, habitual: 0, ocasional: 0, interes: 0 }; base.forEach(r => { if ((r.t.brands || []).includes(b.m)) c[relOf(r, b.m)]++; }); c.tot = c.habitual + c.ocasional + c.interes;
+      c.opp = base.filter(r => !(r.t.brands || []).includes(b.m) && (r.t.brands || []).some(x => S.catOf[x] === b.c)).length; return c; })
+      .filter(c => !f.rel || c[f.rel]).sort((a, z) => (f.rel ? z[f.rel] - a[f.rel] : z.tot - a.tot) || z.opp - a.opp || a.b.m.localeCompare(z.b.m));
+    const mx = Math.max(1, ...st.map(c => c.tot));
+    body = `<div class="bmap"><table><thead><tr><th class="nm">Marca</th><th>Línea</th><th>Canales que la venden</th><th>Habitual</th><th>A veces</th><th>Interés</th><th>Cobertura</th><th title="Venden la misma línea pero no esta marca">Oportunidades</th><th></th></tr></thead><tbody>
+      ${st.map(c => `<tr><td class="nm"><b>${esc(c.b.m)}</b></td><td class="sub2">${esc(c.b.c)}</td>
+        <td><div class="bar2" data-tip="${esc(c.b.m)}\nHabitual ${c.habitual} · A veces ${c.ocasional} · Interés ${c.interes}" style="width:${Math.max(4, c.tot / mx * 100)}%;min-width:${c.tot ? 24 : 0}px">${REL_K.map(k => c[k] ? `<i style="flex:${c[k]};background:${REL[k].c}"></i>` : '').join('')}</div></td>
+        <td>${c.habitual}</td><td>${c.ocasional}</td><td>${c.interes}</td><td>${pct(c.tot, base.length)}%</td><td>${c.opp}</td>
+        <td><button class="btn" style="height:26px;padding:0 9px;font-size:12px" data-promo="${esc(c.b.m)}">${icon('tag')}Promoción</button></td></tr>`).join('')}</tbody></table></div>`;
+  } else {
+    const rowsU = people.map(u => { const mine = base.filter(r => r.t.own === u || val(r, 'exec') === u || (resvFor(r.r) || {}).user === u); return { u, mine, mapped: mine.filter(r => (r.t.brands || []).length).length, stale: mine.filter(r => (r.t.brands || []).some(b => bAge(r, b) > STALE)).length }; });
+    body = `<div class="bmap"><table><thead><tr><th class="nm">Ejecutivo</th><th>Clientes</th><th>Con marcas</th><th>Por confirmar</th>${cats.map(c => `<th class="hc" title="${esc(c)}">${esc(SHORT[c] || c)}</th>`).join('')}</tr></thead><tbody>
+      ${rowsU.map(o => `<tr data-exec="${esc(o.u)}"><td class="nm"><span class="av" style="display:inline-grid;width:22px;height:22px;font-size:10px;vertical-align:middle;margin-right:6px;background:${userColor(o.u)}">${esc(initials(o.u))}</span><b>${esc(o.u)}</b></td><td>${o.mine.length}</td><td>${o.mapped} · ${pct(o.mapped, o.mine.length)}%</td><td class="${o.stale ? 'stale-t' : ''}">${o.stale}</td>
+        ${cats.map(c => { const n = o.mine.filter(r => (r.t.brands || []).some(b => S.catOf[b] === c && (!f.rel || relOf(r, b) === f.rel))).length; return heatCell(n > 4 ? 4 : n, `${o.u} · ${c}: ${n} clientes`).replace(/>(\d|·)<\/span>/, `>${n || '·'}</span>`); }).join('')}</tr>`).join('')}</tbody></table></div>
+      <div class="hint">Cada celda: clientes del ejecutivo que venden al menos una marca de esa línea. Clic en un ejecutivo para ver sus clientes.</div>`;
+  }
+  el.innerHTML = `
+  <div class="d-head"><div><h2>Marcas por canal</h2><div class="sub">${admin ? 'Vista de administrador: toda la cartera' : `Tu cartera: ${fmtN(S.rows.length)} clientes${S.scoped ? ' asignados a ti' : ''}`}. Las marcas se guardan en la pestaña _ClienteMarcas, no en la cartera.</div></div><div class="spacer"></div>
+    <button class="btn primary" id="bfSheet">${icon('file')}Crear hoja del mapeo</button></div>
+  <div class="kpis">
+    <div class="kpi rise"><div class="l">${icon('users')}${admin ? 'Clientes en la cartera' : 'Tus clientes'}</div><div class="v" data-count="${base.length}">0</div><div class="s">${f.exec ? 'de ' + esc(f.exec) : 'según filtros de ejecutivo y tipo'}</div></div>
+    <div class="kpi rise" style="--d:1"><div class="l">${icon('tag')}Con marcas registradas</div><div class="v" data-count="${mapped.length}">0</div><div class="s">${pct(mapped.length, base.length)}% mapeado · <a href="#" id="bfEmpty" style="color:var(--accent)">${f.empty ? 'ver mapeados' : 'ver sin marcas'}</a></div></div>
+    <div class="kpi rise" style="--d:2"><div class="l">${icon('layers')}Marcas distintas</div><div class="v" data-count="${distinct}">0</div><div class="s">de ${S.brands.length} del catálogo</div></div>
+    <div class="kpi rise" style="--d:3"><div class="l">${icon('clock')}Por confirmar</div><div class="v" data-count="${stale}">0</div><div class="s">registros con más de ${STALE} días</div></div>
+  </div>
+  <div class="bfilters">
+    <div class="modes" id="bfMode"><button data-m="cli" class="${f.mode === 'cli' ? 'on' : ''}">${icon('users')}Por cliente</button><button data-m="brand" class="${f.mode === 'brand' ? 'on' : ''}">${icon('tag')}Por marca</button>${admin ? `<button data-m="exec" class="${f.mode === 'exec' ? 'on' : ''}">${icon('chart')}Por ejecutivo</button>` : ''}</div>
+    <div class="field search" style="max-width:240px"><svg><use href="#i-search"/></svg><input id="bfQ" placeholder="Buscar cliente…" value="${esc(f.q)}"></div>
+    <div class="field"><label for="bfCat">Línea</label><select id="bfCat"><option value="">Todas</option>${S.cats.map(c => `<option ${f.cat === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
+    <div class="field"><label for="bfMarca">Marca</label><input id="bfMarca" list="dlBrands" placeholder="Todas" value="${esc(f.marca)}" style="width:110px"></div>
+    <div class="field"><label for="bfRel">Compra</label><select id="bfRel"><option value="">Cualquiera</option>${REL_K.map(k => `<option value="${k}" ${f.rel === k ? 'selected' : ''}>${REL[k].s}</option>`).join('')}</select></div>
+    <div class="field"><label for="bfTipo">Tipo</label><select id="bfTipo"><option value="">Todos</option>${TIPOS.map(x => `<option ${f.tipo === x ? 'selected' : ''}>${x}</option>`).join('')}<option value="-" ${f.tipo === '-' ? 'selected' : ''}>Sin definir</option></select></div>
+    ${admin ? `<div class="field"><label for="bfExec">Ejecutivo</label><select id="bfExec"><option value="">Todos</option>${S.users.map(u => `<option ${f.exec === u ? 'selected' : ''}>${esc(u)}</option>`).join('')}</select></div>` : ''}
+    <button class="btn ghost" id="bfClear">Limpiar</button>
+    <div class="legend" style="margin:0 0 0 auto">${REL_K.map(k => `<span><span class="sw" style="background:${REL[k].c}"></span>${REL[k].s}</span>`).join('')}</div>
+  </div>
+  <div class="rise" style="--d:4">${body}</div>`;
+  if (keep) el.querySelectorAll('.rise').forEach(x => x.classList.remove('rise'));
+  countUp(el);
+}
+let bfT;
+$('#vBrands').addEventListener('input', e => {
+  const id = e.target.id, map = { bfQ: 'q', bfMarca: 'marca' };
+  if (!map[id]) return;
+  S.bf[map[id]] = e.target.value; clearTimeout(bfT);
+  bfT = setTimeout(() => { renderBrands(true); const x = $('#' + id); if (x) { x.focus(); x.setSelectionRange(x.value.length, x.value.length); } }, 280);
+});
+$('#vBrands').addEventListener('change', e => {
+  const map = { bfCat: 'cat', bfRel: 'rel', bfTipo: 'tipo', bfExec: 'exec' }, k = map[e.target.id];
+  if (k) { S.bf[k] = e.target.value; renderBrands(true); }
+});
+$('#vBrands').addEventListener('click', async e => {
+  const m = e.target.closest('#bfMode [data-m]'); if (m) { S.bf.mode = m.dataset.m; return renderBrands(true); }
+  if (e.target.closest('#bfEmpty')) { e.preventDefault(); S.bf.empty = !S.bf.empty; if (S.bf.empty) { S.bf.cat = S.bf.marca = S.bf.rel = ''; S.bf.mode = 'cli'; } return renderBrands(true); }
+  if (e.target.closest('#bfClear')) { Object.assign(S.bf, { q: '', cat: '', marca: '', rel: '', exec: '', tipo: '', empty: false }); return renderBrands(true); }
+  const pr = e.target.closest('[data-promo]'); if (pr) { S.rep.type = 'promo'; S.rep.marca = pr.dataset.promo; setTab('rep'); return; }
+  const ex = e.target.closest('tr[data-exec]'); if (ex) { Object.assign(S.bf, { exec: ex.dataset.exec, mode: 'cli' }); return renderBrands(true); }
+  const tr = e.target.closest('tr[data-open]'); if (tr) return openClient(tr.dataset.open);
+  if (e.target.closest('#bfSheet')) {
+    const f = S.bf, rows = brandRows().filter(r => f.empty ? !(r.t.brands || []).length : (brandMatch(r, f.cat, f.marca, f.rel) && (r.t.brands || []).length));
+    if (!rows.length) return toast('No hay clientes con estos filtros.', true);
+    const mb = findBrand(f.marca), name = 'Mapeo ' + (mb ? mb.m : f.cat ? SHORT[f.cat] || f.cat : f.exec || 'marcas');
+    try { const res = await call('api_saveReport', S.token, name + ' ' + ddmm(S.today).replace('/', '-'), repTable(rows)); S.sheets = res.sheets; toast(`Hoja «${res.sheet}» creada con ${fmtN(rows.length)} clientes, 18 columnas y sus marcas por relación.`); }
+    catch (er) { toast(er.message, true); }
+  }
+});
 
 /* ---------- Mi día ---------- */
 function myDay() {
@@ -1539,7 +1695,7 @@ function renderDay() {
   const list = myDay(), done = doneToday(), goal = isAdmin() ? S.cfg.goal * Math.max(1, S.users.length - 1) : S.cfg.goal;
   const scope = S.rows.filter(r => !r.t.dep && (isAdmin() || isMine(r)));
   const late = list.filter(x => x.urgent).length, aCold = scope.filter(r => tier(r) === 'A' && status(r) === 'none').length;
-  const wrong = scope.filter(r => r.t.res === 'Número errado').length;
+  const wrong = scope.filter(r => r.t.res === 'Número errado').length, noBrands = scope.filter(r => r.t.own && !(r.t.brands || []).length).length, staleB = scope.filter(r => (r.t.brands || []).some(b => bAge(r, b) > STALE)).length;
   const buysT = S.rows.filter(r => r.t.hist.some(h => h.d.startsWith(S.today) && /compra/i.test(h.txt) && (isAdmin() || h.who === S.me.name))).length;
   const R = 44, Cc = 2 * Math.PI * R, off = Cc * (1 - Math.min(1, done / goal));
   const h = new Date().getHours(), greet = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
@@ -1568,6 +1724,8 @@ function renderDay() {
         <div class="alert ${late ? 'crit' : 'ok'} rise" style="--d:3"><span class="ic">${icon(late ? 'alert' : 'check')}</span><div><b>${late}</b><span>${late === 1 ? 'Llamada vencida' : 'Llamadas vencidas'}</span></div></div>
         <div class="alert ${aCold ? 'warn' : 'ok'} rise" style="--d:4"><span class="ic">${icon('star')}</span><div><b>${aCold}</b><span>Clientes A sin gestionar</span></div></div>
         <div class="alert ${wrong ? 'warn' : 'ok'} rise" style="--d:5"><span class="ic">${icon('hash')}</span><div><b>${wrong}</b><span>Números errados por corregir</span></div></div>
+        <div class="alert ${noBrands ? 'warn' : 'ok'} rise" style="--d:6"><span class="ic">${icon('tag')}</span><div><b>${noBrands}</b><span>Gestionados sin marcas registradas</span></div></div>
+        <div class="alert ${staleB ? 'warn' : 'ok'} rise" style="--d:7"><span class="ic">${icon('clock')}</span><div><b>${staleB}</b><span>Con marcas por confirmar (+90 días)</span></div></div>
       </div>
     </div>
   </div></div>`;
@@ -1576,7 +1734,7 @@ function renderDay() {
 }
 function openClient(k) {
   const r = S.byKey.get(k); if (!r) return;
-  $('#q').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; $('#fTipo').value = ''; $('#fCat').value = ''; $('#fMarca').value = ''; S.st = 'all';
+  $('#q').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; $('#fTipo').value = ''; $('#fCat').value = ''; $('#fMarca').value = ''; $('#fRel').value = ''; S.st = 'all';
   $$('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.st === 'all'));
   if (r.t.dep && UI.hideDep) { UI.hideDep = false; $('#hideDep').checked = false; }
   setTab('list'); applyFilter();
@@ -1751,7 +1909,7 @@ const REPORTS = {
   promo: { t: 'Promoción por marca', d: 'Quién la distribuye o a quién ofrecerla', ic: 'tag', c: 'var(--s2)' },
   all: { t: 'Seguimiento completo', d: 'Toda la cartera con su gestión', ic: 'list', c: 'var(--accent)' }
 };
-const EXTRA = ['Fila', 'Prioridad', 'Tipo de negocio', 'Marcas que distribuye', 'Gestionado por', 'Resultado', 'Intentos', 'Último contacto', 'Próximo contacto', 'Compra', 'Monto', 'Motivo', 'Teléfono corregido', 'Depurado'];
+const EXTRA = ['Fila', 'Prioridad', 'Tipo de negocio', 'Marcas habituales', 'Marcas a veces', 'Marcas de interés', 'Líneas', 'Marcas actualizadas', 'Gestionado por', 'Resultado', 'Intentos', 'Último contacto', 'Próximo contacto', 'Compra', 'Monto', 'Motivo', 'Teléfono corregido', 'Depurado'];
 function repRows(type, o) {
   const a = +o.from || -Infinity, b = +o.to || Infinity;
   return S.rows.filter(r => {
@@ -1778,7 +1936,7 @@ function repRows(type, o) {
 }
 /* las 18 columnas originales en su orden y, a la derecha, las de seguimiento */
 function repTable(rows) {
-  const body = rows.map(r => [...r.v.map(x => x == null ? '' : String(x)), r.r, tier(r), r.t.tipo, (r.t.brands || []).join(', '), r.t.own, r.t.res, r.t.int, r.t.lastc, r.t.next, r.t.buy ? 'SI' : '', r.t.monto, r.t.motivo, r.t.fix, r.t.dep]);
+  const body = rows.map(r => [...r.v.map(x => x == null ? '' : String(x)), r.r, tier(r), r.t.tipo, brandsBy(r, 'habitual').join(', '), brandsBy(r, 'ocasional').join(', '), brandsBy(r, 'interes').join(', '), [...new Set((r.t.brands || []).map(b => S.catOf[b]))].join(', '), lastBrandDate(r), r.t.own, r.t.res, r.t.int, r.t.lastc, r.t.next, r.t.buy ? 'SI' : '', r.t.monto, r.t.motivo, r.t.fix, r.t.dep]);
   return [[...S.header, ...EXTRA], ...body];
 }
 function repOpts() {
@@ -1894,7 +2052,7 @@ function openCfg() {
   $('#cCols').innerHTML = S.header.filter((h, j) => keyOf(j) !== 'comment').map(h => `<label class="ck"><input type="checkbox" data-col="${esc(norm(h))}" ${UI.hidden.includes(norm(h)) ? '' : 'checked'}> ${esc(h)}</label>`).join('');
   $('#cAdmin').hidden = !isAdmin();
   const c = S.cfg;
-  $('#cCC').value = c.cc; $('#cLen').value = c.mobLen; $('#cLock').checked = c.lockRow; $('#cExec').checked = c.writeExec; $('#cMin').value = c.minInt; $('#cPoll').value = c.poll; $('#cGoal').value = c.goal;
+  $('#cCC').value = c.cc; $('#cLen').value = c.mobLen; $('#cLock').checked = c.lockRow; $('#cScope').checked = c.scopeOwn !== false; $('#cExec').checked = c.writeExec; $('#cMin').value = c.minInt; $('#cPoll').value = c.poll; $('#cGoal').value = c.goal;
   $('#cWa').value = c.waMode; $('#cMsg').value = c.waMsg; $('#cMail').value = c.mailMode; $('#cSubj').value = c.mailSubj;
   $('#cBrandInfo').textContent = `${S.brands.length} marcas en ${S.cats.length} líneas. Las de «Por definir» se pueden reasignar en la versión real.`;
   $('#cBrandCat').innerHTML = S.cats.map(x => `<option>${esc(x)}</option>`).join('');
@@ -1906,8 +2064,8 @@ $('#bCfgOk').onclick = async () => {
   if (isAdmin()) {
     $('#bCfgOk').disabled = true;
     try {
-      S.cfg = await call('api_saveCfg', S.token, { cc: $('#cCC').value, mobLen: $('#cLen').value, lockRow: $('#cLock').checked, writeExec: $('#cExec').checked, minInt: $('#cMin').value, poll: $('#cPoll').value, goal: $('#cGoal').value, waMode: $('#cWa').value, waMsg: $('#cMsg').value, mailMode: $('#cMail').value, mailSubj: $('#cSubj').value });
-      startPoll(); renderNow(); renderPanel(); toast('Configuración guardada para todo el equipo');
+      S.cfg = await call('api_saveCfg', S.token, { cc: $('#cCC').value, mobLen: $('#cLen').value, lockRow: $('#cLock').checked, scopeOwn: $('#cScope').checked, writeExec: $('#cExec').checked, minInt: $('#cMin').value, poll: $('#cPoll').value, goal: $('#cGoal').value, waMode: $('#cWa').value, waMsg: $('#cMsg').value, mailMode: $('#cMail').value, mailSubj: $('#cSubj').value });
+      startPoll(); renderNow(); renderPanel(); toast('Configuración guardada para todo el equipo. La visibilidad se aplica al volver a entrar.');
     } catch (e) { toast(e.message, true); }
     $('#bCfgOk').disabled = false;
   }
@@ -1959,10 +2117,10 @@ function setTab(t) {
   S.tab = t;
   $$('#mainTabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
   moveInd();
-  $('#vDay').classList.toggle('on', t === 'day'); $('#vList').classList.toggle('on', t === 'list'); $('#dash').classList.toggle('on', t === 'dash'); $('#rep').classList.toggle('on', t === 'rep');
+  $('#vDay').classList.toggle('on', t === 'day'); $('#vBrands').classList.toggle('on', t === 'brands'); $('#vList').classList.toggle('on', t === 'list'); $('#dash').classList.toggle('on', t === 'dash'); $('#rep').classList.toggle('on', t === 'rep');
   $('#toolbar').hidden = t !== 'list'; $('#strip').hidden = t !== 'list';
   updDayBadge();
-  if (t === 'day') renderDay(); else if (t === 'dash') renderDash(); else if (t === 'rep') renderRep(false); else { renderNow(); renderPanel(true); }
+  if (t === 'day') renderDay(); else if (t === 'brands') renderBrands(); else if (t === 'dash') renderDash(); else if (t === 'rep') renderRep(false); else { renderNow(); renderPanel(true); }
 }
 $$('#mainTabs button').forEach(b => b.onclick = () => setTab(b.dataset.tab));
 function applyPanel() { const small = innerWidth <= 1000; $('#panel').classList.toggle('hide', !small && !UI.panel); $('#panel').classList.toggle('hide-m', small && !UI.panelM); }
@@ -1974,15 +2132,15 @@ $('#bReload').onclick = () => { flushAll(); loadAll(false); };
 let qT;
 $('#q').addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(() => { applyFilter(); $('#grid').scrollTop = 0; }, 160); });
 ['#fFrom', '#fTo'].forEach(s => $(s).addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(() => { applyFilter(); $('#grid').scrollTop = 0; if (S.view.length && (!S.active || S.active._vi == null)) setActive(0); }, 250); }));
-['#fTipo', '#fCat'].forEach(s => $(s).addEventListener('change', () => { applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0); }));
+['#fTipo', '#fCat', '#fRel'].forEach(s => $(s).addEventListener('change', () => { applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0); }));
 $('#fMarca').addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(() => { applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0); }, 250); });
 $('#hideDep').checked = UI.hideDep;
 $('#hideDep').onchange = () => { UI.hideDep = $('#hideDep').checked; saveUI(); applyFilter(); };
-$('#bClear').onclick = () => { $('#q').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; $('#fTipo').value = ''; $('#fCat').value = ''; $('#fMarca').value = ''; S.st = 'all'; $$('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.st === 'all')); applyFilter(); if (S.active && S.active._vi != null) ensureVisible(S.active._vi); };
+$('#bClear').onclick = () => { $('#q').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; $('#fTipo').value = ''; $('#fCat').value = ''; $('#fMarca').value = ''; $('#fRel').value = ''; S.st = 'all'; $$('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.st === 'all')); applyFilter(); if (S.active && S.active._vi != null) ensureVisible(S.active._vi); };
 $('#chips').addEventListener('click', e => { const c = e.target.closest('.chip'); if (!c) return; S.st = c.dataset.st; $$('#chips .chip').forEach(x => x.classList.toggle('on', x === c)); applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0); });
 $('#grid').addEventListener('scroll', render, { passive: true });
 window.addEventListener('resize', () => { render(); applyPanel(); moveInd(); });
-function actArg(b) { return b.dataset.act === 'copy' ? b.dataset.f : (['res', 'tipo', 'brand'].includes(b.dataset.act) ? b.dataset.n : (b.dataset.n != null ? +b.dataset.n : null)); }
+function actArg(b) { return b.dataset.act === 'copy' ? b.dataset.f : (['res', 'tipo', 'brand', 'brandrel', 'brandrm', 'addrel'].includes(b.dataset.act) ? b.dataset.n : (b.dataset.n != null ? +b.dataset.n : null)); }
 $('#gbody').addEventListener('click', e => {
   const rowE = e.target.closest('.row'); if (!rowE) return;
   const i = +rowE.dataset.i, r = S.view[i];
