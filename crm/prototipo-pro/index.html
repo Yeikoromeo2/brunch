@@ -459,6 +459,60 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
 [data-brand]:hover .lb{color:var(--accent)}
 .field select{max-width:150px}
 
+/* ventas y OV */
+.ovlist{display:flex;flex-direction:column;gap:6px}
+.ovi{display:grid;grid-template-columns:1fr auto;gap:4px 8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface2)}
+.ovi b{font:600 12px var(--fm)}
+.ovi .m{font-size:11px;color:var(--muted);grid-column:1/-1}
+.ovi .acts2{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.ovi .acts2 .btn{height:26px;padding:0 9px;font-size:11px}
+.est{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.est i{width:7px;height:7px;border-radius:50%}
+.est.Despachando{background:color-mix(in srgb,var(--warn) 15%,var(--surface));color:var(--warn-ink)} .est.Despachando i{background:var(--warn)}
+.est.Incidencia{background:color-mix(in srgb,var(--crit) 12%,var(--surface));color:var(--crit)} .est.Incidencia i{background:var(--crit)}
+.est.Terminado{background:color-mix(in srgb,var(--good) 12%,var(--surface));color:var(--good-ink)} .est.Terminado i{background:var(--good)}
+.est.Anulada{background:var(--surface3);color:var(--muted);text-decoration:line-through} .est.Anulada i{background:var(--muted)}
+.ovform{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid var(--accent);border-radius:10px;background:color-mix(in srgb,var(--accent) 5%,var(--surface));margin-top:10px;animation:rise .25s both}
+.ovform .two{gap:8px}
+.ovline{display:grid;grid-template-columns:1fr 130px 28px;gap:6px;align-items:center}
+.ovline b{font-size:13px}
+.ovline .ib{width:28px;height:28px}
+.ovtot{display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--line2);padding-top:8px;font-size:12px;color:var(--ink2)}
+.ovtot b{font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums}
+.bellwrap{position:relative}
+.bellct{position:absolute;top:1px;right:1px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--crit);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;pointer-events:none}
+.bellpop{position:absolute;right:0;top:40px;z-index:60;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);width:380px;max-width:calc(100vw - 24px);max-height:70vh;overflow:auto;animation:rise .18s both}
+.bellpop[hidden]{display:none}
+.bellpop .hd{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--surface)}
+.bellpop .hd b{font-size:14px}
+.nt{display:grid;grid-template-columns:4px 1fr;gap:10px;padding:10px 14px 10px 0;border-bottom:1px solid var(--line)}
+.nt .lv{border-radius:0 3px 3px 0}
+.nt .lv.l0{background:var(--line2)} .nt .lv.l1{background:var(--warn)} .nt .lv.l2{background:var(--crit)}
+.nt .tt{display:flex;justify-content:space-between;gap:8px;font-size:12px}
+.nt .tt b{font:600 12px var(--fm)}
+.nt .ds{font-size:12px;color:var(--ink2);margin:2px 0 6px}
+.nt .ac{display:flex;gap:6px;flex-wrap:wrap}
+.nt .ac .btn{height:26px;padding:0 9px;font-size:11px}
+.sfil{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.delta{font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:3px}
+.delta.up{color:var(--good-ink)} .delta.dn{color:var(--crit)} .delta.eq{color:var(--muted)}
+.kpi.hero2 .delta{color:#fff;background:rgba(255,255,255,.16);padding:1px 6px;border-radius:4px}
+.goal{display:flex;flex-direction:column;gap:8px}
+.goal .tr{height:12px;border-radius:6px;background:var(--surface3);overflow:hidden;position:relative}
+.goal .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--s1);transform-origin:left;animation:grow .9s cubic-bezier(.2,.8,.2,1) both}
+.goal .tr u{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--s1) 35%,transparent) 0 4px,transparent 4px 8px)}
+.goal .rw{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);flex-wrap:wrap;gap:6px}
+.share{display:grid;grid-template-columns:minmax(90px,140px) 1fr 82px 52px 70px;gap:8px;align-items:center;font-size:12px;padding:5px 0;cursor:pointer;border-radius:6px}
+.share:hover .nm2{color:var(--accent)}
+.share.hd2{cursor:default;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.share .nm2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.share .tr{height:14px;border-radius:4px;background:var(--surface3);overflow:hidden}
+.share .tr i{display:block;height:100%;background:var(--s1);border-radius:4px;transform-origin:left;animation:grow .8s cubic-bezier(.2,.8,.2,1) both}
+.share .r{text-align:right;font-variant-numeric:tabular-nums}
+.share .r small{display:block;color:var(--muted);font-size:10px}
+.stk3{display:flex;height:18px;border-radius:5px;overflow:hidden;gap:2px}
+.stk3 i{display:block;height:100%}
+
 /* modales, avisos, tooltip */
 .modal-bg{position:fixed;inset:0;background:rgba(10,16,22,.42);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
 .modal-bg.on{display:flex}
@@ -547,6 +601,8 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
   <symbol id="i-building" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17M16 9h3a1 1 0 0 1 1 1v11M3 21h18M8 7h4M8 11h4M8 15h4"/></symbol>
   <symbol id="i-layers" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></symbol>
   <symbol id="i-tag" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8ZM7.5 7.5h.01"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-msg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
 </svg>
 
@@ -582,6 +638,8 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
   </div>
   <button class="btn" id="bResv" title="Reservar un rango de filas"><svg><use href="#i-flag"/></svg><span class="hide-sm hide-md">Reservar filas</span></button>
   <span class="vsep hide-sm"></span>
+  <span class="bellwrap"><button class="btn ghost" id="bBell" title="OV por cerrar"><svg><use href="#i-bell"/></svg></button><span class="bellct" id="bellCt" hidden></span>
+    <div class="bellpop" id="bellPop" hidden></div></span>
   <button class="btn ghost" id="bReload" title="Recargar datos"><svg><use href="#i-refresh"/></svg></button>
   <button class="btn ghost" id="bPanel" title="Mostrar u ocultar el panel"><svg><use href="#i-panel"/></svg></button>
   <button class="btn ghost hide-sm" id="bKeys" title="Atajos de teclado"><svg><use href="#i-key"/></svg></button>
@@ -684,6 +742,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
         <div class="two">
           <label class="fl"><span>Intentos para reporte «No contestaron»</span><input type="number" id="cMin" min="1" max="20"></label>
           <label class="fl"><span>Meta diaria de gestiones</span><input type="number" id="cGoal" min="1" max="500"></label>
+          <label class="fl"><span>Meta mensual de venta por ejecutivo (S/ sin IGV)</span><input type="number" id="cSGoal" min="0" step="1000"></label>
         </div>
         <label class="fl"><span>Sincronizar cada (seg.)</span><input type="number" id="cPoll" min="10" max="300"></label>
         <label class="fl"><span>Abrir WhatsApp en</span><select id="cWa"><option value="web">WhatsApp Web (no requiere instalar)</option><option value="wame">Automático (wa.me)</option><option value="app">Aplicación de escritorio</option></select></label>
@@ -808,10 +867,32 @@ for (let i = 0; i < N; i++) {
     if (rnd() < .85) { const n = 2 + Math.floor(rnd() * 4), set = new Set(); while (set.size < n) set.add(pick(PROFILE[tipo])); t.brands = [...set]; t.brands.forEach(b => { const x = rnd(); t.bmeta[b] = { rel: x < .6 ? 'habitual' : x < .85 ? 'ocasional' : 'interes', by: who, d: addDays(TODAY, -(dAgo + Math.floor(rnd() * 160))) }; }); }
   }
 }
-let CFG = { cc: '51', mobLen: 9, lockRow: true, scopeOwn: true, minInt: 2, poll: 20, goal: 40, waMode: 'web', waMsg: '', mailMode: 'outlook', mailSubj: '' };
+let CFG = { cc: '51', mobLen: 9, lockRow: true, scopeOwn: true, minInt: 2, poll: 20, goal: 40, salesGoal: 60000, waMode: 'web', waMsg: '', mailMode: 'outlook', mailSubj: '' };
 let USERS = [{ row: 2, name: 'Ana', role: 'admin', active: true, pin: '1234' }, { row: 3, name: 'Harold', role: 'ejecutivo', active: true, pin: '1111' }, { row: 4, name: 'Luis', role: 'ejecutivo', active: true, pin: '2222' }];
 let ASSIGNS = [{ id: 'rv1', user: 'Harold', from: 2, to: 21, by: 'Ana', date: addDays(TODAY, -10) }, { id: 'rv2', user: 'Luis', from: 22, to: 41, by: 'Ana', date: addDays(TODAY, -10) }];
 const SESS = {}, SHEETS = [];
+/* órdenes de venta (OV) y sus líneas por marca, montos sin IGV; 15 meses de historia inventada */
+const dsv = s => Math.round((new Date(TODAY + 'T12:00:00') - new Date(s + 'T12:00:00')) / 864e5);
+const ORDERS = [], SALES = [];
+let ovSeq = 12040;
+ROWS.forEach(r => {
+  const t = TRACK[r.k];
+  if (t.buy && !(t.brands || []).length) { const b = pick(PROFILE[t.tipo || 'Híbrido']); t.brands = [b]; t.bmeta[b] = { rel: 'habitual', by: t.own || owner(r.r), d: TODAY }; }
+  if (!(t.brands || []).length) return;
+  const n = (t.buy ? 2 : 0) + Math.floor(rnd() * 6), by = t.own || owner(r.r);
+  for (let i = 0; i < n; i++) {
+    const d = addDays(TODAY, -Math.floor(Math.pow(rnd(), 1.3) * 455)), ov = 'OV-' + (ovSeq++), nl = 1 + Math.floor(rnd() * Math.min(3, t.brands.length)), set = new Set();
+    while (set.size < nl) set.add(pick(t.brands));
+    let tot = 0;
+    [...set].forEach(b => { const m = Math.round((350 + rnd() * rnd() * 11000) / 10) * 10; tot += m; SALES.push({ ov, k: r.k, d, b, m, by }); });
+    const age = dsv(d), x = rnd();
+    const est = age <= 9 ? (x < .18 ? 'Incidencia' : 'Despachando') : (x < .04 ? 'Anulada' : 'Terminado');
+    ORDERS.push({ ov, k: r.k, d, tot, est, by, fin: est === 'Terminado' ? addDays(d, 2 + Math.floor(rnd() * 5)) : '', finBy: est === 'Terminado' ? by : '', nota: est === 'Incidencia' ? 'Cliente reporta falta de un ítem' : '' });
+  }
+  const mine = ORDERS.filter(o => o.k === r.k && o.est !== 'Anulada');
+  if (mine.length) { t.buy = true; t.monto = String(mine.reduce((a, o) => a + o.tot, 0)); }
+});
+ORDERS.sort((a, b) => a.d.localeCompare(b.d));
 let SEQ = 1;
 const who = tk => { const n = SESS[tk]; if (!n) throw new Error('SESION: Tu sesión venció, vuelve a ingresar.'); const u = USERS.find(x => x.name === n && x.active); if (!u) throw new Error('SESION: Usuario inactivo.'); return u; };
 const state = row => ({ k: row.k, r: row.r, v: row.v.slice(), t: JSON.parse(JSON.stringify(TRACK[row.k])) });
@@ -827,10 +908,10 @@ const API = {
   },
   api_logout(tk) { delete SESS[tk]; return true; },
   api_load(tk) {
-    const u = who(tk), vis = ROWS.filter(r => inScope(u, r)), tr = {};
+    const u = who(tk), vis = ROWS.filter(r => inScope(u, r)), tr = {}, ks = new Set(vis.map(r => r.k));
     vis.forEach(r => tr[r.k] = TRACK[r.k]);
     return { me: { name: u.name, role: u.role }, cfg: CFG, scoped: vis.length < ROWS.length, total: ROWS.length, header: HEADER, C, assigns: ASSIGNS, users: USERS.filter(x => x.active).map(x => x.name), seq: SEQ, lastRow: N + 1, today: TODAY, sheet: 'Hoja1',
-      rows: vis.map(r => [r.k, r.r, r.v]), track: tr, brands: BRANDS, warnings: [] };
+      rows: vis.map(r => [r.k, r.r, r.v]), track: tr, brands: BRANDS, orders: ORDERS.filter(o => ks.has(o.k)), sales: SALES.filter(x => ks.has(x.k)), warnings: [] };
   },
   api_changes(tk) { who(tk); return { assigns: ASSIGNS, today: TODAY, reload: false, changes: [], seq: SEQ }; },
   api_action(tk, p) {
@@ -866,6 +947,37 @@ const API = {
     t.last = now;
     SEQ++;
     return { ok: true, state: state(row) };
+  },
+  api_addOrder(tk, p) {
+    const u = who(tk), row = ROWS.find(r => r.k === p.k); if (!row) throw new Error('Cliente no encontrado.');
+    if (!inScope(u, row)) throw new Error('Este cliente no está en tu cartera.');
+    const ov = String(p.ov || '').trim().toUpperCase();
+    if (!ov) throw new Error('El número de OV es obligatorio.');
+    if (!/^[A-Z0-9][A-Z0-9\-\/]{2,24}$/.test(ov)) throw new Error('La OV solo puede tener letras, números, guiones o barras (3 a 25 caracteres).');
+    const dup = ORDERS.find(o => o.ov === ov);
+    if (dup) { const c = ROWS.find(r => r.k === dup.k); throw new Error(`La OV ${ov} ya está registrada para ${c ? c.v[C.legal] : 'otro cliente'}.`); }
+    const lines = (p.lines || []).map(l => ({ b: l.b, m: Math.round((+l.m || 0) * 100) / 100 })).filter(l => l.m > 0);
+    if (!lines.length) throw new Error('Agrega al menos una marca con su monto sin IGV.');
+    lines.forEach(l => { if (!BRANDS.some(x => x.m === l.b)) throw new Error('La marca ' + l.b + ' no está en el catálogo.'); });
+    const d = /^\d{4}-\d{2}-\d{2}$/.test(p.d || '') ? p.d : TODAY, tot = lines.reduce((a, l) => a + l.m, 0), t = TRACK[row.k], now = nowStr();
+    const o = { ov, k: row.k, d, tot, est: 'Despachando', by: u.name, fin: '', finBy: '', nota: String(p.nota || '') };
+    ORDERS.push(o); const ls = lines.map(l => ({ ov, k: row.k, d, b: l.b, m: l.m, by: u.name })); SALES.push(...ls);
+    t.buy = true; t.rev = true; t.monto = String((+t.monto || 0) + tot); if (!t.own) t.own = u.name; if (!t.first) t.first = now; t.last = now;
+    t.bmeta = t.bmeta || {}; lines.forEach(l => { if (!t.brands.includes(l.b)) t.brands.push(l.b); t.bmeta[l.b] = { rel: 'habitual', by: u.name, d: TODAY }; });
+    t.hist.unshift({ d: now, who: u.name, txt: `Registró ${ov} · ${lines.map(l => l.b + ' S/ ' + l.m.toLocaleString('es-PE')).join(', ')} · total S/ ${tot.toLocaleString('es-PE')} sin IGV · Despachando`, k: 'cart' });
+    SEQ++; return { order: o, lines: ls, state: state(row) };
+  },
+  api_setOrder(tk, ov, est, nota) {
+    const u = who(tk), o = ORDERS.find(x => x.ov === ov); if (!o) throw new Error('OV no encontrada.');
+    const row = ROWS.find(r => r.k === o.k); if (!inScope(u, row)) throw new Error('Esta OV no es de tu cartera.');
+    if (!['Despachando', 'Incidencia', 'Terminado', 'Anulada'].includes(est)) throw new Error('Estado no válido.');
+    if ((o.est === 'Terminado' || o.est === 'Anulada') && u.role !== 'admin') throw new Error('Solo el administrador puede reabrir una OV cerrada.');
+    if (est === 'Anulada' && u.role !== 'admin') throw new Error('Solo el administrador puede anular una OV.');
+    const prev = o.est; o.est = est; if (nota != null) o.nota = String(nota);
+    if (est === 'Terminado') { o.fin = TODAY; o.finBy = u.name; } else { o.fin = ''; o.finBy = ''; }
+    const t = TRACK[o.k]; t.monto = String(ORDERS.filter(x => x.k === o.k && x.est !== 'Anulada').reduce((a, x) => a + x.tot, 0));
+    t.hist.unshift({ d: nowStr(), who: u.name, txt: `${o.ov}: ${prev} → ${est}${o.nota ? ' · ' + o.nota : ''}`, k: est === 'Terminado' ? 'check' : est === 'Incidencia' ? 'alert' : 'cart' });
+    SEQ++; return { order: o, state: state(row) };
   },
   api_activity(tk) {
     who(tk);
@@ -907,7 +1019,7 @@ const API = {
   },
   api_saveCfg(tk, c) {
     const u = who(tk); if (u.role !== 'admin') throw new Error('Solo el administrador.');
-    CFG = Object.assign({}, CFG, c, { mobLen: +c.mobLen || 9, minInt: Math.max(1, +c.minInt || 1), poll: Math.max(10, +c.poll || 20), goal: Math.max(1, +c.goal || 40), cc: String(c.cc).replace(/\D/g, '') });
+    CFG = Object.assign({}, CFG, c, { mobLen: +c.mobLen || 9, minInt: Math.max(1, +c.minInt || 1), poll: Math.max(10, +c.poll || 20), goal: Math.max(1, +c.goal || 40), salesGoal: Math.max(0, +c.salesGoal || 0), cc: String(c.cc).replace(/\D/g, '') });
     return CFG;
   }
 };
@@ -964,20 +1076,21 @@ function call(fn, ...args) {
 
 /* ---------- estado ---------- */
 const S = { token: '', me: null, cfg: {}, header: [], C: {}, rows: [], byKey: new Map(), view: [], active: null, st: 'all', tab: 'list',
-  assigns: [], users: [], seq: 0, lastRow: 0, today: '', pending: 0, cmtT: {}, needReload: false, activity: null, activityAt: 0, rep: { type: 'noc' }, sheets: [], fixOpen: null, phDraft: '', brands: [], catOf: {}, cats: [], catOpen: false, addRel: 'habitual', scoped: false, total: 0, bf: { q: '', cat: '', marca: '', rel: '', exec: '', tipo: '', empty: false, mode: 'cli' } };
+  assigns: [], users: [], seq: 0, lastRow: 0, today: '', pending: 0, cmtT: {}, needReload: false, activity: null, activityAt: 0, rep: { type: 'noc' }, sheets: [], fixOpen: null, phDraft: '', brands: [], catOf: {}, cats: [], catOpen: false, addRel: 'habitual', scoped: false, total: 0, bf: { q: '', cat: '', marca: '', rel: '', exec: '', tipo: '', empty: false, mode: 'cli' }, orders: [], sales: [], ov: null, dashMode: 'gest', sf: { per: 'mes', marca: '', cat: '', exec: '', tipo: '' } };
 
 /* ---------- utilidades ---------- */
 const norm = s => String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const icon = id => `<svg><use href="#i-${id}"/></svg>`;
 const fmtN = n => (n || 0).toLocaleString('es-PE');
-const money = n => 'S/ ' + Number(n || 0).toLocaleString('es-PE');
+const money = n => 'S/ ' + Math.round(Number(n) || 0).toLocaleString('es-PE');
 const pct = (a, b) => b ? Math.round(a / b * 1000) / 10 : 0;
 const p2 = n => String(n).padStart(2, '0');
 const nowStr = () => { const d = new Date(); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}`; };
 const dayStr = d => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`;
 const ddmm = s => s ? s.slice(8, 10) + '/' + s.slice(5, 7) : '';
 const tomorrow = () => { const d = new Date(); d.setDate(d.getDate() + 1); return dayStr(d); };
+const addDays = (s, n) => { const d = new Date(s + 'T12:00:00'); d.setDate(d.getDate() + n); return dayStr(d); };
 const daysSince = s => s ? Math.round((new Date(S.today + 'T12:00:00') - new Date(String(s).slice(0, 10) + 'T12:00:00')) / 864e5) : 9999;
 const val = (r, k) => S.C[k] == null ? '' : String(r.v[S.C[k]] == null ? '' : r.v[S.C[k]]);
 const status = r => val(r, 'comment').trim() ? 'att' : (r.t.rev ? 'rev' : 'none');
@@ -1160,7 +1273,7 @@ async function loadAll(first) {
   try {
     const d = await call('api_load', S.token);
     S.me = d.me; S.cfg = d.cfg; S.header = d.header; S.C = d.C; S.assigns = d.assigns; S.users = d.users;
-    S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false; S.brands = d.brands; S.scoped = !!d.scoped; S.total = d.total || d.rows.length; fillBrandLists();
+    S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false; S.brands = d.brands; S.orders = d.orders || []; S.sales = d.sales || []; S.scoped = !!d.scoped; S.total = d.total || d.rows.length; fillBrandLists();
     S.rows = d.rows.map(([k, r, v]) => ({ k, r, v, t: Object.assign(emptyT(), d.track[k] || {}), hay: null, _vi: null }));
     S.byKey = new Map(S.rows.map(r => [r.k, r]));
     $('#login').hidden = true;
@@ -1172,7 +1285,7 @@ async function loadAll(first) {
     S.active = null;
     if (r && r._vi != null) { setActive(r._vi, first); if (!first) $('#grid').scrollTop = keepTop; }
     else if (S.view.length) setActive(0, true);
-    setTab(first ? 'day' : S.tab);
+    setTab(first ? 'day' : S.tab); updBell();
     d.warnings.forEach(w => toast(w, true));
     setSync('', 'Sincronizado');
     startPoll();
@@ -1336,13 +1449,18 @@ function act(r, a, n) {
     const t = val(r, n).trim(); if (!t) return;
     copyText(t).then(ok => toast(ok ? 'Copiado: ' + t : 'No se pudo copiar', !ok));
   } else if (a === 'rev') send(r, { op: 'rev', val: !r.t.rev });
-  else if (a === 'buy') send(r, { op: 'buy', val: !r.t.buy }).then(ok => ok && toast(r.t.buy ? '★ Compra con éxito registrada. Anota el monto en el panel.' : 'Compra desmarcada'));
+  else if (a === 'buy') { if (lk) return toast(lk, true); if (!S.ov || S.ov.k !== r.k) act(r, 'ovopen'); toast(r.t.buy ? 'Para sumar otra compra registra su OV.' : 'Registra la OV con sus marcas y montos sin IGV para marcar la compra.'); }
   else if (a === 'res') {
     const v = n || '';
     send(r, { op: 'result', val: v, date: v === 'Volver a llamar' ? (r.t.next || tomorrow()) : '' });
     if (v === 'Número errado') { S.fixOpen = r; S.phDraft = ''; }
   } else if (a === 'unlock') { if (confirm('¿Liberar este cliente para que otra persona lo pueda gestionar?')) send(r, { op: 'unlock' }); }
   else if (a === 'brandfocus') { const i = $('#pBrand'); if (i) { i.focus(); i.scrollIntoView({ block: 'center' }); } }
+  else if (a === 'ovopen') { if (lk) return toast(lk, true); S.ov = S.ov && S.ov.k === r.k ? null : { k: r.k, num: '', date: S.today, nota: '', lines: brandsBy(r, 'habitual').length === 1 ? [{ b: brandsBy(r, 'habitual')[0], m: '' }] : [] }; renderPanel(true); const i = $('#oNum'); if (i) i.focus(); }
+  else if (a === 'ovpick') { const ex = S.ov.lines.findIndex(l => l.b === n); if (ex >= 0 && !S.ov.lines[ex].m) S.ov.lines.splice(ex, 1); else ovLineAdd(n); S.ov.num = $('#oNum').value; renderPanel(true); const i = $(`.oamt[data-i="${S.ov.lines.findIndex(l => l.b === n)}"]`); if (i) i.focus(); }
+  else if (a === 'ovrm') { S.ov.num = $('#oNum').value; S.ov.lines.splice(+n, 1); renderPanel(true); }
+  else if (a === 'ovsave') ovSave(r);
+  else if (a === 'ovst') { const [ov, est] = n.split('|'); if (est === 'Anulada' && !confirm('¿Anular ' + ov + '? Deja de contar en las ventas.')) return; ovSetState(ov, est); }
   else if (a === 'cmtadd') { const ta = $('#pCmt'); if (!ta || !ta.value.trim()) { if (ta) ta.focus(); return toast('Escribe el comentario primero.', true); } const v = ta.value; ta.value = ''; ta.blur(); addComment(r, v); }
   else if (a === 'tipo') { send(r, { op: 'tipo', val: r.t.tipo === n ? '' : n }); }
   else if (a === 'brand') { const on = !(r.t.brands || []).includes(n); send(r, { op: 'brand', val: { b: n, on, rel: S.addRel } }).then(ok => ok && toast(on ? `${n}: ${REL[S.addRel].l.toLowerCase()}` : 'Marca quitada: ' + n)); }
@@ -1496,7 +1614,7 @@ function setActive(i, scroll) {
   if (!S.view.length) return;
   i = Math.max(0, Math.min(S.view.length - 1, i));
   const prev = S.active; S.active = S.view[i];
-  if (prev && prev !== S.active) { if (S.cmtT[prev.k]) flushComment(prev); const e = rowEl(prev); if (e) e.classList.remove('active'); S.fixOpen = null; S.phDraft = ''; }
+  if (prev && prev !== S.active) { if (S.cmtT[prev.k]) flushComment(prev); const e = rowEl(prev); if (e) e.classList.remove('active'); S.fixOpen = null; S.phDraft = ''; S.ov = null; }
   const e = rowEl(S.active); if (e) e.classList.add('active');
   if (scroll) ensureVisible(i);
   LS.set('pos', S.active.k);
@@ -1520,7 +1638,7 @@ function renderPanel(force) {
   const p = $('#panel'), r = S.active;
   if (!r) { p.innerHTML = `<div class="p-empty"><span class="ic">${icon('list')}</span><b>Selecciona un cliente</b>Haz clic en una fila o usa las flechas ↑ ↓.</div>`; return; }
   const ae = document.activeElement;
-  if (!force && ae && (ae.id === 'pCmt' || ae.id === 'pNewPhone' || ae.id === 'pBrand') && p.dataset.k === r.k) { updBadges(); return; }
+  if (!force && ae && (ae.id === 'pCmt' || ae.id === 'pNewPhone' || ae.id === 'pBrand' || /^o(Num|Date|Quick|Brand|Nota)$/.test(ae.id) || (ae.classList && ae.classList.contains('oamt'))) && p.dataset.k === r.k) { updBadges(); return; }
   p.dataset.k = r.k;
   const ps = phonesOf(r), ms = parseMails(val(r, 'mail')), lk = lockedBy(r), dis = lk ? 'disabled' : '', tr = tier(r), sc = score(r);
   const kv = S.header.map((h, j) => {
@@ -1550,13 +1668,14 @@ function renderPanel(force) {
       <button class="btn tog${r.t.rev ? ' on-rev' : ''}" data-act="rev" ${dis}>${icon('eye')}${r.t.rev ? 'Revisado' : 'Marcar revisado'}</button>
       <button class="btn tog${r.t.buy ? ' on-buy' : ''}" data-act="buy" ${dis}>${icon('cart')}${r.t.buy ? 'Compró' : 'Marcar compra'}</button>
     </div>
-    ${r.t.buy ? `<div class="sub"><label class="fl"><span>Monto de la compra (S/)</span><input class="txtin" id="pMonto" inputmode="decimal" value="${esc(r.t.monto)}" placeholder="Ej.: 4500" ${dis}></label></div>` : ''}</div>
+    ${r.t.buy ? `<div class="hint">Total comprado: <b>${money(r.t.monto)}</b> sin IGV en ${ordersOf(r.k).filter(o => o.est !== 'Anulada').length} OV. El monto sale de las OV registradas.</div>` : ''}</div>
     <div class="p-sec"><h3><span>Resultado del contacto</span></h3><div class="rchips">
       ${RES_LIST.map(x => `<button class="rchip${r.t.res === x ? ' on' : ''}" style="--rc:${RES[x].c}" data-act="res" data-n="${esc(x)}" ${dis}><i style="background:${RES[x].c}"></i>${esc(x)}<kbd>${RES[x].k}</kbd></button>`).join('')}
     </div>
     ${r.t.res === 'Volver a llamar' ? `<div class="sub" style="flex-direction:row;align-items:center;gap:8px">${icon('cal')}<span style="white-space:nowrap">Volver a llamar el</span><input type="date" class="datein" id="pNext" value="${esc(r.t.next)}" ${dis}></div>` : ''}
     ${r.t.res === 'No interesado' ? `<div class="sub"><label class="fl"><span>¿Por qué no le interesa?</span><select class="selin" id="pMotivo" ${dis}><option value="">Elige un motivo…</option>${MOTIVOS.map(m => `<option ${r.t.motivo === m ? 'selected' : ''}>${esc(m)}</option>`).join('')}</select></label></div>` : ''}
     ${r.t.res === 'Número errado' ? fixBox : ''}</div>
+    ${ovHTML(r, lk, dis)}
     ${bizHTML(r, lk, dis)}
     <div class="p-sec"><h3><span>${esc(S.header[S.C.comment])}</span></h3>
       ${val(r, 'comment') ? `<div class="curcmt">${val(r, 'comment').split(' | ').map(x => `<p>${esc(x)}</p>`).join('')}</div>` : ''}
@@ -1588,6 +1707,217 @@ function bizHTML(r, lk, dis) {
   ${rec.length ? `<div class="p-sec"><h3><span>Qué ofrecerle</span><button class="linkbtn" data-act="offercopy">${icon('copy')}Copiar</button></h3>
     <div class="offers">${rec.map((o, i) => `<div class="offer" style="animation-delay:${i * 40}ms"><b>${esc(o.m)}</b><span>${esc(o.why)}${o.peers ? ' · la venden ' + o.peers + ' canales parecidos' : ''}</span></div>`).join('')}</div></div>` : ''}`;
 }
+
+/* ---------- OV: registro rápido por marca y seguimiento posventa ---------- */
+const OPEN = o => o.est === 'Despachando' || o.est === 'Incidencia';
+const ovAge = o => daysSince(o.d), ovLvl = o => ovAge(o) >= 7 ? 2 : ovAge(o) >= 3 ? 1 : 0;
+const ordersOf = k => S.orders.filter(o => o.k === k).sort((a, b) => b.d.localeCompare(a.d) || b.ov.localeCompare(a.ov));
+const linesOf = ov => S.sales.filter(x => x.ov === ov);
+const openOrders = () => S.orders.filter(o => OPEN(o) && S.byKey.has(o.k)).sort((a, b) => a.d.localeCompare(b.d));
+function ovHTML(r, lk, dis) {
+  const os = ordersOf(r.k), f = S.ov && S.ov.k === r.k ? S.ov : null, quick = [...brandsBy(r, 'habitual'), ...brandsBy(r, 'ocasional'), ...brandsBy(r, 'interes')];
+  const tot = f ? f.lines.reduce((a, l) => a + (+l.m || 0), 0) : 0;
+  return `<div class="p-sec"><h3><span>Ventas (OV) · sin IGV</span>${lk ? '' : `<button class="linkbtn" data-act="ovopen">${icon(f ? 'x' : 'plus')}${f ? 'Cancelar' : 'Registrar venta'}</button>`}</h3>
+    ${f ? `<div class="ovform">
+      <div class="two"><label class="fl"><span>N° de OV *</span><input class="txtin" id="oNum" placeholder="Ej.: OV-12345" value="${esc(f.num)}" autocomplete="off"></label><label class="fl"><span>Fecha</span><input type="date" class="datein" id="oDate" value="${esc(f.date)}"></label></div>
+      ${quick.length ? `<div class="bsel">${quick.map(b => `<button class="bchip${f.lines.some(l => l.b === b) ? ' on' : ''}" data-act="ovpick" data-n="${esc(b)}">${icon('plus')}${esc(b)}</button>`).join('')}</div>` : ''}
+      <input class="txtin" id="oQuick" placeholder="Rápido: JBL 1200, Lenovo 5400 y Enter">
+      ${f.lines.map((l, i) => `<div class="ovline"><b>${esc(l.b)}</b><input class="txtin oamt" data-i="${i}" inputmode="decimal" placeholder="Monto sin IGV" value="${l.m || ''}"><button class="ib" data-act="ovrm" data-n="${i}" title="Quitar">×</button></div>`).join('')}
+      <div class="badd" style="margin:0"><input class="txtin" id="oBrand" list="dlBrands" placeholder="Otra marca… escribe y Enter"></div>
+      <input class="txtin" id="oNota" placeholder="Nota (opcional): recojo, dirección de entrega…" value="${esc(f.nota)}">
+      <div class="ovtot"><span>Total sin IGV · ${f.lines.length} marca${f.lines.length === 1 ? '' : 's'}</span><b id="oTot">${money(tot)}</b></div>
+      <button class="btn primary" data-act="ovsave" style="justify-content:center;height:38px">${icon('check')}Guardar OV · queda en Despachando</button></div>` : ''}
+    ${os.length ? `<div class="ovlist" style="margin-top:${f ? 10 : 0}px">${os.slice(0, 6).map(o => `<div class="ovi"><b>${esc(o.ov)}</b><span class="est ${o.est}"><i></i>${o.est}</span>
+      <span class="m">${ddmm(o.d)}/${o.d.slice(2, 4)} · ${money(o.tot)} · ${linesOf(o.ov).map(x => esc(x.b)).join(', ')}${OPEN(o) ? ` · hace ${ovAge(o)} día${ovAge(o) === 1 ? '' : 's'}` : o.fin ? ` · cerrada ${ddmm(o.fin)} por ${esc(o.finBy)}` : ''}${o.nota ? ' · ' + esc(o.nota) : ''}</span>
+      ${lk ? '' : `<span class="acts2">${OPEN(o) ? `<button class="btn primary" data-act="ovst" data-n="${esc(o.ov)}|Terminado">${icon('check')}Terminado</button>${o.est !== 'Incidencia' ? `<button class="btn" data-act="ovst" data-n="${esc(o.ov)}|Incidencia">${icon('alert')}Incidencia</button>` : `<button class="btn" data-act="ovst" data-n="${esc(o.ov)}|Despachando">Volver a Despachando</button>`}` : isAdmin() ? `<button class="btn" data-act="ovst" data-n="${esc(o.ov)}|Despachando">Reabrir</button>` : ''}${isAdmin() && o.est !== 'Anulada' ? `<button class="btn" data-act="ovst" data-n="${esc(o.ov)}|Anulada">Anular</button>` : ''}</span>`}</div>`).join('')}
+      ${os.length > 6 ? `<div class="hint" style="margin:0">${os.length - 6} OV anteriores más.</div>` : ''}</div>` : f ? '' : '<div class="hint" style="margin:0">Sin ventas registradas.</div>'}</div>`;
+}
+function ovLineAdd(b, m) { const f = S.ov; if (!f) return; const x = f.lines.find(l => l.b === b); if (x) { if (m) x.m = m; } else f.lines.push({ b, m: m || '' }); }
+function parseQuick(txt) {
+  const out = [], bad = [];
+  String(txt).split(/[,;\n]+/).map(x => x.trim()).filter(Boolean).forEach(part => {
+    const mm = part.match(/^(.*?)[\s:=]*(?:s\/\s*)?([\d.,]+)\s*$/i);
+    const name = mm ? mm[1].trim() : part, num = mm ? +mm[2].replace(/,/g, '') : 0;
+    const b = findBrand(name) || S.brands.find(x => norm(x.m).startsWith(norm(name)) && norm(name).length >= 3);
+    if (b) out.push({ b: b.m, m: num || '' }); else bad.push(name);
+  });
+  return { out, bad };
+}
+async function ovSave(r) {
+  const f = S.ov; if (!f) return;
+  const num = ($('#oNum') ? $('#oNum').value : f.num).trim(); f.num = num;
+  if (!num) { $('#oNum') && $('#oNum').focus(); return toast('El número de OV es obligatorio.', true); }
+  const lines = f.lines.filter(l => +l.m > 0);
+  if (!lines.length) return toast('Agrega al menos una marca con su monto sin IGV.', true);
+  if (f.lines.some(l => !(+l.m > 0))) return toast('Hay marcas sin monto: complétalas o quítalas.', true);
+  try {
+    const res = await call('api_addOrder', S.token, { k: r.k, ov: num, d: f.date, nota: ($('#oNota') ? $('#oNota').value : f.nota), lines });
+    S.orders.push(res.order); S.sales.push(...res.lines); S.ov = null;
+    applyState(res.state); renderPanel(true); updBell(); updDayBadge();
+    toast(`${res.order.ov} registrada · ${money(res.order.tot)} sin IGV · queda en Despachando hasta marcar Terminado.`);
+  } catch (e) { toast(e.message, true); }
+}
+async function ovSetState(ov, est) {
+  const o = S.orders.find(x => x.ov === ov); if (!o) return;
+  try {
+    const res = await call('api_setOrder', S.token, ov, est);
+    Object.assign(o, res.order); applyState(res.state); renderPanel(true); updBell(true); updDayBadge();
+    if (S.tab === 'dash' && S.dashMode === 'ventas') renderSales(true);
+    toast(est === 'Terminado' ? `${ov}: proceso terminado` : `${ov}: ${est}`);
+  } catch (e) { toast(e.message, true); }
+}
+function updBell(rerender) {
+  const l = openOrders(), ct = $('#bellCt'); ct.hidden = !l.length; ct.textContent = l.length;
+  ct.style.background = l.some(o => ovLvl(o) === 2) ? 'var(--crit)' : 'var(--warn)';
+  if (rerender && !$('#bellPop').hidden) renderBell();
+}
+function renderBell() {
+  const l = openOrders();
+  $('#bellPop').innerHTML = `<div class="hd"><b>OV por cerrar · ${l.length}</b><span class="sub" style="font-size:11px;color:var(--muted)">Se quitan solo al marcar Terminado</span></div>
+  ${l.length ? l.map(o => { const r = S.byKey.get(o.k), lv = ovLvl(o); return `<div class="nt"><span class="lv l${lv}"></span><div><div class="tt"><b>${esc(o.ov)}</b><span class="est ${o.est}"><i></i>${o.est} · ${ovAge(o)} d</span></div>
+    <div class="ds">${esc(r ? val(r, 'legal') : o.k)} · ${money(o.tot)} · ${linesOf(o.ov).map(x => esc(x.b)).join(', ')}${isAdmin() ? ' · ' + esc(o.by) : ''}${o.nota ? '<br>' + esc(o.nota) : ''}</div>
+    <div class="ac"><button class="btn primary" data-bst="${esc(o.ov)}|Terminado">${icon('check')}Terminado</button>${o.est !== 'Incidencia' ? `<button class="btn" data-bst="${esc(o.ov)}|Incidencia">${icon('alert')}Incidencia</button>` : ''}<button class="btn ghost" data-bopen="${esc(o.k)}">Ver cliente</button></div></div></div>`; }).join('')
+  : '<div class="p-empty" style="padding:28px 16px"><span class="ic">' + icon('check') + '</span><b>Todo cerrado</b>No hay OV pendientes de terminar.</div>'}`;
+}
+$('#bBell').onclick = e => { e.stopPropagation(); const p = $('#bellPop'); p.hidden = !p.hidden; if (!p.hidden) renderBell(); };
+$('#bellPop').addEventListener('click', e => {
+  e.stopPropagation();
+  const b = e.target.closest('[data-bst]'); if (b) { const [ov, est] = b.dataset.bst.split('|'); ovSetState(ov, est).then(() => renderBell()); return; }
+  const o = e.target.closest('[data-bopen]'); if (o) { $('#bellPop').hidden = true; openClient(o.dataset.bopen); }
+});
+document.addEventListener('click', () => { $('#bellPop').hidden = true; });
+
+/* ---------- dashboard de ventas ---------- */
+const MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+const ym = d => d.slice(0, 7), addM = (ymS, n) => { const [y, m] = ymS.split('-').map(Number), d = new Date(y, m - 1 + n, 1); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}`; };
+const shiftY = (d, n) => (+d.slice(0, 4) + n) + d.slice(4);
+const kS = n => n >= 1e6 ? 'S/ ' + (n / 1e6).toFixed(1) + ' M' : n >= 1e3 ? 'S/ ' + (n / 1e3).toFixed(n >= 1e5 ? 0 : 1) + ' mil' : 'S/ ' + Math.round(n);
+function perRange(per) {
+  const T = S.today, y = T.slice(0, 4), first = T.slice(0, 8) + '01';
+  const lastDay = ymS => { const [a, b] = ymS.split('-').map(Number); return `${ymS}-${p2(new Date(a, b, 0).getDate())}`; };
+  if (per === 'mes') { const pf = addM(ym(T), -1) + '-01', pt = (() => { const ld = lastDay(addM(ym(T), -1)); return T.slice(8) > ld.slice(8) ? ld : addM(ym(T), -1) + '-' + T.slice(8); })(); return { from: first, to: T, pf, pt, label: 'Este mes', prevL: 'mes anterior a la fecha' }; }
+  if (per === 'mesant') { const m = addM(ym(T), -1); return { from: m + '-01', to: lastDay(m), pf: addM(m, -1) + '-01', pt: lastDay(addM(m, -1)), label: MES[+m.slice(5) - 1] + ' ' + m.slice(0, 4), prevL: 'mes anterior' }; }
+  if (per === '3m') { const f = addM(ym(T), -2) + '-01'; return { from: f, to: T, pf: addM(ym(T), -5) + '-01', pt: addDays(f, -1), label: 'Últimos 3 meses', prevL: '3 meses previos' }; }
+  if (per === 'anio') return { from: y + '-01-01', to: T, pf: null, pt: null, label: 'Este año', prevL: '' };
+  return { from: addM(ym(T), -11) + '-01', to: T, pf: addM(ym(T), -23) + '-01', pt: addDays(addM(ym(T), -11) + '-01', -1), label: 'Últimos 12 meses', prevL: '12 meses previos' };
+}
+function saleRows() {
+  const f = S.sf, ok = new Set(S.orders.filter(o => o.est !== 'Anulada').map(o => o.ov));
+  return S.sales.filter(x => ok.has(x.ov) && S.byKey.has(x.k)
+    && (!f.marca || x.b === f.marca) && (!f.cat || S.catOf[x.b] === f.cat) && (!f.exec || x.by === f.exec)
+    && (!f.tipo || (S.byKey.get(x.k).t.tipo || '-') === f.tipo));
+}
+const inR = (x, a, b) => x.d >= a && x.d <= b;
+const sumM = l => l.reduce((a, x) => a + x.m, 0);
+function deltaHTML(cur, prev, label) {
+  if (prev == null || !label) return '';
+  if (!prev) return `<span class="delta eq">sin base en ${label}</span>`;
+  const d = (cur - prev) / prev * 100, c = Math.abs(d) < 0.5 ? 'eq' : d > 0 ? 'up' : 'dn';
+  return `<span class="delta ${c}">${c === 'up' ? '▲' : c === 'dn' ? '▼' : '='} ${Math.abs(d).toFixed(1)}%</span> <span style="color:var(--muted);font-size:11px">vs ${label}</span>`;
+}
+function renderSales(keep) {
+  const d = $('#dash'), f = S.sf, R = perRange(f.per), all = saleRows(), cur = all.filter(x => inR(x, R.from, R.to));
+  const prev = R.pf ? all.filter(x => inR(x, R.pf, R.pt)) : null, ly = all.filter(x => inR(x, shiftY(R.from, -1), shiftY(R.to, -1)));
+  const total = sumM(cur), ovs = new Set(cur.map(x => x.ov)).size, buyers = new Set(cur.map(x => x.k)), nB = buyers.size;
+  const ticket = ovs ? total / ovs : 0, brandsSold = new Set(cur.map(x => x.b)).size;
+  const openN = openOrders().filter(o => !f.exec || o.by === f.exec).length;
+  // meta del mes
+  const people = isAdmin() ? (f.exec ? 1 : Math.max(1, new Set(S.orders.map(o => o.by)).size)) : 1, goal = (S.cfg.salesGoal || 0) * people;
+  const mCur = all.filter(x => ym(x.d) === ym(S.today)), mTot = sumM(mCur), dom = +S.today.slice(8), dim = new Date(+S.today.slice(0, 4), +S.today.slice(5, 7), 0).getDate(), proj = dom ? mTot / dom * dim : 0;
+  // serie mensual: 12 meses vs los 12 previos (misma escala)
+  const months = Array.from({ length: 12 }, (_, i) => addM(ym(S.today), i - 11));
+  const byM = {}; all.forEach(x => byM[ym(x.d)] = (byM[ym(x.d)] || 0) + x.m);
+  const s1 = months.map(m => byM[m] || 0), s0 = months.map(m => byM[addM(m, -12)] || 0), smax = Math.max(1, ...s1, ...s0);
+  const W = 560, H = 170, X0 = 44, PX = i => X0 + i * (W - X0 - 10) / 11, PY = v => 12 + (H - 12) * (1 - v / smax);
+  const path = arr => arr.map((v, i) => `${i ? 'L' : 'M'}${PX(i).toFixed(1)},${PY(v).toFixed(1)}`).join('');
+  const ticks = [0, smax / 2, smax];
+  const lineSvg = `<svg viewBox="0 0 ${W} ${H + 26}" role="img" aria-label="Venta por mes, últimos 12 meses frente a los 12 anteriores">
+    ${ticks.map(v => `<line x1="${X0}" x2="${W}" y1="${PY(v)}" y2="${PY(v)}" stroke="var(--grid-c)"/><text class="m" x="0" y="${PY(v) + 3}">${kS(v)}</text>`).join('')}
+    <path d="${path(s1)}L${PX(11)},${PY(0)}L${PX(0)},${PY(0)}Z" fill="var(--s1)" opacity=".12"/>
+    <path d="${path(s0)}" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="4 4"/>
+    <path d="${path(s1)}" fill="none" stroke="var(--s1)" stroke-width="2.5" stroke-linejoin="round"/>
+    ${s1.map((v, i) => `<circle cx="${PX(i)}" cy="${PY(v)}" r="${i === 11 ? 4.5 : 3}" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>`).join('')}
+    ${months.map((m, i) => `<text class="m" x="${PX(i)}" y="${H + 18}" text-anchor="middle">${MES[+m.slice(5) - 1]}${i === 0 || m.endsWith('-01') ? ' ' + m.slice(2, 4) : ''}</text>
+      <rect class="hit" x="${PX(i) - 20}" y="0" width="40" height="${H + 20}" data-tip="${MES[+m.slice(5) - 1]} ${m.slice(0, 4)}: ${money(s1[i])}\n${MES[+m.slice(5) - 1]} ${+m.slice(0, 4) - 1}: ${money(s0[i])}${s0[i] ? '\nVariación: ' + ((s1[i] - s0[i]) / s0[i] * 100).toFixed(1) + '%' : ''}"/>`).join('')}</svg>`;
+  // share por marca y por línea
+  const agg = key => { const m = {}; cur.forEach(x => { const k = key(x); (m[k] = m[k] || { v: 0, cl: new Set(), ov: new Set() }); m[k].v += x.m; m[k].cl.add(x.k); m[k].ov.add(x.ov); }); return Object.entries(m).map(([k, o]) => ({ k, v: o.v, cl: o.cl.size, ov: o.ov.size })).sort((a, b) => b.v - a.v); };
+  const byB = agg(x => x.b), topB = byB.slice(0, 12), rest = byB.slice(12), bmax = Math.max(1, ...topB.map(x => x.v));
+  if (rest.length) topB.push({ k: `Otras ${rest.length} marcas`, v: sumM(rest.map(x => ({ m: x.v }))), cl: new Set(cur.filter(x => rest.some(o => o.k === x.b)).map(x => x.k)).size, other: true });
+  const byL = agg(x => S.catOf[x.b] || 'Por definir'), lmax = Math.max(1, ...byL.map(x => x.v));
+  const shareRow = (o, max, i, attr) => `<div class="share" ${attr} data-tip="${esc(o.k)}\nVenta: ${money(o.v)} (${pct(o.v, total)}% del total)\nClientes: ${o.cl} de ${nB} compradores (${pct(o.cl, nB)}%)${o.ov ? '\nOV: ' + o.ov : ''}">
+    <span class="nm2">${esc(o.k)}</span><span class="tr"><i style="width:${Math.max(1, o.v / max * 100)}%;animation-delay:${i * 40}ms;${o.other ? 'background:var(--tD)' : ''}"></i></span>
+    <span class="r"><b>${kS(o.v)}</b></span><span class="r">${pct(o.v, total)}%</span><span class="r">${o.cl}<small>${pct(o.cl, nB)}% cli.</small></span></div>`;
+  const shareHd = `<div class="share hd2"><span>Marca</span><span>Venta sin IGV</span><span class="r">Monto</span><span class="r">Share</span><span class="r">Clientes</span></div>`;
+  // marca × mes (6 meses, top 8)
+  const m6 = months.slice(6), top8 = agg(x => x.b).slice(0, 8).map(x => x.k), hm = {};
+  all.forEach(x => { if (top8.includes(x.b) && m6.includes(ym(x.d))) hm[x.b + ym(x.d)] = (hm[x.b + ym(x.d)] || 0) + x.m; });
+  const hmax = Math.max(1, ...Object.values(hm));
+  // escala de clientes y estatus por última compra
+  const perCli = {}; cur.forEach(x => perCli[x.k] = (perCli[x.k] || 0) + x.m);
+  const TR = [['Hasta S/ 5 mil', 0, 5000], ['S/ 5 a 20 mil', 5000, 20000], ['Más de S/ 20 mil', 20000, 1e12]].map(([l, a, b]) => { const ks = Object.entries(perCli).filter(([, v]) => v > a && v <= b); return { l, n: ks.length, v: ks.reduce((s, [, v]) => s + v, 0) }; });
+  const lastBuy = {}; all.forEach(x => { if (!lastBuy[x.k] || x.d > lastBuy[x.k]) lastBuy[x.k] = x.d; });
+  const stt = { act: 0, risk: 0, ina: 0 }; Object.values(lastBuy).forEach(dd => { const a = daysSince(dd); stt[a <= 90 ? 'act' : a <= 180 ? 'risk' : 'ina']++; });
+  const sttT = stt.act + stt.risk + stt.ina || 1;
+  // ejecutivos
+  const byE = agg(x => x.by);
+  const ordP = S.orders.filter(o => S.byKey.has(o.k) && inR(o, R.from, R.to) && (!f.exec || o.by === f.exec)), est = { Despachando: 0, Incidencia: 0, Terminado: 0, Anulada: 0 }; ordP.forEach(o => est[o.est]++);
+  const filtTxt = [f.marca, f.cat, f.tipo && (f.tipo === '-' ? 'sin tipo' : f.tipo), f.exec].filter(Boolean).join(' · ');
+  d.innerHTML = `
+  <div class="d-head"><div><h2>Ventas · ${esc(R.label)}</h2><div class="sub">Montos sin IGV · OV anuladas excluidas${filtTxt ? ' · filtro: ' + esc(filtTxt) : ''}${isAdmin() ? '' : ' · solo tu cartera'}</div></div><div class="spacer"></div>${dashModes()}</div>
+  <div class="sfil">
+    <div class="field"><label for="sPer">Período</label><select id="sPer">${[['mes', 'Este mes'], ['mesant', 'Mes anterior'], ['3m', 'Últimos 3 meses'], ['anio', 'Este año'], ['12m', 'Últimos 12 meses']].map(([v, l]) => `<option value="${v}" ${f.per === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+    <div class="field"><label for="sMarca">Marca</label><input id="sMarca" list="dlBrands" placeholder="Todas" value="${esc(f.marca)}" style="width:110px"></div>
+    <div class="field"><label for="sCat">Línea</label><select id="sCat"><option value="">Todas</option>${S.cats.map(c => `<option ${f.cat === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
+    <div class="field"><label for="sTipo">Tipo</label><select id="sTipo"><option value="">Todos</option>${TIPOS.map(x => `<option ${f.tipo === x ? 'selected' : ''}>${x}</option>`).join('')}<option value="-" ${f.tipo === '-' ? 'selected' : ''}>Sin definir</option></select></div>
+    ${isAdmin() ? `<div class="field"><label for="sExec">Ejecutivo</label><select id="sExec"><option value="">Todos</option>${S.users.map(u => `<option ${f.exec === u ? 'selected' : ''}>${esc(u)}</option>`).join('')}</select></div>` : ''}
+    <button class="btn ghost" id="sClear">Limpiar</button>
+  </div>
+  <div class="kpis">
+    <div class="kpi hero2 rise"><div class="l">Venta sin IGV</div><div class="v" data-count="${Math.round(total)}" data-pre="S/ ">S/ 0</div><div class="s" style="color:#fff">${prev ? deltaHTML(total, sumM(prev), R.prevL).replace(/var\(--muted\)/, 'rgba(255,255,255,.8)') : ''}</div></div>
+    <div class="kpi rise" style="--d:1"><div class="l">${icon('cal')}Mismo período año anterior</div><div class="v">${kS(sumM(ly))}</div><div class="s">${deltaHTML(total, sumM(ly), 'año anterior')}</div></div>
+    <div class="kpi rise" style="--d:2"><div class="l">${icon('file')}OV</div><div class="v" data-count="${ovs}">0</div><div class="s">Ticket promedio ${kS(ticket)}</div></div>
+    <div class="kpi rise" style="--d:3"><div class="l">${icon('users')}Clientes que compraron</div><div class="v" data-count="${nB}">0</div><div class="s">${pct(nB, S.rows.length)}% de ${isAdmin() ? 'la cartera' : 'tu cartera'}</div></div>
+    <div class="kpi rise" style="--d:4"><div class="l">${icon('tag')}Marcas vendidas</div><div class="v" data-count="${brandsSold}">0</div><div class="s">de ${S.brands.length} del catálogo</div></div>
+    <div class="kpi rise" style="--d:5"><div class="l">${icon('bell')}OV por cerrar</div><div class="v" data-count="${openN}">0</div><div class="s">Despachando o con incidencia</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card chart rise" style="--d:3"><h3>Venta por mes</h3><div class="sub">Últimos 12 meses frente a los 12 anteriores, en la misma escala</div>
+      <div class="legend"><span><span class="sw" style="background:var(--s1)"></span>Últimos 12 meses</span><span><span class="sw" style="background:var(--muted)"></span>12 meses anteriores</span></div>${lineSvg}</div>
+    <div class="card rise" style="--d:4"><h3>Avance de la meta del mes</h3><div class="sub">${goal ? `Meta ${money(goal)} sin IGV${people > 1 ? ' (' + people + ' ejecutivos)' : ''}` : 'Sin meta configurada (Ajustes → meta mensual)'}</div>
+      <div class="goal"><div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><b style="font-size:30px;letter-spacing:-.02em">${goal ? pct(mTot, goal) + '%' : kS(mTot)}</b><span style="color:var(--ink2)">${money(mTot)} vendidos al día ${dom} de ${dim}</span></div>
+        ${goal ? `<div class="tr" data-tip="Vendido: ${money(mTot)}\nProyección de cierre: ${money(proj)}\nMeta: ${money(goal)}"><u style="width:${Math.min(100, proj / goal * 100)}%"></u><i style="width:${Math.min(100, mTot / goal * 100)}%"></i></div>
+        <div class="rw"><span>Proyección de cierre (ritmo actual): <b>${money(proj)}</b> · ${pct(proj, goal)}% de la meta</span><span>${proj >= goal ? '<span class="delta up">▲ en camino</span>' : `Faltan <b>${money(Math.max(0, goal - mTot))}</b> · ${money(Math.max(0, goal - mTot) / Math.max(1, dim - dom))} por día`}</span></div>` : ''}
+        <div class="hint" style="margin:0">La proyección es una estimación lineal: venta del mes a la fecha ÷ días transcurridos × días del mes.</div></div>
+      <div style="height:1px;background:var(--line);margin:14px 0 12px"></div>
+      <h3>OV del período por estado</h3>
+      <div class="legend" style="margin:8px 0 0">${Object.entries(est).map(([k, v]) => `<span class="est ${k}"><i></i>${k}: ${v}</span>`).join('')}</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card rise" style="--d:5"><h3>Share de venta por marca</h3><div class="sub">Participación en la venta y cuántos clientes la compraron · clic para filtrar</div>
+      ${topB.length ? shareHd + topB.map((o, i) => shareRow(o, bmax, i, o.other ? '' : `data-smarca="${esc(o.k)}"`)).join('') : '<div class="d-empty">Sin ventas en este período.</div>'}</div>
+    <div class="card rise" style="--d:6"><h3>Share de venta por línea</h3><div class="sub">Participación por línea de producto · clic para filtrar</div>
+      ${byL.length ? shareHd.replace('Marca', 'Línea') + byL.map((o, i) => shareRow(o, lmax, i, `data-scat="${esc(o.k)}"`)).join('') : '<div class="d-empty">Sin ventas en este período.</div>'}</div>
+  </div>
+  <div class="grid2">
+    <div class="card rise" style="--d:7"><h3>Marcas por mes</h3><div class="sub">Venta de las 8 marcas principales en los últimos 6 meses</div>
+      ${top8.length ? `<div class="bmap" style="max-height:none;min-height:0"><table><thead><tr><th class="nm">Marca</th>${m6.map(m => `<th class="hc">${MES[+m.slice(5) - 1]}</th>`).join('')}<th>Total</th></tr></thead><tbody>
+      ${top8.map(b => `<tr><td class="nm"><b>${esc(b)}</b></td>${m6.map(m => { const v = hm[b + m] || 0, pc = v ? 18 + Math.round(v / hmax * 66) : 0; return `<td class="hc"><span class="heat${v ? '' : ' h0'}${pc > 55 ? ' dark' : ''}" style="min-width:58px;${v ? `background:color-mix(in srgb,var(--s1) ${pc}%,var(--surface))` : ''}" data-tip="${esc(b)} · ${MES[+m.slice(5) - 1]} ${m.slice(0, 4)}: ${money(v)}">${v ? kS(v).replace('S/ ', '') : '·'}</span></td>`; }).join('')}<td><b>${kS(m6.reduce((a, m) => a + (hm[b + m] || 0), 0))}</b></td></tr>`).join('')}</tbody></table></div>` : '<div class="d-empty">Sin ventas.</div>'}</div>
+    <div class="card rise" style="--d:8"><h3>Escala de clientes</h3><div class="sub">Clientes del período según cuánto compraron</div>
+      ${TR.map((o, i) => hbar(esc(o.l), o.n, Math.max(1, ...TR.map(x => x.n)), `var(${['--f2', '--f3', '--f4'][i]},#2a78d6)`, `${o.n} cli. · ${kS(o.v)}`, `${o.l}: ${o.n} clientes · ${money(o.v)}`, i)).join('')}
+      <div style="height:1px;background:var(--line);margin:14px 0 12px"></div>
+      <h3>Estatus de compradores${f.marca ? ' de ' + esc(f.marca) : ''}</h3><div class="sub">Según su última compra (toda la historia)</div>
+      <div class="stk3" data-tip="Activos (≤90 días): ${stt.act}\nEn riesgo (91–180): ${stt.risk}\nInactivos (+180): ${stt.ina}"><i style="flex:${stt.act};background:var(--good)"></i><i style="flex:${stt.risk};background:var(--warn)"></i><i style="flex:${stt.ina};background:var(--crit)"></i></div>
+      <div class="legend" style="margin:8px 0 0"><span><span class="sw" style="background:var(--good)"></span>Activos ${stt.act} · ${pct(stt.act, sttT)}%</span><span><span class="sw" style="background:var(--warn)"></span>En riesgo ${stt.risk} · ${pct(stt.risk, sttT)}%</span><span><span class="sw" style="background:var(--crit)"></span>Inactivos ${stt.ina} · ${pct(stt.ina, sttT)}%</span></div></div>
+  </div>
+  ${isAdmin() ? `<div class="card rise" style="--d:9"><h3>Venta por ejecutivo</h3><div class="sub">Share de venta del período · clic para filtrar</div>
+    ${byE.length ? shareHd.replace('Marca', 'Ejecutivo') + byE.map((o, i) => shareRow(o, Math.max(1, byE[0].v), i, `data-sexec="${esc(o.k)}"`)).join('') : '<div class="d-empty">Sin ventas.</div>'}</div>` : ''}`;
+  if (keep) d.querySelectorAll('.rise').forEach(x => x.classList.remove('rise'));
+  countUp(d);
+}
+const dashModes = () => `<div class="modes" id="dMode"><button data-dm="gest" class="${S.dashMode === 'gest' ? 'on' : ''}">${icon('chart')}Gestión</button><button data-dm="ventas" class="${S.dashMode === 'ventas' ? 'on' : ''}">${icon('cart')}Ventas</button></div>`;
+let sfT;
+$('#dash').addEventListener('change', e => { const k = { sPer: 'per', sCat: 'cat', sTipo: 'tipo', sExec: 'exec', sMarca: 'marca' }[e.target.id]; if (!k) return; S.sf[k] = k === 'marca' ? ((findBrand(e.target.value) || {}).m || '') : e.target.value; renderSales(true); });
+$('#dash').addEventListener('input', e => { if (e.target.id !== 'sMarca') return; clearTimeout(sfT); sfT = setTimeout(() => { const b = findBrand(e.target.value); if (b || !e.target.value) { S.sf.marca = b ? b.m : ''; renderSales(true); const x = $('#sMarca'); if (x) { x.focus(); x.setSelectionRange(x.value.length, x.value.length); } } }, 300); });
 
 /* ---------- vista Marcas: filtrador y mapeo ---------- */
 function brandRows() {
@@ -1727,6 +2057,7 @@ function renderDay() {
         <div class="alert ${aCold ? 'warn' : 'ok'} rise" style="--d:4"><span class="ic">${icon('star')}</span><div><b>${aCold}</b><span>Clientes A sin gestionar</span></div></div>
         <div class="alert ${wrong ? 'warn' : 'ok'} rise" style="--d:5"><span class="ic">${icon('hash')}</span><div><b>${wrong}</b><span>Números errados por corregir</span></div></div>
         <div class="alert ${noBrands ? 'warn' : 'ok'} rise" style="--d:6"><span class="ic">${icon('tag')}</span><div><b>${noBrands}</b><span>Gestionados sin marcas registradas</span></div></div>
+        <div class="alert ${openOrders().length ? (openOrders().some(o => ovLvl(o) === 2) ? 'crit' : 'warn') : 'ok'} rise" style="--d:6;cursor:pointer" id="dBell" role="button"><span class="ic">${icon('bell')}</span><div><b>${openOrders().length}</b><span>OV por cerrar (Despachando o incidencia)</span></div></div>
         <div class="alert ${staleB ? 'warn' : 'ok'} rise" style="--d:7"><span class="ic">${icon('clock')}</span><div><b>${staleB}</b><span>Con marcas por confirmar (+90 días)</span></div></div>
       </div>
     </div>
@@ -1744,6 +2075,7 @@ function openClient(k) {
 }
 $('#vDay').addEventListener('click', e => {
   const b = e.target.closest('[data-open]'); if (b) return openClient(b.dataset.open);
+  if (e.target.closest('#dBell')) { e.stopPropagation(); $('#bellPop').hidden = false; renderBell(); return; }
   if (e.target.closest('#dStart')) { const l = myDay(); if (l.length) openClient(l[0].r.k); }
 });
 
@@ -1778,6 +2110,7 @@ async function loadActivity() {
 function renderDash(skipFetch) {
   const d = $('#dash');
   if (!S.me) return;
+  if (S.dashMode === 'ventas') return renderSales();
   if (!skipFetch) { S.activityAt = 0; loadActivity(); }
   const scope = LS.get('dashScope', 'all');
   const rows = (scope === 'view' ? S.view : S.rows).filter(r => !r.t.dep);
@@ -1821,7 +2154,7 @@ function renderDash(skipFetch) {
   const cc = {}; rows.forEach(r => new Set((r.t.brands || []).map(b => S.catOf[b])).forEach(c => cc[c] = (cc[c] || 0) + 1));
   const topC = Object.entries(cc).sort((a, b) => b[1] - a[1]).slice(0, 8), cmax = Math.max(1, ...topC.map(x => x[1]));
   d.innerHTML = `
-  <div class="d-head"><div><h2>Avance de la gestión</h2><div class="sub">Actualizado en vivo con el trabajo de todo el equipo${deps ? ` · ${fmtN(deps)} depurados excluidos` : ''}</div></div><div class="spacer"></div>
+  <div class="d-head"><div><h2>Avance de la gestión</h2><div class="sub">Actualizado en vivo con el trabajo de todo el equipo${deps ? ` · ${fmtN(deps)} depurados excluidos` : ''}</div></div><div class="spacer"></div>${dashModes()}
     <div class="tabs" id="dScope"><button data-s="all" class="${scope === 'all' ? 'on' : ''}" style="${scope === 'all' ? 'background:var(--surface);box-shadow:var(--shadow)' : ''}">Toda la cartera</button><button data-s="view" class="${scope === 'view' ? 'on' : ''}" style="${scope === 'view' ? 'background:var(--surface);box-shadow:var(--shadow)' : ''}">Filtro actual</button></div></div>
   <div class="kpis">
     <div class="kpi hero2 rise"><div class="l">Avance de la cartera</div><div class="v" data-count="${pct(touched, total).toFixed(1)}" data-suf="%">0%</div><div class="s">${fmtN(touched)} de ${fmtN(total)} clientes gestionados</div></div>
@@ -1894,6 +2227,11 @@ function renderDash(skipFetch) {
   requestAnimationFrame(() => requestAnimationFrame(() => d.querySelectorAll('circle.seg').forEach(s => s.setAttribute('stroke-dasharray', s.dataset.dash))));
 }
 $('#dash').addEventListener('click', e => {
+  const dm = e.target.closest('#dMode [data-dm]'); if (dm) { S.dashMode = dm.dataset.dm; return renderDash(); }
+  if (e.target.closest('#sClear')) { Object.assign(S.sf, { marca: '', cat: '', exec: '', tipo: '' }); return renderSales(true); }
+  const sm = e.target.closest('[data-smarca]'); if (sm) { S.sf.marca = S.sf.marca === sm.dataset.smarca ? '' : sm.dataset.smarca; return renderSales(true); }
+  const sc = e.target.closest('[data-scat]'); if (sc) { S.sf.cat = S.sf.cat === sc.dataset.scat ? '' : sc.dataset.scat; return renderSales(true); }
+  const se = e.target.closest('[data-sexec]'); if (se) { S.sf.exec = S.sf.exec === se.dataset.sexec ? '' : se.dataset.sexec; return renderSales(true); }
   const b = e.target.closest('#dScope button'); if (b) { LS.set('dashScope', b.dataset.s); renderDash(true); return; }
   const fb = e.target.closest('[data-brand],[data-cat],[data-tipo]');
   if (fb) { $('#q').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; $('#fMarca').value = fb.dataset.brand || ''; $('#fCat').value = fb.dataset.cat || ''; $('#fTipo').value = fb.dataset.tipo || ''; S.st = 'all'; $$('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.st === 'all')); setTab('list'); applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0, true); return; }
@@ -2053,7 +2391,7 @@ function openCfg() {
   $('#cCols').innerHTML = S.header.filter((h, j) => keyOf(j) !== 'comment').map(h => `<label class="ck"><input type="checkbox" data-col="${esc(norm(h))}" ${UI.hidden.includes(norm(h)) ? '' : 'checked'}> ${esc(h)}</label>`).join('');
   $('#cAdmin').hidden = !isAdmin();
   const c = S.cfg;
-  $('#cCC').value = c.cc; $('#cLen').value = c.mobLen; $('#cLock').checked = c.lockRow; $('#cScope').checked = c.scopeOwn !== false; $('#cMin').value = c.minInt; $('#cPoll').value = c.poll; $('#cGoal').value = c.goal;
+  $('#cCC').value = c.cc; $('#cLen').value = c.mobLen; $('#cLock').checked = c.lockRow; $('#cScope').checked = c.scopeOwn !== false; $('#cMin').value = c.minInt; $('#cPoll').value = c.poll; $('#cGoal').value = c.goal; $('#cSGoal').value = c.salesGoal || 0;
   $('#cWa').value = c.waMode; $('#cMsg').value = c.waMsg; $('#cMail').value = c.mailMode; $('#cSubj').value = c.mailSubj;
   $('#cBrandInfo').textContent = `${S.brands.length} marcas en ${S.cats.length} líneas. Las de «Por definir» se pueden reasignar en la versión real.`;
   $('#cBrandCat').innerHTML = S.cats.map(x => `<option>${esc(x)}</option>`).join('');
@@ -2065,7 +2403,7 @@ $('#bCfgOk').onclick = async () => {
   if (isAdmin()) {
     $('#bCfgOk').disabled = true;
     try {
-      S.cfg = await call('api_saveCfg', S.token, { cc: $('#cCC').value, mobLen: $('#cLen').value, lockRow: $('#cLock').checked, scopeOwn: $('#cScope').checked, minInt: $('#cMin').value, poll: $('#cPoll').value, goal: $('#cGoal').value, waMode: $('#cWa').value, waMsg: $('#cMsg').value, mailMode: $('#cMail').value, mailSubj: $('#cSubj').value });
+      S.cfg = await call('api_saveCfg', S.token, { cc: $('#cCC').value, mobLen: $('#cLen').value, lockRow: $('#cLock').checked, scopeOwn: $('#cScope').checked, minInt: $('#cMin').value, poll: $('#cPoll').value, goal: $('#cGoal').value, salesGoal: $('#cSGoal').value, waMode: $('#cWa').value, waMsg: $('#cMsg').value, mailMode: $('#cMail').value, mailSubj: $('#cSubj').value });
       startPoll(); renderNow(); renderPanel(); toast('Configuración guardada para todo el equipo. La visibilidad se aplica al volver a entrar.');
     } catch (e) { toast(e.message, true); }
     $('#bCfgOk').disabled = false;
@@ -2141,7 +2479,7 @@ $('#bClear').onclick = () => { $('#q').value = ''; $('#fFrom').value = ''; $('#f
 $('#chips').addEventListener('click', e => { const c = e.target.closest('.chip'); if (!c) return; S.st = c.dataset.st; $$('#chips .chip').forEach(x => x.classList.toggle('on', x === c)); applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0); });
 $('#grid').addEventListener('scroll', render, { passive: true });
 window.addEventListener('resize', () => { render(); applyPanel(); moveInd(); });
-function actArg(b) { return b.dataset.act === 'copy' ? b.dataset.f : (['res', 'tipo', 'brand', 'brandrel', 'brandrm', 'addrel'].includes(b.dataset.act) ? b.dataset.n : (b.dataset.n != null ? +b.dataset.n : null)); }
+function actArg(b) { return b.dataset.act === 'copy' ? b.dataset.f : (['res', 'tipo', 'brand', 'brandrel', 'brandrm', 'addrel', 'ovpick', 'ovrm', 'ovst'].includes(b.dataset.act) ? b.dataset.n : (b.dataset.n != null ? +b.dataset.n : null)); }
 $('#gbody').addEventListener('click', e => {
   const rowE = e.target.closest('.row'); if (!rowE) return;
   const i = +rowE.dataset.i, r = S.view[i];
@@ -2158,6 +2496,20 @@ $('#panel').addEventListener('input', e => {
 });
 $('#panel').addEventListener('keydown', e => { if (e.target.id === 'pCmt' && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); act(S.active, 'cmtadd'); } });
 $('#panel').addEventListener('keydown', e => { if (e.target.id === 'pBrand' && e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); act(S.active, 'brandadd'); } });
+$('#panel').addEventListener('input', e => {
+  if (!S.ov) return;
+  if (e.target.id === 'oNum') S.ov.num = e.target.value;
+  if (e.target.id === 'oDate') S.ov.date = e.target.value;
+  if (e.target.id === 'oNota') S.ov.nota = e.target.value;
+  if (e.target.classList.contains('oamt')) { S.ov.lines[+e.target.dataset.i].m = e.target.value.replace(/[^\d.]/g, ''); const t = $('#oTot'); if (t) t.textContent = money(S.ov.lines.reduce((a, l) => a + (+l.m || 0), 0)); }
+});
+$('#panel').addEventListener('keydown', e => {
+  if (!S.ov || e.key !== 'Enter') return;
+  const id = e.target.id;
+  if (id === 'oQuick') { e.preventDefault(); e.stopPropagation(); const { out, bad } = parseQuick(e.target.value); out.forEach(l => ovLineAdd(l.b, l.m)); S.ov.num = $('#oNum').value; renderPanel(true); const q = $('#oQuick'); if (q) q.focus(); if (bad.length) toast('No reconocí: ' + bad.join(', ') + '. Revisa el nombre de la marca.', true); else if (out.length) toast(out.length + ' marca(s) agregadas'); }
+  else if (id === 'oBrand') { e.preventDefault(); e.stopPropagation(); const b = findBrand(e.target.value); if (!b) return toast('Elige una marca del catálogo.', true); ovLineAdd(b.m); S.ov.num = $('#oNum').value; renderPanel(true); const i = $(`.oamt[data-i="${S.ov.lines.findIndex(l => l.b === b.m)}"]`); if (i) i.focus(); }
+  else if (e.target.classList.contains('oamt') || id === 'oNum' || id === 'oNota') { e.preventDefault(); e.stopPropagation(); if (e.ctrlKey || e.metaKey || id === 'oNota') return ovSave(S.active); const nx = $(`.oamt[data-i="${+e.target.dataset.i + 1}"]`) || $('#oQuick'); if (id === 'oNum') { const f0 = $('.oamt') || $('#oQuick'); if (f0) f0.focus(); } else if (nx) nx.focus(); }
+}, true);
 $('#panel').addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('bcat')) S.catOpen = e.target.open; }, true);
 $('#panel').addEventListener('change', e => {
   if (!S.active) return;

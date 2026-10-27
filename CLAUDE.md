@@ -19,6 +19,9 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 - Toda venta se registra con su **número de OV** (obligatorio y único) y una línea por marca con su monto.
 - Los montos siempre son **sin IGV**.
 - Al registrar una OV su estado pasa automáticamente a **Despachando**. La alerta sigue activa hasta que alguien la marque como **Terminado**; no se puede desactivar.
+- Estados: `Despachando` → `Terminado`, con `Incidencia` para problemas de entrega. Solo el administrador puede **reabrir** una OV cerrada o **anularla**; las anuladas no cuentan en las ventas.
+- El monto comprado de cada cliente es la suma de sus OV no anuladas; no se escribe a mano.
+- Dashboard de ventas: período, marca, línea, tipo y ejecutivo como filtros; share de venta y de clientes por marca y por línea, venta mensual frente a los 12 meses anteriores, avance y proyección de la meta mensual, escala y estatus de compradores.
 
 ## Tipo de negocio y marcas
 
