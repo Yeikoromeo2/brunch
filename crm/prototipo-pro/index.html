@@ -391,6 +391,36 @@ table.bt td.nm{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-spac
 .sheets span{display:inline-flex;align-items:center;gap:6px;font:12px var(--fm);padding:4px 9px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);animation:pop .4s}
 .sheets span svg{width:13px;height:13px;color:var(--good)}
 
+/* negocio y marcas */
+.ttag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;background:var(--surface3);color:var(--ink2)}
+.tipos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tipo{height:38px;border:1px solid var(--line2);border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;gap:6px;font-weight:600;cursor:pointer;transition:all .15s}
+.tipo:hover:not(:disabled){border-color:var(--accent)}
+.tipo.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent-soft)}
+.tipo.sug{border-style:dashed;border-color:var(--accent);color:var(--accent)}
+.tipo:disabled{opacity:.45;cursor:default}
+.sugg{text-transform:none;letter-spacing:0;font-weight:500;color:var(--accent);font-size:11px;text-align:right}
+.bsel,.bdet{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.bchip{height:26px;padding:0 9px;border-radius:6px;border:1px solid var(--line2);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .12s}
+.bchip:hover:not(:disabled){border-color:var(--accent)}
+.bchip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--ink);font-weight:600}
+.bchip span{color:var(--muted)}
+.bchip:disabled{opacity:.5;cursor:default}
+.badd{display:flex;gap:6px;margin-top:10px}
+.bdet{margin-top:10px;font-size:12px;color:var(--ink2)}
+details.bcat{margin-top:10px}
+details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--accent)}
+.cgrp{margin-top:9px}
+.cgrp b{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.cgrp div{display:flex;flex-wrap:wrap;gap:4px}
+.offers{display:flex;flex-direction:column;gap:6px}
+.offer{display:flex;flex-direction:column;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);border-left:3px solid var(--accent);animation:rise .3s both}
+.offer b{font-size:13px}
+.offer span{font-size:11px;color:var(--muted)}
+[data-brand]{cursor:pointer}
+[data-brand]:hover .lb{color:var(--accent)}
+.field select{max-width:150px}
+
 /* modales, avisos, tooltip */
 .modal-bg{position:fixed;inset:0;background:rgba(10,16,22,.42);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
 .modal-bg.on{display:flex}
@@ -474,6 +504,10 @@ table.bt td.nm{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-spac
   <symbol id="i-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm3-12-6 6m0-6 6 6"/></symbol>
   <symbol id="i-right" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6"/></symbol>
   <symbol id="i-bolt" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M13 2 3 14h9l-1 8 10-12h-9z"/></symbol>
+  <symbol id="i-store" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 9 4.5 4h15L21 9M3 9v11h18V9M3 9h18M9 20v-6h6v6"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17M16 9h3a1 1 0 0 1 1 1v11M3 21h18M8 7h4M8 11h4M8 15h4"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8ZM7.5 7.5h.01"/></symbol>
   <symbol id="i-msg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
 </svg>
 
@@ -531,6 +565,10 @@ table.bt td.nm{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-spac
   <div class="field search"><svg><use href="#i-search"/></svg><input id="q" placeholder="Buscar cliente, ID, RUC, teléfono…  ( / )"></div>
   <div class="field num"><label for="fFrom">Fila desde</label><input id="fFrom" type="number" min="2" placeholder="—"></div>
   <div class="field num"><label for="fTo">hasta</label><input id="fTo" type="number" min="2" placeholder="—"></div>
+  <div class="field"><label for="fTipo">Tipo</label><select id="fTipo"><option value="">Todos</option><option>Tienda</option><option>Oficina</option><option>Híbrido</option><option value="-">Sin definir</option></select></div>
+  <div class="field"><label for="fCat">Línea</label><select id="fCat"><option value="">Todas</option></select></div>
+  <div class="field"><label for="fMarca">Marca</label><input id="fMarca" list="dlBrands" placeholder="Todas" style="width:112px"></div>
+  <datalist id="dlBrands"></datalist>
   <button class="btn ghost" id="bClear">Limpiar</button>
   <div class="chips" id="chips">
     <button class="chip on" data-st="all">Todos <span class="n" data-n="all">0</span></button>
@@ -616,7 +654,11 @@ table.bt td.nm{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-spac
         <label class="fl"><span>Mensaje inicial de WhatsApp</span><textarea id="cMsg" placeholder="Hola {legal}, le saluda {ejecutivo}…"></textarea></label>
         <label class="fl"><span>Abrir correo con</span><select id="cMail"><option value="outlook">Outlook web (Office 365)</option><option value="gmail">Gmail web</option><option value="mailto">Programa predeterminado</option></select></label>
         <label class="fl"><span>Asunto del correo</span><input type="text" id="cSubj" placeholder="Atención cliente {id} – {legal}"></label>
-        <div class="hint" style="margin:0">Variables: {legal} {id} {state} {city} {ejecutivo}</div>
+        <div class="hint" style="margin:0">Variables: {legal} {id} {state} {city} {ejecutivo} {marca}</div>
+        <div class="sec-t" style="margin-top:6px">Catálogo de marcas</div>
+        <div class="hint" id="cBrandInfo" style="margin:0"></div>
+        <div class="two"><label class="fl"><span>Nueva marca</span><input type="text" id="cBrandName" placeholder="Ej.: Fortinet"></label><label class="fl"><span>Línea</span><select id="cBrandCat"></select></label></div>
+        <button class="btn" id="bAddBrand" type="button" style="justify-content:center">Agregar al catálogo</button>
       </div>
     </div>
   </div>
@@ -659,6 +701,7 @@ table.bt td.nm{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-spac
     <span><kbd>0</kbd></span><span>Quitar resultado</span>
     <span><kbd>R</kbd> / <kbd>V</kbd></span><span>Revisado / compra con éxito</span>
     <span><kbd>E</kbd></span><span>Editar número del cliente</span>
+    <span><kbd>B</kbd></span><span>Agregar marca al cliente</span>
     <span><kbd>/</kbd></span><span>Ir al buscador</span>
   </div></div>
   <div class="mf"><button class="btn primary" data-close>Entendido</button></div>
@@ -688,7 +731,16 @@ const C = { org: 0, kam: 1, exec: 2, id: 3, legal: 4, tax: 5, addr: 6, state: 7,
 const PRE = ['Ferretería', 'Distribuidora', 'Inversiones', 'Comercial', 'Grupo', 'Bodega', 'Constructora', 'Agroindustrias', 'Textiles', 'Servicios', 'Importaciones', 'Maderera', 'Transportes', 'Botica', 'Panificadora', 'Electro', 'Librería', 'Agrícola', 'Minimarket', 'Corporación'];
 const NAM = ['San Martín', 'El Sol', 'Kallpa', 'Rímac', 'Pachamama', 'Don Lucho', 'Huascarán', 'Majes', 'Altiplano', 'Mistura', 'Piura Norte', 'Titicaca', 'Amazonas', 'Chasqui', 'Santa Rosa', 'Misti', 'Sur Andino', 'Palma', 'Chavín', 'Mollendo', 'Selva Verde', 'Los Andes', 'Paracas', 'Inca Real', 'Colca', 'Nazca', 'Tumbes', 'Lurín', 'Cóndor', 'Vilcanota'];
 const PL = [['Lima', 'Lima'], ['Arequipa', 'Arequipa'], ['Piura', 'Piura'], ['La Libertad', 'Trujillo'], ['Cusco', 'Cusco'], ['Junín', 'Huancayo'], ['Lambayeque', 'Chiclayo'], ['Ica', 'Ica'], ['Puno', 'Juliaca'], ['Loreto', 'Iquitos']];
-const CMTS = ['Pidió cotización, se envió por correo', 'Interesado, revisar precios la próxima semana', 'Solicitó ampliación de línea de crédito', 'Llamar después de las 4 pm', 'Pide visita del vendedor'];
+const CMTS = ['Pidió cotización, se envió por correo', 'Interesado, revisar precios la próxima semana', 'Solicitó ampliación de línea de crédito', 'Llamar después de las 4 pm', 'Pide visita del vendedor', 'Pidió precios de HP y Epson', 'Consultó por discos Seagate para cámaras Hikvision'];
+/* catálogo de marcas que distribuye el mayorista, agrupadas por línea (editable por el administrador) */
+const CAT = {"Cómputo": "ASUS|Dell|HP|Lenovo|MSI|Huawei", "Gaming": "ROG|HyperX|Razer|Primus Gaming", "Componentes": "AMD|Intel|Gigabyte", "Almacenamiento y memoria": "A-Data|Kingston|PNY|SanDisk|Seagate|Western Digital|QNAP", "Servidores y centro de datos": "HPE|Dell EMC", "Redes y conectividad": "Ubiquiti|TP-Link|Meraki|Ruckus|Nexxt Solutions Home|Nexxt Solutions Infrastructure|Furukawa|Starlink|Riverbed", "Energía": "APC|Salicru|Forza", "Seguridad electrónica": "Hikvision|EZVIZ|Hanwha|Axis|VideoIQ|Honeywell|Firelite", "Hogar inteligente": "Ring|Eufy|Philips Hue|Wiz", "Punto de venta y código de barras": "Zebra|Newland|Unitech|Logic Controls|Elo|Custom", "Impresión": "Epson|Xerox", "Colaboración y videoconferencia": "Jabra|Poly|Logitech|Screenbeam|Promethean", "Audio profesional": "AKG|JBL Pro|Crown|Soundcraft", "Audio de consumo": "JBL|Harman Kardon|Soundcore", "Pantallas y monitores": "LG|Viewsonic|Philips|Haier", "Accesorios y periféricos": "Anker|Belkin|Gear4|Zagg|Klip Xtreme|Xtech|StarTech.com|Wacom", "Móviles y wearables": "Motorola|Realme|Oura", "Software y ciberseguridad": "Microsoft|Bitdefender|ESET|McAfee|BitTitan", "Por definir": "ELISE|Folksafe|Cyrus|Nebula"};
+let BRANDS = Object.entries(CAT).flatMap(([c, l]) => l.split('|').map(m => ({ m, c })));
+const KWC = { Tienda: ['Tiene tienda en galería Wilson, vende accesorios', 'Stand en Compuplaza, atiende venta al público'], Oficina: ['Oficina, hace proyectos de cableado para empresas', 'Integrador, participa en licitaciones del sector público'], 'Híbrido': ['Tiene local y también hace proyectos', 'Tienda en Cyber Plaza y atiende corporativo'] };
+const PROFILE = {
+  Tienda: ['HP', 'Lenovo', 'ASUS', 'Kingston', 'SanDisk', 'Logitech', 'HyperX', 'Razer', 'JBL', 'Anker', 'Belkin', 'Klip Xtreme', 'Xtech', 'TP-Link', 'Epson', 'A-Data', 'Western Digital', 'Primus Gaming', 'Soundcore', 'EZVIZ'],
+  Oficina: ['Dell', 'HPE', 'Ubiquiti', 'Meraki', 'Hikvision', 'Hanwha', 'Axis', 'APC', 'Furukawa', 'Microsoft', 'ESET', 'Poly', 'Jabra', 'QNAP', 'Ruckus', 'Zebra', 'Xerox', 'Lenovo', 'Seagate', 'Salicru'],
+  'Híbrido': ['HP', 'Dell', 'Lenovo', 'TP-Link', 'Ubiquiti', 'Hikvision', 'EZVIZ', 'APC', 'Kingston', 'Logitech', 'Epson', 'Microsoft', 'Seagate', 'Jabra', 'ASUS']
+};
 const MOT = ['Precio', 'Ya compra a otro proveedor', 'No lo necesita ahora', 'Problema de crédito'];
 const N = 64;
 const ROWS = [], TRACK = {};
@@ -701,7 +753,7 @@ for (let i = 0; i < N; i++) {
     String(Math.round(Math.pow(rnd(), 2) * 148) * 1000 + 2000), addDays(TODAY, -(800 + Math.floor(rnd() * 1500))), addDays(TODAY, -(3 + Math.floor(rnd() * 420))), c < .3 ? 'A' : c < .65 ? 'B' : 'C', ''];
   v[C.phone] = v[C.phone].replace(/^9(\d{2}) /, (m, a) => '9' + a + ' ');
   ROWS.push({ k, r, v });
-  const t = { rev: false, res: '', int: 0, buy: false, next: '', own: '', first: '', last: '', lastc: '', dep: '', motivo: '', monto: '', fix: '', hist: [] };
+  const t = { rev: false, res: '', int: 0, buy: false, next: '', own: '', first: '', last: '', lastc: '', dep: '', motivo: '', monto: '', fix: '', tipo: '', brands: [], hist: [] };
   TRACK[k] = t;
   if (rnd() < .58) {
     const who = owner(r), dAgo = Math.floor(rnd() * 14), hm = `${p2(9 + Math.floor(rnd() * 9))}:${p2(Math.floor(rnd() * 60))}`, d = addDays(TODAY, -dAgo) + ' ' + hm, o = rnd();
@@ -714,6 +766,10 @@ for (let i = 0; i < N; i++) {
     else if (o < .8) { t.res = 'Número errado'; H('Resultado: Número errado', 'hash'); }
     else if (o < .9) { t.res = 'No interesado'; t.motivo = pick(MOT); H('Resultado: No interesado · ' + t.motivo, 'ban'); v[C.comment] = 'No interesado: ' + t.motivo.toLowerCase(); H(v[C.comment], 'msg', 1); }
     else { H('Marcó revisado', 'eye'); }
+    const tp = rnd(), tipo = tp < .42 ? 'Tienda' : tp < .72 ? 'Oficina' : 'Híbrido';
+    if (rnd() < .6) t.tipo = tipo;
+    else if (!v[C.comment] || rnd() < .6) { v[C.comment] = pick(KWC[tipo]); H(v[C.comment], 'msg', 1); }
+    if (rnd() < .85) { const n = 2 + Math.floor(rnd() * 4), set = new Set(); while (set.size < n) set.add(pick(PROFILE[tipo])); t.brands = [...set]; }
   }
 }
 let CFG = { cc: '51', mobLen: 9, lockRow: true, writeExec: true, minInt: 2, poll: 20, goal: 40, waMode: 'web', waMsg: '', mailMode: 'outlook', mailSubj: '' };
@@ -735,7 +791,7 @@ const API = {
   api_load(tk) {
     const u = who(tk);
     return { me: { name: u.name, role: u.role }, cfg: CFG, header: HEADER, C, assigns: ASSIGNS, users: USERS.filter(x => x.active).map(x => x.name), seq: SEQ, lastRow: N + 1, today: TODAY, sheet: 'Hoja1',
-      rows: ROWS.map(r => [r.k, r.r, r.v]), track: TRACK, warnings: [] };
+      rows: ROWS.map(r => [r.k, r.r, r.v]), track: TRACK, brands: BRANDS, warnings: [] };
   },
   api_changes(tk) { who(tk); return { assigns: ASSIGNS, today: TODAY, reload: false, changes: [], seq: SEQ }; },
   api_action(tk, p) {
@@ -759,6 +815,8 @@ const API = {
       case 'next': t.next = p.val || ''; H('Reagendó para ' + (p.val || '—'), 'cal'); break;
       case 'motivo': t.motivo = p.val || ''; H('Motivo: ' + (p.val || '—'), 'ban'); break;
       case 'monto': t.monto = String(p.val || '').replace(/[^\d.]/g, ''); H('Monto de compra: S/ ' + Number(t.monto || 0).toLocaleString('es-PE'), 'cart'); break;
+      case 'tipo': t.tipo = p.val || ''; H('Tipo de negocio: ' + (p.val || 'sin definir'), 'store'); break;
+      case 'brand': { const b = p.val && p.val.b; if (!BRANDS.some(x => x.m === b)) throw new Error('La marca no está en el catálogo.'); t.brands = (t.brands || []).filter(x => x !== b); if (p.val.on) t.brands.push(b); H((p.val.on ? 'Agregó la marca ' : 'Quitó la marca ') + b, 'tag'); break; }
       case 'contact': t.int++; t.lastc = now; t.rev = true; H(p.val ? 'Contactó por ' + p.val : 'Contactó', /WhatsApp/.test(p.val) ? 'wa' : /Correo/.test(p.val) ? 'mail' : 'phone'); break;
       case 'fixphone': H('Corrigió el número: ' + (t.fix || row.v[C.phone]) + ' → ' + p.val, 'pencil'); t.fix = p.val; if (t.res === 'Número errado') t.res = ''; break;
       case 'unlock': if (u.role !== 'admin') throw new Error('Solo el administrador puede liberar.'); t.own = ''; H('Liberó el cliente', 'lock'); SEQ++; return { ok: true, state: state(row) };
@@ -804,6 +862,12 @@ const API = {
     Object.assign(x, { name, role: p.role, active: !!p.active }); if (p.pin) x.pin = p.pin;
     return API.api_users(tk);
   },
+  api_addBrand(tk, b) {
+    const u = who(tk); if (u.role !== 'admin') throw new Error('Solo el administrador.');
+    const m = String(b.m || '').trim(); if (!m) throw new Error('Escribe el nombre de la marca.');
+    if (BRANDS.some(x => x.m.toLowerCase() === m.toLowerCase())) throw new Error('Esa marca ya está en el catálogo.');
+    BRANDS.push({ m, c: b.c || 'Por definir' }); return BRANDS;
+  },
   api_saveCfg(tk, c) {
     const u = who(tk); if (u.role !== 'admin') throw new Error('Solo el administrador.');
     CFG = Object.assign({}, CFG, c, { mobLen: +c.mobLen || 9, minInt: Math.max(1, +c.minInt || 1), poll: Math.max(10, +c.poll || 20), goal: Math.max(1, +c.goal || 40), cc: String(c.cc).replace(/\D/g, '') });
@@ -838,7 +902,7 @@ const RES = {
 };
 const RES_LIST = Object.keys(RES);
 const MOTIVOS = ['Precio', 'Ya compra a otro proveedor', 'No lo necesita ahora', 'Problema de crédito', 'Cerró el negocio', 'Otro'];
-const emptyT = () => ({ rev: false, res: '', int: 0, buy: false, next: '', own: '', first: '', last: '', lastc: '', dep: '', motivo: '', monto: '', fix: '', hist: [] });
+const emptyT = () => ({ rev: false, res: '', int: 0, buy: false, next: '', own: '', first: '', last: '', lastc: '', dep: '', motivo: '', monto: '', fix: '', tipo: '', brands: [], hist: [] });
 const SERIES = ['--s1', '--s2', '--s3', '--s4', '--s5', '--s6', '--s7', '--s8'];
 
 /* ---------- almacenamiento local (solo preferencias) ---------- */
@@ -863,7 +927,7 @@ function call(fn, ...args) {
 
 /* ---------- estado ---------- */
 const S = { token: '', me: null, cfg: {}, header: [], C: {}, rows: [], byKey: new Map(), view: [], active: null, st: 'all', tab: 'list',
-  assigns: [], users: [], seq: 0, lastRow: 0, today: '', pending: 0, cmtT: {}, needReload: false, activity: null, activityAt: 0, rep: { type: 'noc' }, sheets: [], fixOpen: null, phDraft: '' };
+  assigns: [], users: [], seq: 0, lastRow: 0, today: '', pending: 0, cmtT: {}, needReload: false, activity: null, activityAt: 0, rep: { type: 'noc' }, sheets: [], fixOpen: null, phDraft: '', brands: [], catOf: {}, cats: [], catOpen: false };
 
 /* ---------- utilidades ---------- */
 const norm = s => String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
@@ -908,6 +972,75 @@ function score(r) {
 const tier = r => { const s = score(r).total; return s >= 8 ? 'A' : s >= 6 ? 'B' : s >= 4 ? 'C' : 'D'; };
 const TIER_TX = { A: 'Llamar primero', B: 'Reactivar', C: 'Calificar', D: 'Baja prioridad' };
 
+/* tipo de negocio sugerido por palabras clave del comentario y la razón social */
+const TIPOS = ['Tienda', 'Oficina', 'Híbrido'], TIPO_IC = { Tienda: 'store', Oficina: 'building', 'Híbrido': 'layers' };
+const KW = {
+  Tienda: ['tienda', 'local comercial', 'local', 'galeria', 'stand', 'modulo', 'puesto', 'vitrina', 'mostrador', 'venta al publico', 'punto de venta', 'retail', 'centro comercial', 'wilson', 'compuplaza', 'cyber plaza', 'garcilaso'],
+  Oficina: ['oficina', 'proyecto', 'proyectos', 'licitacion', 'licitaciones', 'integrador', 'integracion', 'corporativo', 'empresas', 'b2b', 'sector publico', 'gobierno', 'peru compras', 'seace', 'instalacion', 'cableado', 'implementacion', 'soporte tecnico', 'servicios ti', 'outsourcing', 'contrato']
+};
+const KW_HYB = ['tienda y proyectos', 'local y oficina', 'tambien hace proyectos', 'retail y corporativo', 'local y tambien hace proyectos'];
+const NEG = /(no tiene|sin|cerro|ya no tiene|no cuenta con)\s+(una |un |la |el |su )?$/;
+const wordRe = k => new RegExp('(^|[^a-z0-9])' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/ /g, '\\s+') + '(?=[^a-z0-9]|$)');
+function suggestTipo(r) {
+  const txt = norm(val(r, 'comment') + ' ' + val(r, 'legal'));
+  const tag = txt.match(/#(tienda|oficina|hibrido)\b/);
+  if (tag) return { tipo: { tienda: 'Tienda', oficina: 'Oficina', hibrido: 'Híbrido' }[tag[1]], hits: ['#' + tag[1]] };
+  const hy = KW_HYB.filter(k => txt.includes(k));
+  if (hy.length) return { tipo: 'Híbrido', hits: hy };
+  const hits = { Tienda: [], Oficina: [] };
+  for (const tp in KW) KW[tp].forEach(k => { const m = wordRe(k).exec(txt); if (m && !NEG.test(txt.slice(0, m.index + m[1].length))) hits[tp].push(k); });
+  const u = a => [...new Set(a)];
+  if (hits.Tienda.length && hits.Oficina.length) return { tipo: 'Híbrido', hits: u([...hits.Tienda, ...hits.Oficina]) };
+  if (hits.Tienda.length) return { tipo: 'Tienda', hits: u(hits.Tienda) };
+  if (hits.Oficina.length) return { tipo: 'Oficina', hits: u(hits.Oficina) };
+  return null;
+}
+/* marcas mencionadas en el comentario que aún no están marcadas */
+function detectBrands(r) {
+  const txt = norm(val(r, 'comment')), have = new Set(r.t.brands || []);
+  if (!txt) return [];
+  return S.brands.filter(b => !have.has(b.m) && b.m.length > 1 && wordRe(norm(b.m)).test(txt)).map(b => b.m);
+}
+/* qué ofrecerle: misma línea, líneas complementarias y lo que venden canales parecidos */
+const COMP = {
+  'Cómputo': ['Accesorios y periféricos', 'Software y ciberseguridad', 'Energía', 'Almacenamiento y memoria'],
+  'Gaming': ['Componentes', 'Almacenamiento y memoria', 'Pantallas y monitores'],
+  'Componentes': ['Gaming', 'Almacenamiento y memoria', 'Energía'],
+  'Almacenamiento y memoria': ['Cómputo', 'Seguridad electrónica'],
+  'Servidores y centro de datos': ['Redes y conectividad', 'Energía', 'Software y ciberseguridad', 'Almacenamiento y memoria'],
+  'Redes y conectividad': ['Energía', 'Seguridad electrónica', 'Servidores y centro de datos'],
+  'Energía': ['Redes y conectividad', 'Servidores y centro de datos'],
+  'Seguridad electrónica': ['Almacenamiento y memoria', 'Redes y conectividad', 'Energía'],
+  'Hogar inteligente': ['Seguridad electrónica', 'Redes y conectividad'],
+  'Punto de venta y código de barras': ['Impresión', 'Cómputo', 'Energía'],
+  'Impresión': ['Punto de venta y código de barras', 'Cómputo'],
+  'Colaboración y videoconferencia': ['Pantallas y monitores', 'Audio profesional', 'Redes y conectividad'],
+  'Audio profesional': ['Colaboración y videoconferencia', 'Pantallas y monitores'],
+  'Audio de consumo': ['Accesorios y periféricos', 'Móviles y wearables'],
+  'Pantallas y monitores': ['Cómputo', 'Colaboración y videoconferencia'],
+  'Accesorios y periféricos': ['Cómputo', 'Móviles y wearables', 'Audio de consumo'],
+  'Móviles y wearables': ['Accesorios y periféricos', 'Audio de consumo'],
+  'Software y ciberseguridad': ['Cómputo', 'Servidores y centro de datos']
+};
+function recommend(r) {
+  const mine = new Set(r.t.brands || []); if (!mine.size) return [];
+  const cats = new Set([...mine].map(b => S.catOf[b]));
+  const comp = new Set([...cats].flatMap(c => COMP[c] || []).filter(c => !cats.has(c)));
+  const cnt = {};
+  S.rows.forEach(x => { if (x === r || !(x.t.brands || []).some(b => cats.has(S.catOf[b]))) return; x.t.brands.forEach(b => { if (!mine.has(b)) cnt[b] = (cnt[b] || 0) + 1; }); });
+  return S.brands.filter(b => !mine.has(b.m) && b.c !== 'Por definir' && (cats.has(b.c) || comp.has(b.c)))
+    .map(b => ({ m: b.m, c: b.c, peers: cnt[b.m] || 0, s: (cnt[b.m] || 0) + (cats.has(b.c) ? 3 : 0) + (comp.has(b.c) ? 2 : 0), why: cats.has(b.c) ? 'Misma línea · ' + b.c : 'Complementa · ' + b.c }))
+    .sort((a, b) => b.s - a.s || a.m.localeCompare(b.m)).slice(0, 6);
+}
+function fillBrandLists() {
+  S.catOf = Object.fromEntries(S.brands.map(b => [b.m, b.c]));
+  S.cats = [...new Set(S.brands.map(b => b.c))];
+  $('#dlBrands').innerHTML = S.brands.map(b => `<option value="${esc(b.m)}">${esc(b.c)}</option>`).join('');
+  const cur = $('#fCat').value;
+  $('#fCat').innerHTML = '<option value="">Todas</option>' + S.cats.map(c => `<option ${c === cur ? 'selected' : ''}>${esc(c)}</option>`).join('');
+}
+const findBrand = q => { const n = norm(q); return n ? S.brands.find(b => norm(b.m) === n) : null; };
+
 let toastT;
 function toast(msg, err) { const t = $('#toast'); t.textContent = msg; t.className = 'on' + (err ? ' err' : ''); clearTimeout(toastT); toastT = setTimeout(() => t.className = '', err ? 4500 : 2600); }
 function setSync(s, tx) { const el = $('#sync'); el.className = 'sync ' + (s || ''); $('#syncTx').textContent = tx || (s === 'saving' ? 'Guardando…' : s === 'err' ? 'Sin conexión' : 'Sincronizado'); }
@@ -945,7 +1078,7 @@ function parsePhones(s) {
 /* el número corregido va primero; el original se conserva en la hoja */
 const phonesOf = r => { const ps = parsePhones(val(r, 'phone')); if (!r.t.fix) return ps; const f = parsePhones(r.t.fix)[0]; return f ? [Object.assign(f, { fix: true }), ...ps.map(p => Object.assign(p, { old: true }))] : ps; };
 const parseMails = s => (String(s || '').match(/[^\s,;<>()"']+@[^\s,;<>()"']+\.[a-z]{2,}/gi) || []);
-const tpl = (t, r) => String(t || '').replace(/\{(\w+)\}/g, (m, k) => k === 'ejecutivo' ? (val(r, 'exec') || S.me.name) : (S.C[k] != null ? val(r, k) : m));
+const tpl = (t, r) => String(t || '').replace(/\{(\w+)\}/g, (m, k) => k === 'ejecutivo' ? (val(r, 'exec') || S.me.name) : k === 'marca' ? ((S.rep && S.rep.marca) || (r.t.brands || [])[0] || '') : (S.C[k] != null ? val(r, k) : m));
 
 /* ---------- sesión ---------- */
 $('#loginForm').addEventListener('submit', async e => {
@@ -976,7 +1109,7 @@ async function loadAll(first) {
   try {
     const d = await call('api_load', S.token);
     S.me = d.me; S.cfg = d.cfg; S.header = d.header; S.C = d.C; S.assigns = d.assigns; S.users = d.users;
-    S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false;
+    S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false; S.brands = d.brands; fillBrandLists();
     S.rows = d.rows.map(([k, r, v]) => ({ k, r, v, t: Object.assign(emptyT(), d.track[k] || {}), hay: null, _vi: null }));
     S.byKey = new Map(S.rows.map(r => [r.k, r]));
     $('#login').hidden = true;
@@ -1054,6 +1187,8 @@ function applyLocal(r, p) {
     case 'motivo': t.motivo = p.val || ''; break;
     case 'monto': t.monto = String(p.val || ''); break;
     case 'fixphone': t.fix = p.val; if (t.res === 'Número errado') t.res = ''; break;
+    case 'tipo': t.tipo = p.val || ''; break;
+    case 'brand': t.brands = (t.brands || []).filter(x => x !== p.val.b); if (p.val.on) t.brands.push(p.val.b); break;
     case 'contact': t.int++; t.lastc = nowStr(); t.rev = true; break;
     case 'unlock': t.own = ''; return;
   }
@@ -1151,6 +1286,17 @@ function act(r, a, n) {
     send(r, { op: 'result', val: v, date: v === 'Volver a llamar' ? (r.t.next || tomorrow()) : '' });
     if (v === 'Número errado') { S.fixOpen = r; S.phDraft = ''; }
   } else if (a === 'unlock') { if (confirm('¿Liberar este cliente para que otra persona lo pueda gestionar?')) send(r, { op: 'unlock' }); }
+  else if (a === 'brandfocus') { const i = $('#pBrand'); if (i) { i.focus(); i.scrollIntoView({ block: 'center' }); } }
+  else if (a === 'tipo') { send(r, { op: 'tipo', val: r.t.tipo === n ? '' : n }); }
+  else if (a === 'brand') { const on = !(r.t.brands || []).includes(n); send(r, { op: 'brand', val: { b: n, on } }).then(ok => ok && toast((on ? 'Marca agregada: ' : 'Marca quitada: ') + n)); }
+  else if (a === 'brandadd') {
+    const inp = $('#pBrand'), b = inp && findBrand(inp.value);
+    if (!b) { if (inp) inp.focus(); return toast('Elige una marca del catálogo (escribe y selecciónala de la lista).', true); }
+    inp.value = ''; inp.blur();
+    if ((r.t.brands || []).includes(b.m)) return toast(b.m + ' ya está registrada');
+    send(r, { op: 'brand', val: { b: b.m, on: true } }).then(ok => ok && toast('Marca agregada: ' + b.m));
+  }
+  else if (a === 'offercopy') { const t = recommend(r).map(o => o.m + ' (' + o.c + ')').join(', '); copyText('Ofrecer a ' + val(r, 'legal') + ': ' + t).then(ok => toast(ok ? 'Sugerencias copiadas' : 'No se pudo copiar', !ok)); }
   else if (a === 'fixopen') { if (lk) return toast(lk, true); S.fixOpen = S.fixOpen === r ? null : r; S.phDraft = ''; renderPanel(true); const i = $('#pNewPhone'); if (i) i.focus(); }
   else if (a === 'phtry' || a === 'phsave') {
     const ok = validPhone(S.phDraft);
@@ -1161,10 +1307,14 @@ function act(r, a, n) {
 }
 
 /* ---------- filtro ---------- */
-function hay(r) { if (r.hay == null) r.hay = norm(r.v.join(' | ') + ' ' + r.t.res + ' ' + r.t.own + ' ' + r.t.fix) + ' ' + (S.C.phone != null ? (val(r, 'phone') + r.t.fix).replace(/\D/g, '') : ''); return r.hay; }
+function hay(r) { if (r.hay == null) r.hay = norm(r.v.join(' | ') + ' ' + r.t.res + ' ' + r.t.own + ' ' + r.t.fix + ' ' + r.t.tipo + ' ' + (r.t.brands || []).join(' ')) + ' ' + (S.C.phone != null ? (val(r, 'phone') + r.t.fix).replace(/\D/g, '') : ''); return r.hay; }
 function baseRows() {
   const q = norm($('#q').value), a = +$('#fFrom').value || -Infinity, b = +$('#fTo').value || Infinity, hd = UI.hideDep;
-  return S.rows.filter(r => r.r >= a && r.r <= b && (!hd || !r.t.dep) && (!q || hay(r).includes(q)));
+  const tp = $('#fTipo').value, cat = $('#fCat').value, mq = norm($('#fMarca').value), mx = findBrand(mq);
+  return S.rows.filter(r => r.r >= a && r.r <= b && (!hd || !r.t.dep) && (!q || hay(r).includes(q))
+    && (!tp || (tp === '-' ? !r.t.tipo : r.t.tipo === tp))
+    && (!cat || (r.t.brands || []).some(x => S.catOf[x] === cat))
+    && (!mq || (r.t.brands || []).some(x => mx ? x === mx.m : norm(x).includes(mq))));
 }
 function counts(rows) {
   const c = { all: rows.length, none: 0, rev: 0, att: 0, buy: 0, noc: 0, agenda: 0, mine: 0, prio: 0 };
@@ -1225,6 +1375,8 @@ function resHTML(t) {
   if (t.int) h += `<span class="cnt" title="Intentos de contacto">×${t.int}</span>`;
   if (t.res === 'Volver a llamar' && t.next) h += `<span class="cnt" title="Volver a llamar">${icon('cal')}${ddmm(t.next)}</span>`;
   if (t.buy && t.monto) h += `<span class="cnt" title="Monto de la compra">${money(t.monto)}</span>`;
+  if (t.tipo) h += `<span class="ttag" title="Tipo de negocio">${esc(t.tipo)}</span>`;
+  if ((t.brands || []).length) h += `<span class="cnt" title="Marcas: ${esc(t.brands.join(', '))}">${icon('tag')}${t.brands.length}</span>`;
   return h;
 }
 function cellHTML(r, c) {
@@ -1309,7 +1461,7 @@ function renderPanel(force) {
   const p = $('#panel'), r = S.active;
   if (!r) { p.innerHTML = `<div class="p-empty"><span class="ic">${icon('list')}</span><b>Selecciona un cliente</b>Haz clic en una fila o usa las flechas ↑ ↓.</div>`; return; }
   const ae = document.activeElement;
-  if (!force && ae && (ae.id === 'pCmt' || ae.id === 'pNewPhone') && p.dataset.k === r.k) { updBadges(); return; }
+  if (!force && ae && (ae.id === 'pCmt' || ae.id === 'pNewPhone' || ae.id === 'pBrand') && p.dataset.k === r.k) { updBadges(); return; }
   p.dataset.k = r.k;
   const ps = phonesOf(r), ms = parseMails(val(r, 'mail')), lk = lockedBy(r), dis = lk ? 'disabled' : '', tr = tier(r), sc = score(r);
   const kv = S.header.map((h, j) => {
@@ -1346,6 +1498,7 @@ function renderPanel(force) {
     ${r.t.res === 'Volver a llamar' ? `<div class="sub" style="flex-direction:row;align-items:center;gap:8px">${icon('cal')}<span style="white-space:nowrap">Volver a llamar el</span><input type="date" class="datein" id="pNext" value="${esc(r.t.next)}" ${dis}></div>` : ''}
     ${r.t.res === 'No interesado' ? `<div class="sub"><label class="fl"><span>¿Por qué no le interesa?</span><select class="selin" id="pMotivo" ${dis}><option value="">Elige un motivo…</option>${MOTIVOS.map(m => `<option ${r.t.motivo === m ? 'selected' : ''}>${esc(m)}</option>`).join('')}</select></label></div>` : ''}
     ${r.t.res === 'Número errado' ? fixBox : ''}</div>
+    ${bizHTML(r, lk, dis)}
     <div class="p-sec"><h3><span>${esc(S.header[S.C.comment])}</span></h3><textarea id="pCmt" placeholder="${lk ? esc(lk) : 'Detalle de la atención…'}" ${dis}>${esc(val(r, 'comment'))}</textarea>
       <div class="hint">Al escribir un comentario el cliente queda <b>atendido</b> (verde). Se guarda solo y cada versión queda en el historial.</div></div>
     <div class="p-sec"><h3><span>Contacto</span>${lk ? '' : `<button class="linkbtn" data-act="fixopen">${icon('pencil')}${r.t.fix ? 'Cambiar número' : 'Editar número'}</button>`}</h3>
@@ -1355,6 +1508,22 @@ function renderPanel(force) {
     <div class="p-sec"><h3><span>Historial</span><span style="text-transform:none;letter-spacing:0;font-weight:500">${r.t.hist.length} movimiento${r.t.hist.length === 1 ? '' : 's'}</span></h3>
       ${r.t.hist.length ? `<div class="tl">${r.t.hist.slice(0, 12).map(h => `<div class="ev${h.cm ? ' cm' : ''}"><span class="dot">${icon(h.k || 'clock')}</span><div><div class="w"><b>${esc(h.who)}</b> · ${esc(ddmm(h.d.slice(0, 10)) + ' ' + h.d.slice(11))}</div><p>${esc(h.txt)}</p></div></div>`).join('')}</div>` : '<div class="hint" style="margin:0">Aún no hay movimientos con este cliente.</div>'}</div>
     <div class="p-sec"><h3>Datos del cliente</h3><dl class="kv">${kv}</dl></div>`;
+}
+
+function bizHTML(r, lk, dis) {
+  const sg = suggestTipo(r), det = lk ? [] : detectBrands(r), rec = recommend(r), mine = r.t.brands || [];
+  const sugTxt = sg && sg.tipo !== r.t.tipo ? `<span class="sugg">Sugerido: <b>${esc(sg.tipo)}</b> por «${sg.hits.slice(0, 3).map(esc).join('», «')}»</span>` : '';
+  const byCat = S.cats.map(c => ({ c, l: S.brands.filter(b => b.c === c) }));
+  return `<div class="p-sec"><h3><span>Tipo de negocio</span>${sugTxt}</h3>
+    <div class="tipos">${TIPOS.map(x => `<button class="tipo${r.t.tipo === x ? ' on' : ''}${!r.t.tipo && sg && sg.tipo === x ? ' sug' : ''}" data-act="tipo" data-n="${x}" ${dis}>${icon(TIPO_IC[x])}${x}</button>`).join('')}</div>
+    ${!r.t.tipo && !sg ? '<div class="hint">Sin pistas en el comentario: pregúntalo en la llamada o escribe #tienda, #oficina o #hibrido.</div>' : ''}</div>
+  <div class="p-sec"><h3><span>Marcas que distribuye</span><span style="text-transform:none;letter-spacing:0;font-weight:500">${mine.length} marca${mine.length === 1 ? '' : 's'}</span></h3>
+    ${mine.length ? `<div class="bsel">${mine.map(b => `<button class="bchip on" data-act="brand" data-n="${esc(b)}" title="${esc(S.catOf[b] || '')} · clic para quitar" ${dis}>${esc(b)}<span>×</span></button>`).join('')}</div>` : '<div class="hint" style="margin:0">Aún no se registran marcas para este canal.</div>'}
+    ${lk ? '' : `<div class="badd"><input class="txtin" id="pBrand" list="dlBrands" placeholder="Agregar marca… escribe y elige"><button class="btn" data-act="brandadd">Agregar</button></div>`}
+    ${det.length ? `<div class="bdet">${icon('msg')}En el comentario: ${det.map(b => `<button class="bchip" data-act="brand" data-n="${esc(b)}">+ ${esc(b)}</button>`).join('')}</div>` : ''}
+    ${lk ? '' : `<details class="bcat" ${S.catOpen ? 'open' : ''}><summary>Ver las ${S.brands.length} marcas por línea</summary>${byCat.map(g => `<div class="cgrp"><b>${esc(g.c)}</b><div>${g.l.map(b => `<button class="bchip${mine.includes(b.m) ? ' on' : ''}" data-act="brand" data-n="${esc(b.m)}">${esc(b.m)}</button>`).join('')}</div></div>`).join('')}</details>`}</div>
+  ${rec.length ? `<div class="p-sec"><h3><span>Qué ofrecerle</span><button class="linkbtn" data-act="offercopy">${icon('copy')}Copiar</button></h3>
+    <div class="offers">${rec.map((o, i) => `<div class="offer" style="animation-delay:${i * 40}ms"><b>${esc(o.m)}</b><span>${esc(o.why)}${o.peers ? ' · la venden ' + o.peers + ' canales parecidos' : ''}</span></div>`).join('')}</div></div>` : ''}`;
 }
 
 /* ---------- Mi día ---------- */
@@ -1407,7 +1576,7 @@ function renderDay() {
 }
 function openClient(k) {
   const r = S.byKey.get(k); if (!r) return;
-  $('#q').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; S.st = 'all';
+  $('#q').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; $('#fTipo').value = ''; $('#fCat').value = ''; $('#fMarca').value = ''; S.st = 'all';
   $$('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.st === 'all'));
   if (r.t.dep && UI.hideDep) { UI.hideDep = false; $('#hideDep').checked = false; }
   setTab('list'); applyFilter();
@@ -1485,6 +1654,12 @@ function renderDash(skipFetch) {
   }).join('');
   const team = `<svg viewBox="0 0 ${W} ${PY + PH + 26}" role="img" aria-label="Comparativa por ejecutivo">${gridL}${groups}</svg>`;
   const wR = bought.length ? recov.length / bought.length * 100 : 0;
+  const tipoC = TIPOS.map((x, i) => ({ l: x, v: rows.filter(r => r.t.tipo === x).length, c: `var(${SERIES[i]})` })), sinT = rows.filter(r => !r.t.tipo).length, sugT = rows.filter(r => !r.t.tipo && suggestTipo(r)).length;
+  const tmax = Math.max(1, sinT, ...tipoC.map(x => x.v));
+  const bc = {}; rows.forEach(r => (r.t.brands || []).forEach(b => bc[b] = (bc[b] || 0) + 1));
+  const topB = Object.entries(bc).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 12), bmax = Math.max(1, ...topB.map(x => x[1]));
+  const cc = {}; rows.forEach(r => new Set((r.t.brands || []).map(b => S.catOf[b])).forEach(c => cc[c] = (cc[c] || 0) + 1));
+  const topC = Object.entries(cc).sort((a, b) => b[1] - a[1]).slice(0, 8), cmax = Math.max(1, ...topC.map(x => x[1]));
   d.innerHTML = `
   <div class="d-head"><div><h2>Avance de la gestión</h2><div class="sub">Actualizado en vivo con el trabajo de todo el equipo${deps ? ` · ${fmtN(deps)} depurados excluidos` : ''}</div></div><div class="spacer"></div>
     <div class="tabs" id="dScope"><button data-s="all" class="${scope === 'all' ? 'on' : ''}" style="${scope === 'all' ? 'background:var(--surface);box-shadow:var(--shadow)' : ''}">Toda la cartera</button><button data-s="view" class="${scope === 'view' ? 'on' : ''}" style="${scope === 'view' ? 'background:var(--surface);box-shadow:var(--shadow)' : ''}">Filtro actual</button></div></div>
@@ -1526,6 +1701,16 @@ function renderDash(skipFetch) {
       <div class="legend" style="margin:8px 0 0"><span>${icon('hash')}${wrong} por corregir</span><span style="color:var(--good-ink);font-weight:600">${icon('check')}${fixed} corregido${fixed === 1 ? '' : 's'}</span></div></div>
   </div>
   <div class="grid2">
+    <div class="card rise" style="--d:7"><h3>Tipo de negocio</h3><div class="sub">Canales clasificados${sugT ? ` · ${sugT} sin definir tienen una sugerencia por palabras clave` : ''}</div>
+      ${tipoC.map((x, i) => `<div data-tipo="${x.l}">${hbar(`${icon(TIPO_IC[x.l])}${x.l}`, x.v, tmax, x.c, `${fmtN(x.v)} · ${pct(x.v, total)}%`, x.l + ': ' + fmtN(x.v) + ' (clic para ver la lista)', i)}</div>`).join('')}
+      <div data-tipo="-">${hbar('Sin definir', sinT, tmax, 'var(--pend)', `${fmtN(sinT)} · ${pct(sinT, total)}%`, 'Sin definir: ' + fmtN(sinT) + ' (clic para ver la lista)', 3)}</div>
+      <div style="height:1px;background:var(--line);margin:14px 0 12px"></div>
+      <h3>Líneas que más distribuyen</h3><div class="sub">Canales que venden al menos una marca de la línea</div>
+      ${topC.map(([c, v], i) => `<div data-cat="${esc(c)}">${hbar(esc(c), v, cmax, 'var(--s1)', fmtN(v), c + ': ' + v + ' canales (clic para filtrar)', i)}</div>`).join('') || '<div class="d-empty">Aún no hay marcas registradas.</div>'}</div>
+    <div class="card rise" style="--d:7"><h3>Marcas más distribuidas</h3><div class="sub">Clic en una marca para ver sus canales en la lista</div>
+      ${topB.map(([b, v], i) => `<div data-brand="${esc(b)}">${hbar(esc(b), v, bmax, 'var(--s1)', `${fmtN(v)} canal${v === 1 ? '' : 'es'}`, b + ' · ' + (S.catOf[b] || '') + ': ' + v + ' canales', i)}</div>`).join('') || '<div class="d-empty">Aún no hay marcas registradas.</div>'}</div>
+  </div>
+  <div class="grid2">
     <div class="card rise" style="--d:7"><h3>Actividad del equipo · últimos 14 días</h3><div class="sub">Clientes gestionados por día y por persona</div>
       ${A ? (actUsers.length ? `<div class="legend">${actUsers.map(u => `<span><span class="sw" style="background:${userColor(u)}"></span>${esc(u)}</span>`).join('')}</div>
       <div class="cols">${days.map((dd, i) => `<div class="col" data-tip="${ddmm(dd)}\n${actUsers.map(u => `${u}: ${(A.m[u] || {})[dd] || 0}`).join('\n')}">${dayTot[i] ? `<span class="vl">${dayTot[i]}</span>` : ''}<div class="stk" style="animation-delay:${i * 30}ms">${actUsers.map(u => { const v = (A.m[u] || {})[dd] || 0; return v ? `<i style="height:${v / mx * 130}px;background:${userColor(u)}"></i>` : ''; }).join('')}</div></div>`).join('')}</div>
@@ -1550,6 +1735,8 @@ function renderDash(skipFetch) {
 }
 $('#dash').addEventListener('click', e => {
   const b = e.target.closest('#dScope button'); if (b) { LS.set('dashScope', b.dataset.s); renderDash(true); return; }
+  const fb = e.target.closest('[data-brand],[data-cat],[data-tipo]');
+  if (fb) { $('#q').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; $('#fMarca').value = fb.dataset.brand || ''; $('#fCat').value = fb.dataset.cat || ''; $('#fTipo').value = fb.dataset.tipo || ''; S.st = 'all'; $$('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.st === 'all')); setTab('list'); applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0, true); return; }
   const t = e.target.closest('.tile');
   if (t) { $('#fFrom').value = t.dataset.from; $('#fTo').value = t.dataset.to; setTab('list'); applyFilter(); $('#grid').scrollTop = 0; setActive(0, true); }
 });
@@ -1561,16 +1748,25 @@ const REPORTS = {
   buy: { t: 'Compras con éxito', d: 'Clientes que compraron, con monto', ic: 'star', c: 'var(--s1)' },
   tel: { t: 'Teléfonos corregidos', d: 'Para actualizar el sistema de la empresa', ic: 'pencil', c: 'var(--good)' },
   pend: { t: 'Sin gestión', d: 'Clientes que nadie ha tocado, por prioridad', ic: 'eye', c: 'var(--pend)' },
+  promo: { t: 'Promoción por marca', d: 'Quién la distribuye o a quién ofrecerla', ic: 'tag', c: 'var(--s2)' },
   all: { t: 'Seguimiento completo', d: 'Toda la cartera con su gestión', ic: 'list', c: 'var(--accent)' }
 };
-const EXTRA = ['Fila', 'Prioridad', 'Gestionado por', 'Resultado', 'Intentos', 'Último contacto', 'Próximo contacto', 'Compra', 'Monto', 'Motivo', 'Teléfono corregido', 'Depurado'];
+const EXTRA = ['Fila', 'Prioridad', 'Tipo de negocio', 'Marcas que distribuye', 'Gestionado por', 'Resultado', 'Intentos', 'Último contacto', 'Próximo contacto', 'Compra', 'Monto', 'Motivo', 'Teléfono corregido', 'Depurado'];
 function repRows(type, o) {
   const a = +o.from || -Infinity, b = +o.to || Infinity;
   return S.rows.filter(r => {
     if (r.r < a || r.r > b) return false;
     if (o.user && (o.user === '(sin asignar)' ? r.t.own : r.t.own !== o.user)) return false;
     if (!o.dep && r.t.dep) return false;
+    if (o.tipo && (o.tipo === '-' ? r.t.tipo : r.t.tipo !== o.tipo)) return false;
     switch (type) {
+      case 'promo': {
+        const mb = findBrand(o.marca); if (!mb) return false;
+        const has = (r.t.brands || []).includes(mb.m);
+        if (o.modo === 'tiene') return has;
+        const cats = new Set((r.t.brands || []).map(b => S.catOf[b]));
+        return !has && (cats.has(mb.c) || [...cats].some(c => (COMP[c] || []).includes(mb.c)));
+      }
       case 'noc': return !r.t.buy && !r.t.fix && ((isNoc(r) && r.t.int >= o.min) || (o.wrong && r.t.res === 'Número errado'));
       case 'agenda': return r.t.res === 'Volver a llamar';
       case 'buy': return r.t.buy;
@@ -1582,15 +1778,16 @@ function repRows(type, o) {
 }
 /* las 18 columnas originales en su orden y, a la derecha, las de seguimiento */
 function repTable(rows) {
-  const body = rows.map(r => [...r.v.map(x => x == null ? '' : String(x)), r.r, tier(r), r.t.own, r.t.res, r.t.int, r.t.lastc, r.t.next, r.t.buy ? 'SI' : '', r.t.monto, r.t.motivo, r.t.fix, r.t.dep]);
+  const body = rows.map(r => [...r.v.map(x => x == null ? '' : String(x)), r.r, tier(r), r.t.tipo, (r.t.brands || []).join(', '), r.t.own, r.t.res, r.t.int, r.t.lastc, r.t.next, r.t.buy ? 'SI' : '', r.t.monto, r.t.motivo, r.t.fix, r.t.dep]);
   return [[...S.header, ...EXTRA], ...body];
 }
 function repOpts() {
-  return { min: +($('#rMin') ? $('#rMin').value : S.cfg.minInt) || 1, wrong: $('#rWrong') ? $('#rWrong').checked : true, from: $('#rFrom') ? $('#rFrom').value : '', to: $('#rTo') ? $('#rTo').value : '', user: $('#rUser') ? $('#rUser').value : '', dep: $('#rDep') ? $('#rDep').checked : false };
+  return { min: +($('#rMin') ? $('#rMin').value : S.cfg.minInt) || 1, wrong: $('#rWrong') ? $('#rWrong').checked : true, from: $('#rFrom') ? $('#rFrom').value : '', to: $('#rTo') ? $('#rTo').value : '', user: $('#rUser') ? $('#rUser').value : '', dep: $('#rDep') ? $('#rDep').checked : false, tipo: $('#rTipo') ? $('#rTipo').value : '', marca: $('#rMarca') ? $('#rMarca').value : (S.rep.marca || ''), modo: $('#rModo') ? $('#rModo').value : 'opp' };
 }
 async function renderRep(keep) {
   const el = $('#rep');
-  const o = keep ? repOpts() : { min: S.cfg.minInt, wrong: true, from: '', to: '', user: '', dep: false };
+  const o = keep ? repOpts() : { min: S.cfg.minInt, wrong: true, from: '', to: '', user: '', dep: false, tipo: '', marca: S.rep.marca || '', modo: 'opp' };
+  S.rep.marca = o.marca;
   const type = S.rep.type;
   const owners = [...new Set(S.rows.map(r => r.t.own).filter(Boolean))].sort();
   const cnt = {}; Object.keys(REPORTS).forEach(k => cnt[k] = repRows(k, Object.assign({}, o, { dep: k === type ? o.dep : false })).length);
@@ -1606,6 +1803,9 @@ async function renderRep(keep) {
       <div class="field num"><label for="rFrom">Fila desde</label><input id="rFrom" type="number" value="${esc(o.from)}"></div>
       <div class="field num"><label for="rTo">hasta</label><input id="rTo" type="number" value="${esc(o.to)}"></div>
       <div class="field"><label for="rUser">Gestionado por</label><select id="rUser"><option value="">Todos</option>${owners.map(u => `<option ${o.user === u ? 'selected' : ''}>${esc(u)}</option>`).join('')}<option ${o.user === '(sin asignar)' ? 'selected' : ''}>(sin asignar)</option></select></div>
+      <div class="field"><label for="rTipo">Tipo</label><select id="rTipo"><option value="">Todos</option>${TIPOS.map(x => `<option ${o.tipo === x ? 'selected' : ''}>${x}</option>`).join('')}<option value="-" ${o.tipo === '-' ? 'selected' : ''}>Sin definir</option></select></div>
+      ${type === 'promo' ? `<div class="field"><label for="rMarca">Marca</label><input id="rMarca" list="dlBrands" value="${esc(o.marca)}" placeholder="Elige una marca" style="width:130px"></div>
+        <div class="field"><label for="rModo">Clientes</label><select id="rModo"><option value="opp" ${o.modo === 'opp' ? 'selected' : ''}>Aún no la distribuyen (ofrecer)</option><option value="tiene" ${o.modo === 'tiene' ? 'selected' : ''}>Ya la distribuyen</option></select></div>` : ''}
       <label class="ck"><input type="checkbox" id="rDep" ${o.dep ? 'checked' : ''}> Incluir depurados</label>
     </div>
     <div style="display:flex;align-items:center;gap:12px;margin:14px 0 10px;flex-wrap:wrap">
@@ -1620,22 +1820,24 @@ async function renderRep(keep) {
       </div>
     </div>
     ${type === 'noc' ? `<div class="hint" style="margin:0 0 10px">Clientes con «No contesta» y al menos ${o.min} intento${o.min > 1 ? 's' : ''}${o.wrong ? ', más los de número errado' : ''}, sin compra y sin número corregido. Crea la hoja, dalos de baja en el sistema y luego márcalos como depurados (no se borran filas).</div>` : ''}
+    ${type === 'promo' ? `<div class="hint" style="margin:0 0 10px">${findBrand(o.marca) ? (o.modo === 'tiene' ? `Canales que ya distribuyen <b>${esc(findBrand(o.marca).m)}</b>: ideal para promociones, lanzamientos y reposición.` : `Canales que aún no distribuyen <b>${esc(findBrand(o.marca).m)}</b> pero venden la misma línea (${esc(findBrand(o.marca).c)}) o una complementaria: oportunidad de venta nueva.`) : 'Elige una marca para armar la lista de la promoción.'}</div>` : ''}
     ${type === 'tel' ? `<div class="hint" style="margin:0 0 10px">La columna «Teléfono corregido» trae el número validado. «Cust. Telephone» conserva el original.</div>` : ''}
     ${rows.length ? `<div class="rprev"><table><thead><tr>${tb[0].map((h, j) => `<th class="${j >= nH ? 'x' : ''}">${esc(h)}</th>`).join('')}</tr></thead><tbody>${tb.slice(1).map(r => `<tr>${r.map(v => `<td title="${esc(v)}">${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : '<div class="d-empty">No hay clientes que cumplan estos filtros.</div>'}
     <div id="rSheets" style="margin-top:14px"></div>
   </div>`;
+  if (keep) el.querySelectorAll('.rise').forEach(x => x.classList.remove('rise'));
   showSheets();
 }
 function showSheets() { const b = $('#rSheets'); if (!b) return; b.innerHTML = S.sheets.length ? `<div class="sec-t" style="margin:0 0 8px">Hojas creadas en el libro</div><div class="sheets">${S.sheets.map(s => `<span>${icon('check')}${esc(s.name)} · ${fmtN(s.rows)} filas</span>`).join('')}</div>` : ''; }
 let repT;
 $('#rep').addEventListener('input', e => { if (e.target.closest('.rfilters')) { clearTimeout(repT); repT = setTimeout(() => { const id = document.activeElement && document.activeElement.id; renderRep(true); if (id && $('#' + id)) $('#' + id).focus(); }, 300); } });
-$('#rep').addEventListener('change', e => { if (e.target.type === 'checkbox' || e.target.tagName === 'SELECT') renderRep(true); });
+$('#rep').addEventListener('change', e => { if (e.target.type === 'checkbox' || e.target.tagName === 'SELECT' || e.target.id === 'rMarca') renderRep(true); });
 $('#rep').addEventListener('click', async e => {
   const rt = e.target.closest('[data-rt]');
   if (rt) { S.rep.type = rt.dataset.rt; renderRep(true); return; }
   const btn = e.target.closest('button'), id = btn && btn.id;
   if (!id) return;
-  const o = repOpts(), type = S.rep.type, rows = repRows(type, o), aoa = repTable(rows), name = REPORTS[type].t;
+  const o = repOpts(), type = S.rep.type, rows = repRows(type, o), aoa = repTable(rows), mb = findBrand(o.marca), name = type === 'promo' && mb ? 'Promo ' + mb.m + (o.modo === 'opp' ? ' ofrecer' : ' clientes') : REPORTS[type].t;
   if (id === 'rXlsx') { if (DEMO) toast(`En la versión real se descarga «Reporte_${name.replace(/\s+/g, '_')}_${S.today}.xlsx» con ${fmtN(rows.length)} filas.`); }
   else if (id === 'rCopy') { const ok = await copyText(aoa.map(r => r.join('\t')).join('\n')); toast(ok ? `${fmtN(rows.length)} filas copiadas. Pégalas en Excel.` : 'No se pudo copiar', !ok); }
   else if (id === 'rSheet') {
@@ -1694,6 +1896,8 @@ function openCfg() {
   const c = S.cfg;
   $('#cCC').value = c.cc; $('#cLen').value = c.mobLen; $('#cLock').checked = c.lockRow; $('#cExec').checked = c.writeExec; $('#cMin').value = c.minInt; $('#cPoll').value = c.poll; $('#cGoal').value = c.goal;
   $('#cWa').value = c.waMode; $('#cMsg').value = c.waMsg; $('#cMail').value = c.mailMode; $('#cSubj').value = c.mailSubj;
+  $('#cBrandInfo').textContent = `${S.brands.length} marcas en ${S.cats.length} líneas. Las de «Por definir» se pueden reasignar en la versión real.`;
+  $('#cBrandCat').innerHTML = S.cats.map(x => `<option>${esc(x)}</option>`).join('');
   openModal('#mCfg');
 }
 $('#bCfgOk').onclick = async () => {
@@ -1708,6 +1912,10 @@ $('#bCfgOk').onclick = async () => {
     $('#bCfgOk').disabled = false;
   }
   closeModal('#mCfg');
+};
+$('#bAddBrand').onclick = async () => {
+  try { S.brands = await call('api_addBrand', S.token, { m: $('#cBrandName').value, c: $('#cBrandCat').value }); fillBrandLists(); $('#cBrandInfo').textContent = `${S.brands.length} marcas en ${S.cats.length} líneas.`; toast('Marca agregada: ' + $('#cBrandName').value.trim()); $('#cBrandName').value = ''; }
+  catch (e) { toast(e.message, true); }
 };
 let USERS = [];
 async function openUsers() { openModal('#mUsers'); uForm(null); $('#uList').innerHTML = '<div class="it">Cargando…</div>'; try { USERS = await call('api_users', S.token); renderUsers(); } catch (e) { toast(e.message, true); } }
@@ -1766,13 +1974,15 @@ $('#bReload').onclick = () => { flushAll(); loadAll(false); };
 let qT;
 $('#q').addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(() => { applyFilter(); $('#grid').scrollTop = 0; }, 160); });
 ['#fFrom', '#fTo'].forEach(s => $(s).addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(() => { applyFilter(); $('#grid').scrollTop = 0; if (S.view.length && (!S.active || S.active._vi == null)) setActive(0); }, 250); }));
+['#fTipo', '#fCat'].forEach(s => $(s).addEventListener('change', () => { applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0); }));
+$('#fMarca').addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(() => { applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0); }, 250); });
 $('#hideDep').checked = UI.hideDep;
 $('#hideDep').onchange = () => { UI.hideDep = $('#hideDep').checked; saveUI(); applyFilter(); };
-$('#bClear').onclick = () => { $('#q').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; S.st = 'all'; $$('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.st === 'all')); applyFilter(); if (S.active && S.active._vi != null) ensureVisible(S.active._vi); };
+$('#bClear').onclick = () => { $('#q').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; $('#fTipo').value = ''; $('#fCat').value = ''; $('#fMarca').value = ''; S.st = 'all'; $$('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.st === 'all')); applyFilter(); if (S.active && S.active._vi != null) ensureVisible(S.active._vi); };
 $('#chips').addEventListener('click', e => { const c = e.target.closest('.chip'); if (!c) return; S.st = c.dataset.st; $$('#chips .chip').forEach(x => x.classList.toggle('on', x === c)); applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0); });
 $('#grid').addEventListener('scroll', render, { passive: true });
 window.addEventListener('resize', () => { render(); applyPanel(); moveInd(); });
-function actArg(b) { return b.dataset.act === 'copy' ? b.dataset.f : (b.dataset.act === 'res' ? b.dataset.n : (b.dataset.n != null ? +b.dataset.n : null)); }
+function actArg(b) { return b.dataset.act === 'copy' ? b.dataset.f : (['res', 'tipo', 'brand'].includes(b.dataset.act) ? b.dataset.n : (b.dataset.n != null ? +b.dataset.n : null)); }
 $('#gbody').addEventListener('click', e => {
   const rowE = e.target.closest('.row'); if (!rowE) return;
   const i = +rowE.dataset.i, r = S.view[i];
@@ -1790,6 +2000,8 @@ $('#panel').addEventListener('input', e => {
   if (e.target.id === 'pNewPhone') { S.phDraft = e.target.value; $('#pFixHint').innerHTML = fixHint(); }
 });
 $('#panel').addEventListener('focusout', e => { if (e.target.id === 'pCmt' && S.active) flushComment(S.active); });
+$('#panel').addEventListener('keydown', e => { if (e.target.id === 'pBrand' && e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); act(S.active, 'brandadd'); } });
+$('#panel').addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('bcat')) S.catOpen = e.target.open; }, true);
 $('#panel').addEventListener('change', e => {
   if (!S.active) return;
   if (e.target.id === 'pNext') send(S.active, { op: 'next', val: e.target.value });
@@ -1832,7 +2044,7 @@ document.addEventListener('keydown', e => {
   const resK = RES_LIST.find(x => RES[x].k === k);
   if (resK) { e.preventDefault(); return act(r, 'res', resK); }
   if (k === '0') { e.preventDefault(); if (r.t.res) act(r, 'res', ''); return; }
-  const map = { w: ['wa'], m: ['mail'], c: ['contact'], i: ['copy', 'id'], t: ['copy', 'tax'], r: ['rev'], v: ['buy'], e: ['fixopen'] };
+  const map = { w: ['wa'], m: ['mail'], c: ['contact'], i: ['copy', 'id'], t: ['copy', 'tax'], r: ['rev'], v: ['buy'], e: ['fixopen'], b: ['brandfocus'] };
   const a = map[k.toLowerCase()]; if (a) { e.preventDefault(); act(r, a[0], a[1] || null); }
 });
 

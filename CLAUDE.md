@@ -12,3 +12,8 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 - `Customer ID`, `Tax Reg No` y los teléfonos se tratan como texto.
 - Antes de procesar un Excel real, validarlo con `python3 crm/estructura/validar_cartera.py <archivo.xlsx>`. Si no pasa, no procesarlo.
 - En la base de datos del CRM (Supabase), la tabla de clientes conserva estas 18 columnas con el mismo significado, de modo que el Excel se pueda importar y exportar sin pérdidas.
+
+## Tipo de negocio y marcas
+
+- Tipo de negocio de cada cliente: Tienda, Oficina o Híbrido. Se sugiere por palabras clave del comentario y se confirma en el panel; se guarda en `_Seguimiento`.
+- El catálogo de marcas está en `crm/estructura/marcas.json` (pestaña `_Marcas`). Las marcas que distribuye cada cliente van en `_ClienteMarcas`, nunca como columnas de la cartera.
