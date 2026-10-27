@@ -33,3 +33,11 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 
 - El ejecutivo solo ve su cartera: clientes con su nombre en `Ejecutivo`, en sus filas reservadas o gestionados por él. El administrador ve todo, incluido el mapeo de marcas por ejecutivo.
 - El modelo completo de pestañas auxiliares está en `crm/estructura/modelo-datos.md`.
+
+## Complemento de Excel (`crm/complemento/`)
+
+- `taskpane.html` se **genera** con `python3 crm/complemento/construir.py` a partir de `crm/prototipo-pro/index.html`; los cambios de diseño se hacen en el prototipo y luego se regenera. No editar `taskpane.html` a mano.
+- `datos.js` es la única capa que toca el libro (Office.js) y expone las funciones `api_*` con el mismo contrato que la versión Sheets. Las llamadas se atienden en fila, una a la vez.
+- Acceso con nombre y PIN: el primero que abre el libro lo configura y queda como administrador; los demás reciben un PIN temporal que cambian al entrar. Los PIN se guardan como SHA-256 con sal en `_Usuarios`.
+- Antes de subir cambios, correr `node crm/complemento/pruebas/prueba-flujo.js` (simulador de Excel + Playwright); debe terminar en «Todas las pruebas pasaron».
+- Instalación y publicación (GitHub Pages, «Cargar mi complemento»): `crm/complemento/GUIA-INSTALACION.md`.

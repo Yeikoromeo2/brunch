@@ -1,0 +1,179 @@
+/* Prueba de punta a punta del complemento con el simulador de Excel.
+   Uso:  node crm/complemento/pruebas/prueba-flujo.js [ruta/xlsx.full.min.js] [carpeta-capturas]
+   Sirve los archivos del complemento desde disco, cambia office.js por el
+   simulador y verifica que la hoja de la cartera solo cambie en «Comentario Créditos». */
+const { chromium } = require('playwright');
+const fs = require('fs');
+const path = require('path');
+
+const DIR = path.resolve(__dirname, '..');
+const XLSX_JS = process.argv[2] && fs.existsSync(process.argv[2]) ? fs.readFileSync(process.argv[2], 'utf8') : null;
+const SHOTS = process.argv[3] || null;
+
+const COLS = ['Organization', 'KAM ID', 'Ejecutivo', 'Customer ID', 'Legal Name', 'Tax Reg No', 'Cust. Address1', 'State Name', 'City Name', 'Cust. Telephone', 'Cust. Mail Address', 'Term ID', 'Report Code', 'Credit Limit', 'Creation Date', 'Last Purchase', 'Clasif.', 'Comentario Créditos'];
+const NAMES = ['Ferretería San Martín SAC', 'Distribuidora El Sol EIRL', 'Inversiones Kallpa SRL', 'Comercial Rímac SAC', 'Grupo Pachamama SAC', 'Bodega Don Lucho EIRL', 'Constructora Huascarán SAC', 'Textiles Majes SRL', 'Servicios Altiplano SAC', 'Importaciones Mistura SAC', 'Maderera Piura Norte EIRL', 'Botica Titicaca SAC'];
+const execs = ['Harold', 'Harold', 'Harold', 'Luis', 'Luis', '', '', '', 'Harold', '', 'Luis', ''];
+const cartera = [COLS, ...NAMES.map((n, i) => ['PE01', 'K21' + (i % 4), execs[i], String(100101 + i), n, '20600' + (100101 + i), 'Av. Ejemplo ' + (100 + i), 'Lima', 'Lima', 987650000 + i * 111, `compras${i}@ejemplo.pe`, '30D', 'R1' + (i % 5), 5000 + i * 7000, 43500 + i * 30, 45900 + i * 20, ['A', 'B', 'C'][i % 3], i === 2 ? 'Tiene tienda en galería Wilson' : ''])];
+const SEED = [{ name: 'Hoja1', rows: cartera }, { name: 'Resumen', rows: [['Notas'], ['hoja ajena al sistema']] }];
+
+const fails = [];
+let PAGE = null; const LOGS = [];
+const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if (!cond) fails.push(msg); };
+
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } }); PAGE = page;
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message)); page.on('console', m => LOGS.push(m.text()));
+  page.on('dialog', d => d.accept());
+  await page.addInitScript(seed => { window.__seed = seed; }, SEED);
+  await page.route('**/*', route => {
+    const u = new URL(route.request().url());
+    if (u.hostname === 'appsforoffice.microsoft.com') return route.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(path.join(__dirname, 'office-mock.js'), 'utf8') });
+    if (u.hostname === 'cdnjs.cloudflare.com' && XLSX_JS) return route.fulfill({ contentType: 'text/javascript', body: XLSX_JS });
+    if (u.hostname === 'gcx.local') { const f = path.join(DIR, u.pathname); return fs.existsSync(f) ? route.fulfill({ path: f }) : route.fulfill({ status: 404, body: '' }); }
+    return route.abort();
+  });
+  const toast = async () => (await page.textContent('#toast')) || '';
+  const shot = async n => { if (SHOTS) await page.screenshot({ path: path.join(SHOTS, n + '.png') }); };
+  const aux = n => page.evaluate(x => window.__book.dump(x), n);
+
+  await page.goto('https://gcx.local/taskpane.html');
+
+  /* 1. primer uso */
+  await page.waitForSelector('#setup:not([hidden])'); await page.waitForTimeout(120);
+  ok(/12/.test(await page.textContent('#suRows')), 'Pantalla de configuración inicial con 12 clientes');
+  await shot('01-configurar');
+  await page.fill('#suName', 'Ana'); await page.fill('#suPin', '1234'); await page.fill('#suPin2', '1234');
+  await page.click('#suBtn');
+  await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana');
+  const vis = await page.evaluate(() => window.__book.raw.sheets.map(s => s.name + ':' + s.visibility));
+  ok(vis.filter(x => x.startsWith('_')).length === 10 && vis.filter(x => x.startsWith('_')).every(x => x.endsWith(':VeryHidden')), '10 pestañas internas creadas como VeryHidden');
+  ok(vis.includes('Hoja1:Visible') && vis.includes('Resumen:Visible'), 'Hoja1 y hojas ajenas siguen visibles');
+  ok((await aux('_Marcas')).length === 90, 'Catálogo de 89 marcas en _Marcas');
+  const u0 = await aux('_Usuarios');
+  ok(u0[1][0] === 'Ana' && u0[1][1] === 'admin' && u0[1][3].length === 64 && u0[1][3] !== '1234', 'Administrador creado con PIN cifrado (no en texto)');
+
+  /* 2. usuario con PIN temporal */
+  await page.click('#bUsers');
+  await page.fill('#uName', 'Harold'); await page.fill('#uPin', '1111');
+  await page.click('#uSave'); await page.waitForTimeout(150);
+  const u1 = await aux('_Usuarios');
+  ok(u1.some(r => r[0] === 'Harold' && r[5] === 'SI'), 'Harold creado con PIN temporal (CambiarPin = SI)');
+  await page.click('#mUsers [data-close]');
+
+  /* 3. lista y panel */
+  await page.click('#mainTabs [data-tab="list"]');
+  await page.waitForSelector('#gbody .row');
+  ok((await page.$$('#gbody .row')).length === 12, 'El administrador ve los 12 clientes');
+  await page.click('#gbody .row[data-i="2"]');
+  await page.waitForFunction(() => document.querySelector('#panel h2').textContent.includes('Kallpa'));
+  ok((await page.textContent('#panel')).includes('Sugerido: Tienda'), 'Tipo de negocio sugerido por palabras clave');
+  await shot('02-lista-panel');
+
+  /* 4. comentario: se agrega sin borrar el anterior */
+  await page.fill('#pCmt', 'Pidió precios de HP');
+  await page.click('[data-act="cmtadd"]'); await page.waitForTimeout(200);
+  const h1 = await aux('Hoja1');
+  ok(/^\d\d\/\d\d Ana: Pidió precios de HP \| Tiene tienda en galería Wilson$/.test(h1[3][17]), 'Comentario agregado con fecha y usuario, conserva el anterior');
+
+  /* 5. resultado, tipo y marca */
+  await page.click('[data-act="res"][data-n="Contestó"]'); await page.waitForTimeout(150);
+  await page.click('[data-act="tipo"][data-n="Tienda"]'); await page.waitForTimeout(150);
+  await page.fill('#pBrand', 'HP'); await page.press('#pBrand', 'Enter'); await page.waitForTimeout(200);
+  const seg = await aux('_Seguimiento'), cm = await aux('_ClienteMarcas');
+  ok(seg.some(r => r[0] === '100103' && r[2] === 'Contestó' && r[6] === 'Tienda' && r[7] === 'Ana'), '_Seguimiento guarda resultado, tipo y gestor por Customer ID');
+  ok(cm.some(r => r[0] === '100103' && r[1] === 'HP' && r[2] === 'habitual'), '_ClienteMarcas guarda la marca con su relación');
+
+  /* 6. venta con OV */
+  await page.click('[data-act="ovopen"]');
+  await page.fill('#oNum', 'ov-5001');
+  await page.fill('#oQuick', 'HP 1500, Lenovo 2300'); await page.press('#oQuick', 'Enter');
+  await page.click('[data-act="ovsave"]'); await page.waitForTimeout(250);
+  const ord = await aux('_Ordenes'), ven = await aux('_Ventas');
+  ok(ord.some(r => r[0] === 'OV-5001' && r[1] === '100103' && r[3] === '3800' && r[4] === 'Despachando'), 'OV registrada en Despachando con total sin IGV');
+  ok(ven.filter(r => r[0] === 'OV-5001').length === 2, 'Una línea por marca en _Ventas');
+  ok(!(await page.$('#bellCt[hidden]')), 'La campana avisa de la OV abierta');
+  await page.click('[data-act="ovopen"]');
+  await page.fill('#oNum', 'OV-5001'); await page.fill('#oQuick', 'HP 100'); await page.press('#oQuick', 'Enter');
+  await page.click('[data-act="ovsave"]'); await page.waitForTimeout(200);
+  ok(/ya está registrada/.test(await toast()), 'OV duplicada rechazada');
+  await page.click('[data-act="ovopen"]');
+  await page.click('[data-act="ovst"][data-n="OV-5001|Terminado"]'); await page.waitForTimeout(200);
+  ok((await aux('_Ordenes')).some(r => r[0] === 'OV-5001' && r[4] === 'Terminado' && r[7] === 'Ana'), 'OV marcada como Terminado por quien la cerró');
+
+  /* 7. número corregido */
+  await page.click('#gbody .row[data-i="5"]');
+  await page.click('[data-act="fixopen"]');
+  await page.fill('#pNewPhone', '912345678');
+  await page.click('[data-act="phsave"]'); await page.waitForTimeout(200);
+  ok((await aux('_Telefonos')).some(r => r[0] === '100106' && r[2] === '912 345 678'), 'Teléfono corregido en _Telefonos, el original se conserva');
+
+  /* 8. reserva de filas para Harold */
+  await page.click('#bResv'); await page.waitForTimeout(120);
+  await page.fill('#rvFrom', '11'); await page.fill('#rvTo', '13'); await page.selectOption('#rvUser', 'Harold');
+  await page.click('#bDoResv'); await page.waitForTimeout(300);
+  ok((await aux('_Asignaciones')).some(r => r[1] === 'Harold' && r[2] === '11' && r[3] === '13'), 'Reserva guardada en _Asignaciones');
+  if (await page.$('#mResv.on')) await page.click('#mResv [data-close]');
+
+  /* 9. dashboard y reporte en libro nuevo */
+  await page.click('#mainTabs [data-tab="dash"]'); await page.waitForTimeout(300);
+  await shot('03-dashboard');
+  await page.click('#mainTabs [data-tab="rep"]');
+  await page.click('[data-rt="all"]');
+  await page.waitForTimeout(150);
+  const before = await page.evaluate(() => window.__book.raw.sheets.length);
+  await page.click('#rSheet'); await page.waitForTimeout(XLSX_JS ? 600 : 300);
+  const created = await page.evaluate(() => window.__book.raw.created.length);
+  ok(XLSX_JS ? created === 1 : true, 'Reporte creado como libro nuevo (Excel.createWorkbook)' + (XLSX_JS ? '' : ' · omitido, falta SheetJS'));
+  ok((await page.evaluate(() => window.__book.raw.sheets.length)) === before, 'La cartera no recibe hojas nuevas');
+  await shot('04-reportes');
+
+  /* 10. selección en la hoja → abre el cliente */
+  await page.click('#mainTabs [data-tab="list"]');
+  await page.evaluate(() => window.__book.selectRow('Hoja1', 8));
+  await page.waitForTimeout(300);
+  ok((await page.textContent('#panel h2')).includes('Textiles Majes'), 'Seleccionar la fila 9 de la hoja abre ese cliente');
+
+  /* 11. Harold entra con PIN temporal y ve solo su cartera */
+  await page.click('#bOut');
+  await page.waitForSelector('#login:not([hidden])'); await page.waitForTimeout(120);
+  await page.fill('#lgName', 'harold'); await page.fill('#lgPin', '0000'); await page.click('#lgBtn'); await page.waitForTimeout(150);
+  ok(/incorrecto/.test(await page.textContent('#lgErr')), 'PIN incorrecto rechazado');
+  await page.fill('#lgPin', '1111'); await page.click('#lgBtn');
+  await page.waitForSelector('#pinCover:not([hidden])'); await page.waitForTimeout(120);
+  await shot('05-cambiar-pin');
+  await page.fill('#pnPin', '2468'); await page.fill('#pnPin2', '2468'); await page.click('#pnBtn');
+  await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Harold');
+  await page.click('#mainTabs [data-tab="list"]');
+  const n = (await page.$$('#gbody .row')).length;
+  ok(n === 7, `Harold ve solo su cartera: Ejecutivo + filas reservadas (${n} de 12)`);
+  ok((await aux('_Usuarios')).some(r => r[0] === 'Harold' && r[5] === 'NO'), 'El PIN temporal quedó reemplazado');
+
+  /* 12. la hoja de la cartera solo cambió en «Comentario Créditos» */
+  const fin = await aux('Hoja1');
+  let diff = [];
+  cartera.forEach((row, i) => row.forEach((x, j) => { if (j !== 17 && String(fin[i][j]) !== String(x)) diff.push(`${i + 1},${j + 1}`); }));
+  ok(diff.length === 0 && fin.length === cartera.length && fin.every(r => r.length <= 18), 'Hoja1 intacta salvo la columna «Comentario Créditos»');
+  const fmt = await page.evaluate(() => window.__book.sheet('Hoja1').formats.length);
+  ok(fmt === 0, 'Sin cambios de formato en Hoja1');
+
+  /* 13. panel angosto de Excel */
+  await page.setViewportSize({ width: 420, height: 820 }); await page.waitForTimeout(300);
+  await shot('06-taskpane-lista');
+  await page.click('#gbody .row[data-i="0"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(200);
+  ok(await page.isVisible('#panel .p-nav'), 'En el panel angosto el detalle trae «Lista» y anterior/siguiente');
+  await shot('07-taskpane-detalle');
+  const over = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+  ok(over <= 0, 'Sin desplazamiento horizontal a 420 px');
+
+  ok(errors.length === 0, 'Sin errores de JavaScript' + (errors.length ? ': ' + errors.join(' | ') : ''));
+  await browser.close();
+  console.log(fails.length ? `\n${fails.length} prueba(s) fallaron` : '\nTodas las pruebas pasaron');
+  process.exit(fails.length ? 1 : 0);
+})().catch(async e => {
+  console.error(e.message.split('\n')[0]);
+  try { console.error('Estado:', await PAGE.evaluate(() => ({ toast: document.querySelector('#toast').textContent, covers: [...document.querySelectorAll('.cover')].filter(c => !c.hidden).map(c => c.id), pnErr: document.querySelector('#pnErr').textContent, lgErr: document.querySelector('#lgErr').textContent, me: document.querySelector('#meName').textContent, runs: window.__book.raw.runs, pnBtn: document.querySelector('#pnBtn').disabled, pin: document.querySelector('#pnPin').value }))); } catch (er) {}
+  console.error(LOGS.slice(-8).join('\n'));
+  process.exit(1);
+});
