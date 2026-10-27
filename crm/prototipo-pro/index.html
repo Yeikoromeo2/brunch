@@ -226,7 +226,10 @@ a.ml:hover{text-decoration:underline}
 .linkbtn{border:0;background:transparent;color:var(--accent);font-weight:600;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:2px 4px;border-radius:5px}
 .linkbtn:hover{background:var(--accent-soft)}
 .linkbtn svg{width:13px;height:13px}
-textarea#pCmt{width:100%;min-height:100px;resize:vertical;border:1px solid var(--line2);border-radius:8px;padding:9px 11px;background:var(--surface);outline:0;transition:border-color .15s,box-shadow .15s}
+.curcmt{max-height:150px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface2);padding:6px 10px;margin-bottom:8px;font-size:12px}
+.curcmt p{margin:4px 0;padding-bottom:4px;border-bottom:1px dashed var(--line)}
+.curcmt p:last-child{border-bottom:0}
+textarea#pCmt{width:100%;min-height:70px;resize:vertical;border:1px solid var(--line2);border-radius:8px;padding:9px 11px;background:var(--surface);outline:0;transition:border-color .15s,box-shadow .15s}
 textarea#pCmt:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 textarea#pCmt:disabled{background:var(--surface2);color:var(--muted)}
 .hint{font-size:11px;color:var(--muted);margin-top:6px}
@@ -654,13 +657,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
         <label class="fl"><span>Hasta fila</span><input type="number" id="rvTo" min="2"></label>
       </div>
       <label class="fl" id="rvUserWrap"><span>Para</span><select id="rvUser"></select></label>
-      <label class="fl"><span>Columna Ejecutivo</span>
-        <select id="rvExec">
-          <option value="none">No escribir el nombre todavía (se llena al atender)</option>
-          <option value="touched">Escribir el nombre solo en filas ya gestionadas</option>
-          <option value="all">Escribir el nombre en todas las filas del rango</option>
-        </select></label>
-      <label class="ck"><input type="checkbox" id="rvOver"> Reemplazar si la fila ya tiene otro ejecutivo</label>
+      <div class="hint" style="margin:0">La reserva se guarda en las pestañas internas. La columna «Ejecutivo» de la cartera no se modifica.</div>
       <div class="preview" id="rvPrev"></div>
     </div>
     <div class="sec-t">Reservas activas</div>
@@ -684,7 +681,6 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
         </div>
         <label class="ck"><input type="checkbox" id="cScope"> Cada ejecutivo ve solo su cartera (asignados, reservados o gestionados por él)</label>
         <label class="ck"><input type="checkbox" id="cLock"> Bloquear el cliente cuando alguien lo gestiona</label>
-        <label class="ck"><input type="checkbox" id="cExec"> Escribir el nombre en «Ejecutivo» al gestionar</label>
         <div class="two">
           <label class="fl"><span>Intentos para reporte «No contestaron»</span><input type="number" id="cMin" min="1" max="20"></label>
           <label class="fl"><span>Meta diaria de gestiones</span><input type="number" id="cGoal" min="1" max="500"></label>
@@ -812,7 +808,7 @@ for (let i = 0; i < N; i++) {
     if (rnd() < .85) { const n = 2 + Math.floor(rnd() * 4), set = new Set(); while (set.size < n) set.add(pick(PROFILE[tipo])); t.brands = [...set]; t.brands.forEach(b => { const x = rnd(); t.bmeta[b] = { rel: x < .6 ? 'habitual' : x < .85 ? 'ocasional' : 'interes', by: who, d: addDays(TODAY, -(dAgo + Math.floor(rnd() * 160))) }; }); }
   }
 }
-let CFG = { cc: '51', mobLen: 9, lockRow: true, writeExec: true, scopeOwn: true, minInt: 2, poll: 20, goal: 40, waMode: 'web', waMsg: '', mailMode: 'outlook', mailSubj: '' };
+let CFG = { cc: '51', mobLen: 9, lockRow: true, scopeOwn: true, minInt: 2, poll: 20, goal: 40, waMode: 'web', waMsg: '', mailMode: 'outlook', mailSubj: '' };
 let USERS = [{ row: 2, name: 'Ana', role: 'admin', active: true, pin: '1234' }, { row: 3, name: 'Harold', role: 'ejecutivo', active: true, pin: '1111' }, { row: 4, name: 'Luis', role: 'ejecutivo', active: true, pin: '2222' }];
 let ASSIGNS = [{ id: 'rv1', user: 'Harold', from: 2, to: 21, by: 'Ana', date: addDays(TODAY, -10) }, { id: 'rv2', user: 'Luis', from: 22, to: 41, by: 'Ana', date: addDays(TODAY, -10) }];
 const SESS = {}, SHEETS = [];
@@ -846,9 +842,9 @@ const API = {
       if (a && a.user !== u.name) return { ok: false, error: 'Reservada para ' + a.user, state: state(row) };
       if (CFG.lockRow && t.own && t.own !== u.name) return { ok: false, error: 'Gestionado por ' + t.own, state: state(row) };
     }
-    const H = (txt, k, cm) => { const h0 = t.hist[0]; if (cm && h0 && h0.cm && h0.who === u.name && Date.now() - new Date(h0.d.replace(' ', 'T')).getTime() < 10 * 60000) { h0.txt = txt; h0.d = now; } else t.hist.unshift({ d: now, who: u.name, txt, k, cm: !!cm }); };
+    const H = (txt, k, cm) => { t.hist.unshift({ d: now, who: u.name, txt, k, cm: !!cm }); };
     switch (p.op) {
-      case 'comment': row.v[C.comment] = String(p.val || ''); if (p.val) H(String(p.val), 'msg', 1); break;
+      case 'comment': { const txt = String(p.val || '').trim(); if (!txt) throw new Error('El comentario está vacío.'); const prev = String(row.v[C.comment] || '').trim(), line = `${now.slice(8, 10)}/${now.slice(5, 7)} ${u.name}: ${txt}`; row.v[C.comment] = prev ? line + ' | ' + prev : line; H(txt, 'msg', 1); break; }
       case 'rev': t.rev = !!p.val; H(p.val ? 'Marcó revisado' : 'Quitó revisado', 'eye'); break;
       case 'buy': t.buy = !!p.val; if (p.val) t.rev = true; H(p.val ? 'Registró compra' : 'Quitó la compra', 'cart'); break;
       case 'result':
@@ -868,7 +864,6 @@ const API = {
     if (!t.own) t.own = u.name;
     if (!t.first) t.first = now;
     t.last = now;
-    if (CFG.writeExec && t.own === u.name) row.v[C.exec] = u.name;
     SEQ++;
     return { ok: true, state: state(row) };
   },
@@ -891,9 +886,7 @@ const API = {
     const clash = ASSIGNS.find(a => a.user !== user && from <= a.to && to >= a.from);
     if (clash) throw new Error(`Se cruza con las filas ${clash.from}–${clash.to} de ${clash.user}.`);
     ASSIGNS.push({ id: 'rv' + Date.now(), user, from, to, by: u.name, date: TODAY });
-    let updated = 0;
-    if (p.exec !== 'none') ROWS.filter(r => r.r >= from && r.r <= to).forEach(r => { const cur = r.v[C.exec]; if (cur === user || (cur && !p.over)) return; if (p.exec === 'touched' && !TRACK[r.k].own) return; r.v[C.exec] = user; updated++; });
-    SEQ++; return { assigns: ASSIGNS, updated, reload: updated > 0 };
+    SEQ++; return { assigns: ASSIGNS, updated: 0, reload: true };
   },
   api_release(tk, id) { const u = who(tk), a = ASSIGNS.find(x => x.id === id); if (!a) throw new Error('Reserva no encontrada.'); if (u.role !== 'admin' && a.user !== u.name) throw new Error('Solo puedes liberar tus propias filas.'); ASSIGNS = ASSIGNS.filter(x => x !== a); return ASSIGNS; },
   api_users(tk) { const u = who(tk); if (u.role !== 'admin') throw new Error('Solo el administrador.'); return USERS.map(x => ({ row: x.row, name: x.name, role: x.role, active: x.active, hasPin: !!x.pin })); },
@@ -1235,7 +1228,7 @@ function isEditing(r) {
 function applyLocal(r, p) {
   const t = r.t;
   switch (p.op) {
-    case 'comment': r.v[S.C.comment] = p.val; break;
+    case 'comment': { const prev = val(r, 'comment').trim(), n = nowStr(), line = `${n.slice(8, 10)}/${n.slice(5, 7)} ${S.me.name}: ${p.val}`; r.v[S.C.comment] = prev ? line + ' | ' + prev : line; break; }
     case 'rev': t.rev = !!p.val; break;
     case 'buy': t.buy = !!p.val; if (p.val) t.rev = true; break;
     case 'result': t.res = p.val || ''; if (p.val) t.rev = true; t.next = p.val === 'Volver a llamar' ? (p.date || t.next || tomorrow()) : '';
@@ -1253,19 +1246,17 @@ function applyLocal(r, p) {
   if (!t.own) t.own = S.me.name;
   if (!t.first) t.first = nowStr();
   t.last = nowStr();
-  if (S.cfg.writeExec && t.own === S.me.name && S.C.exec != null) r.v[S.C.exec] = S.me.name;
   r.hay = null;
 }
 async function send(r, p) {
   const lk = lockedBy(r);
   if (lk && p.op !== 'unlock') { toast(lk + '. No puedes modificarlo.', true); return false; }
-  if (p.op !== 'comment') { applyLocal(r, p); refreshRow(r, true); if (r === S.active) renderPanel(); updStripSoon(); }
+  applyLocal(r, p); refreshRow(r, true); if (r === S.active) renderPanel(true); updStripSoon();
   S.pending++; setSync('saving');
   try {
     const res = await call('api_action', S.token, { k: r.k, op: p.op, val: p.val, date: p.date });
     if (!res.ok) toast(res.error, true);
     applyState(res.state);
-    if (!res.ok && p.op === 'comment' && r === S.active) renderPanel(true);
   } catch (e) {
     if (!/sesi[oó]n/i.test(e.message)) { toast('No se pudo guardar: ' + e.message, true); setSync('err', 'Error al guardar'); S.needReload = true; }
     S.pending--; return false;
@@ -1274,6 +1265,13 @@ async function send(r, p) {
   if (!S.pending) setSync('', 'Guardado');
   updStripSoon(); updDayBadge();
   return true;
+}
+/* el comentario nunca reemplaza al anterior: se agrega con fecha y usuario */
+function addComment(r, text) {
+  text = String(text || '').trim();
+  if (!text) return Promise.resolve(false);
+  if (lockedBy(r)) { toast(lockedBy(r), true); return Promise.resolve(false); }
+  return send(r, { op: 'comment', val: text }).then(ok => { if (ok) toast('Comentario agregado. Los anteriores se conservan.'); return ok; });
 }
 function queueComment(r, text, from) {
   if (lockedBy(r)) return;
@@ -1345,6 +1343,7 @@ function act(r, a, n) {
     if (v === 'Número errado') { S.fixOpen = r; S.phDraft = ''; }
   } else if (a === 'unlock') { if (confirm('¿Liberar este cliente para que otra persona lo pueda gestionar?')) send(r, { op: 'unlock' }); }
   else if (a === 'brandfocus') { const i = $('#pBrand'); if (i) { i.focus(); i.scrollIntoView({ block: 'center' }); } }
+  else if (a === 'cmtadd') { const ta = $('#pCmt'); if (!ta || !ta.value.trim()) { if (ta) ta.focus(); return toast('Escribe el comentario primero.', true); } const v = ta.value; ta.value = ''; ta.blur(); addComment(r, v); }
   else if (a === 'tipo') { send(r, { op: 'tipo', val: r.t.tipo === n ? '' : n }); }
   else if (a === 'brand') { const on = !(r.t.brands || []).includes(n); send(r, { op: 'brand', val: { b: n, on, rel: S.addRel } }).then(ok => ok && toast(on ? `${n}: ${REL[S.addRel].l.toLowerCase()}` : 'Marca quitada: ' + n)); }
   else if (a === 'brandrel') { const nx = REL_K[(REL_K.indexOf(relOf(r, n)) + 1) % REL_K.length]; send(r, { op: 'brand', val: { b: n, on: true, rel: nx } }).then(ok => ok && toast(`${n}: ${REL[nx].l.toLowerCase()}`)); }
@@ -1468,7 +1467,7 @@ function rowHTML(r, i) {
     + `<button class="ib${r.t.buy ? ' on-buy' : ''}" data-act="buy" title="Compra con éxito (V)" ${dis}>${icon('cart')}</button>`
     + `</div><div class="c">${resHTML(r.t)}${who}</div>`
     + COLS.map(c => cellHTML(r, c)).join('')
-    + `<div class="c sr"><input class="cmt" data-i="${i}" value="${esc(val(r, 'comment'))}" placeholder="${lk ? esc(lk) : 'Escribe un comentario…'}" ${dis}></div></div>`;
+    + `<div class="c sr" title="${esc(val(r, 'comment'))}"><input class="cmt" data-i="${i}" value="" placeholder="${lk ? esc(lk) : esc(val(r, 'comment') || 'Agregar comentario… (Enter)')}" ${dis}></div></div>`;
 }
 let rq = 0;
 function render() { cancelAnimationFrame(rq); rq = requestAnimationFrame(renderNow); }
@@ -1559,8 +1558,11 @@ function renderPanel(force) {
     ${r.t.res === 'No interesado' ? `<div class="sub"><label class="fl"><span>¿Por qué no le interesa?</span><select class="selin" id="pMotivo" ${dis}><option value="">Elige un motivo…</option>${MOTIVOS.map(m => `<option ${r.t.motivo === m ? 'selected' : ''}>${esc(m)}</option>`).join('')}</select></label></div>` : ''}
     ${r.t.res === 'Número errado' ? fixBox : ''}</div>
     ${bizHTML(r, lk, dis)}
-    <div class="p-sec"><h3><span>${esc(S.header[S.C.comment])}</span></h3><textarea id="pCmt" placeholder="${lk ? esc(lk) : 'Detalle de la atención…'}" ${dis}>${esc(val(r, 'comment'))}</textarea>
-      <div class="hint">Al escribir un comentario el cliente queda <b>atendido</b> (verde). Se guarda solo y cada versión queda en el historial.</div></div>
+    <div class="p-sec"><h3><span>${esc(S.header[S.C.comment])}</span></h3>
+      ${val(r, 'comment') ? `<div class="curcmt">${val(r, 'comment').split(' | ').map(x => `<p>${esc(x)}</p>`).join('')}</div>` : ''}
+      <textarea id="pCmt" placeholder="${lk ? esc(lk) : 'Nuevo comentario… (Ctrl+Enter para agregar)'}" ${dis}></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="btn primary" data-act="cmtadd" ${dis}>${icon('msg')}Agregar comentario</button></div>
+      <div class="hint">Cada comentario se agrega en «Comentario Créditos» con fecha y nombre, sin borrar los anteriores. Con comentario el cliente queda <b>atendido</b>.</div></div>
     <div class="p-sec"><h3><span>Contacto</span>${lk ? '' : `<button class="linkbtn" data-act="fixopen">${icon('pencil')}${r.t.fix ? 'Cambiar número' : 'Editar número'}</button>`}</h3>
       <div class="phones">${ps.map((x, n) => x.wa ? `<a class="ph wa${x.fix ? ' fix' : ''}${x.old ? ' bad' : ''}" data-act="wa" data-n="${n}">${icon(x.fix ? 'check' : 'wa')}${esc(x.d)}</a>` : `<a class="ph tel${x.old ? ' bad' : ''}" data-act="tel">${icon('phone')}${esc(x.d)}</a>`).join('') || '<span class="hint" style="margin:0">Sin teléfono registrado</span>'}</div>
       ${ms.length ? `<div style="margin-top:8px;display:flex;flex-direction:column;gap:3px">${ms.map((m, n) => `<a class="ml" data-act="mail" data-n="${n}">${esc(m)}</a>`).join('')}</div>` : ''}
@@ -1632,8 +1634,8 @@ function renderBrands(keep) {
       <div class="hint">Cada celda: clientes del ejecutivo que venden al menos una marca de esa línea. Clic en un ejecutivo para ver sus clientes.</div>`;
   }
   el.innerHTML = `
-  <div class="d-head"><div><h2>Marcas por canal</h2><div class="sub">${admin ? 'Vista de administrador: toda la cartera' : `Tu cartera: ${fmtN(S.rows.length)} clientes${S.scoped ? ' asignados a ti' : ''}`}. Las marcas se guardan en la pestaña _ClienteMarcas, no en la cartera.</div></div><div class="spacer"></div>
-    <button class="btn primary" id="bfSheet">${icon('file')}Crear hoja del mapeo</button></div>
+  <div class="d-head"><div><h2>Marcas por canal</h2><div class="sub">${admin ? 'Vista de administrador: toda la cartera' : `Tu cartera: ${fmtN(S.rows.length)} clientes${S.scoped ? ' asignados a ti' : ''}`}. Las marcas se guardan en las pestañas internas, no en la cartera.</div></div><div class="spacer"></div>
+    <button class="btn primary" id="bfSheet">${icon('file')}Crear archivo del mapeo</button></div>
   <div class="kpis">
     <div class="kpi rise"><div class="l">${icon('users')}${admin ? 'Clientes en la cartera' : 'Tus clientes'}</div><div class="v" data-count="${base.length}">0</div><div class="s">${f.exec ? 'de ' + esc(f.exec) : 'según filtros de ejecutivo y tipo'}</div></div>
     <div class="kpi rise" style="--d:1"><div class="l">${icon('tag')}Con marcas registradas</div><div class="v" data-count="${mapped.length}">0</div><div class="s">${pct(mapped.length, base.length)}% mapeado · <a href="#" id="bfEmpty" style="color:var(--accent)">${f.empty ? 'ver mapeados' : 'ver sin marcas'}</a></div></div>
@@ -1677,7 +1679,7 @@ $('#vBrands').addEventListener('click', async e => {
     const f = S.bf, rows = brandRows().filter(r => f.empty ? !(r.t.brands || []).length : (brandMatch(r, f.cat, f.marca, f.rel) && (r.t.brands || []).length));
     if (!rows.length) return toast('No hay clientes con estos filtros.', true);
     const mb = findBrand(f.marca), name = 'Mapeo ' + (mb ? mb.m : f.cat ? SHORT[f.cat] || f.cat : f.exec || 'marcas');
-    try { const res = await call('api_saveReport', S.token, name + ' ' + ddmm(S.today).replace('/', '-'), repTable(rows)); S.sheets = res.sheets; toast(`Hoja «${res.sheet}» creada con ${fmtN(rows.length)} clientes, 18 columnas y sus marcas por relación.`); }
+    try { const res = await call('api_saveReport', S.token, name + ' ' + ddmm(S.today).replace('/', '-'), repTable(rows)); S.sheets = res.sheets; toast(`En la versión real se abre el libro nuevo «${res.sheet}.xlsx» con ${fmtN(rows.length)} clientes, las 18 columnas y sus marcas.`); }
     catch (er) { toast(er.message, true); }
   }
 });
@@ -1970,14 +1972,14 @@ async function renderRep(keep) {
       <div style="font-size:15px"><b>${fmtN(rows.length)}</b> cliente${rows.length === 1 ? '' : 's'} en «${REPORTS[type].t}»${rows.length > 300 ? ' <span style="font-size:12px;color:var(--muted)">(vista previa de 300)</span>' : ''}</div>
       <div class="spacer"></div>
       <div class="ractions">
-        <button class="btn primary" id="rSheet" ${rows.length ? '' : 'disabled'}>${icon('file')}Crear hoja nueva en el libro</button>
+        <button class="btn primary" id="rSheet" ${rows.length ? '' : 'disabled'}>${icon('file')}Crear archivo con el reporte</button>
         <button class="btn" id="rXlsx" ${rows.length ? '' : 'disabled'}>${icon('down')}Descargar Excel</button>
         <button class="btn" id="rCopy" ${rows.length ? '' : 'disabled'}>${icon('copy')}Copiar</button>
         ${type === 'noc' && isAdmin() ? `<button class="btn danger" id="rPurge" ${rows.filter(r => !r.t.dep).length ? '' : 'disabled'}>${icon('trash')}Marcar como depurados</button>` : ''}
         ${isAdmin() && o.dep && rows.some(r => r.t.dep) ? `<button class="btn" id="rUndo">Restaurar depurados</button>` : ''}
       </div>
     </div>
-    ${type === 'noc' ? `<div class="hint" style="margin:0 0 10px">Clientes con «No contesta» y al menos ${o.min} intento${o.min > 1 ? 's' : ''}${o.wrong ? ', más los de número errado' : ''}, sin compra y sin número corregido. Crea la hoja, dalos de baja en el sistema y luego márcalos como depurados (no se borran filas).</div>` : ''}
+    ${type === 'noc' ? `<div class="hint" style="margin:0 0 10px">Clientes con «No contesta» y al menos ${o.min} intento${o.min > 1 ? 's' : ''}${o.wrong ? ', más los de número errado' : ''}, sin compra y sin número corregido. Crea el archivo, dalos de baja en el sistema y luego márcalos como depurados (no se borran filas).</div>` : ''}
     ${type === 'promo' ? `<div class="hint" style="margin:0 0 10px">${findBrand(o.marca) ? (o.modo === 'tiene' ? `Canales que ya distribuyen <b>${esc(findBrand(o.marca).m)}</b>: ideal para promociones, lanzamientos y reposición.` : `Canales que aún no distribuyen <b>${esc(findBrand(o.marca).m)}</b> pero venden la misma línea (${esc(findBrand(o.marca).c)}) o una complementaria: oportunidad de venta nueva.`) : 'Elige una marca para armar la lista de la promoción.'}</div>` : ''}
     ${type === 'tel' ? `<div class="hint" style="margin:0 0 10px">La columna «Teléfono corregido» trae el número validado. «Cust. Telephone» conserva el original.</div>` : ''}
     ${rows.length ? `<div class="rprev"><table><thead><tr>${tb[0].map((h, j) => `<th class="${j >= nH ? 'x' : ''}">${esc(h)}</th>`).join('')}</tr></thead><tbody>${tb.slice(1).map(r => `<tr>${r.map(v => `<td title="${esc(v)}">${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : '<div class="d-empty">No hay clientes que cumplan estos filtros.</div>'}
@@ -1986,7 +1988,7 @@ async function renderRep(keep) {
   if (keep) el.querySelectorAll('.rise').forEach(x => x.classList.remove('rise'));
   showSheets();
 }
-function showSheets() { const b = $('#rSheets'); if (!b) return; b.innerHTML = S.sheets.length ? `<div class="sec-t" style="margin:0 0 8px">Hojas creadas en el libro</div><div class="sheets">${S.sheets.map(s => `<span>${icon('check')}${esc(s.name)} · ${fmtN(s.rows)} filas</span>`).join('')}</div>` : ''; }
+function showSheets() { const b = $('#rSheets'); if (!b) return; b.innerHTML = S.sheets.length ? `<div class="sec-t" style="margin:0 0 8px">Archivos creados en tu OneDrive</div><div class="sheets">${S.sheets.map(s => `<span>${icon('check')}${esc(s.name)} · ${fmtN(s.rows)} filas</span>`).join('')}</div>` : ''; }
 let repT;
 $('#rep').addEventListener('input', e => { if (e.target.closest('.rfilters')) { clearTimeout(repT); repT = setTimeout(() => { const id = document.activeElement && document.activeElement.id; renderRep(true); if (id && $('#' + id)) $('#' + id).focus(); }, 300); } });
 $('#rep').addEventListener('change', e => { if (e.target.type === 'checkbox' || e.target.tagName === 'SELECT' || e.target.id === 'rMarca') renderRep(true); });
@@ -2000,7 +2002,7 @@ $('#rep').addEventListener('click', async e => {
   else if (id === 'rCopy') { const ok = await copyText(aoa.map(r => r.join('\t')).join('\n')); toast(ok ? `${fmtN(rows.length)} filas copiadas. Pégalas en Excel.` : 'No se pudo copiar', !ok); }
   else if (id === 'rSheet') {
     btn.disabled = true;
-    try { const res = await call('api_saveReport', S.token, name + ' ' + ddmm(S.today).replace('/', '-'), aoa); S.sheets = res.sheets; toast('Hoja «' + res.sheet + '» creada. La cartera original sigue igual.'); }
+    try { const res = await call('api_saveReport', S.token, name + ' ' + ddmm(S.today).replace('/', '-'), aoa); S.sheets = res.sheets; toast('En la versión real se abre el libro nuevo «' + res.sheet + '.xlsx» en tu OneDrive. La cartera original no se toca.'); }
     catch (er) { toast(er.message, true); }
     renderRep(true);
   } else if (id === 'rPurge' || id === 'rUndo') {
@@ -2016,7 +2018,6 @@ function openResv() {
   $('#rvFrom').value = $('#fFrom').value || ''; $('#rvTo').value = $('#fTo').value || '';
   $('#rvUserWrap').hidden = !isAdmin();
   $('#rvUser').innerHTML = S.users.map(u => `<option ${u === S.me.name ? 'selected' : ''}>${esc(u)}</option>`).join('');
-  $('#rvExec').value = 'none'; $('#rvOver').checked = false;
   renderResvList(); updResv(); openModal('#mResv'); setTimeout(() => $('#rvFrom').focus(), 50);
 }
 function renderResvList() {
@@ -2036,12 +2037,12 @@ $('#rvList').addEventListener('click', async e => {
   try { S.assigns = await call('api_release', S.token, b.dataset.rel); renderResvList(); render(); updStrip(); toast('Reserva liberada'); } catch (er) { toast(er.message, true); b.disabled = false; }
 });
 $('#bDoResv').onclick = async () => {
-  const p = { from: $('#rvFrom').value, to: $('#rvTo').value, user: isAdmin() ? $('#rvUser').value : '', exec: $('#rvExec').value, over: $('#rvOver').checked };
+  const p = { from: $('#rvFrom').value, to: $('#rvTo').value, user: isAdmin() ? $('#rvUser').value : '' };
   $('#bDoResv').disabled = true;
   try {
     const res = await call('api_reserve', S.token, p);
     S.assigns = res.assigns; renderResvList(); updResv();
-    toast('Filas reservadas' + (res.updated ? ` · ejecutivo escrito en ${res.updated} filas` : ''));
+    toast('Filas reservadas');
     if (res.reload) await loadAll(false); else { render(); updStrip(); }
   } catch (er) { toast(er.message, true); }
   $('#bDoResv').disabled = false;
@@ -2052,7 +2053,7 @@ function openCfg() {
   $('#cCols').innerHTML = S.header.filter((h, j) => keyOf(j) !== 'comment').map(h => `<label class="ck"><input type="checkbox" data-col="${esc(norm(h))}" ${UI.hidden.includes(norm(h)) ? '' : 'checked'}> ${esc(h)}</label>`).join('');
   $('#cAdmin').hidden = !isAdmin();
   const c = S.cfg;
-  $('#cCC').value = c.cc; $('#cLen').value = c.mobLen; $('#cLock').checked = c.lockRow; $('#cScope').checked = c.scopeOwn !== false; $('#cExec').checked = c.writeExec; $('#cMin').value = c.minInt; $('#cPoll').value = c.poll; $('#cGoal').value = c.goal;
+  $('#cCC').value = c.cc; $('#cLen').value = c.mobLen; $('#cLock').checked = c.lockRow; $('#cScope').checked = c.scopeOwn !== false; $('#cMin').value = c.minInt; $('#cPoll').value = c.poll; $('#cGoal').value = c.goal;
   $('#cWa').value = c.waMode; $('#cMsg').value = c.waMsg; $('#cMail').value = c.mailMode; $('#cSubj').value = c.mailSubj;
   $('#cBrandInfo').textContent = `${S.brands.length} marcas en ${S.cats.length} líneas. Las de «Por definir» se pueden reasignar en la versión real.`;
   $('#cBrandCat').innerHTML = S.cats.map(x => `<option>${esc(x)}</option>`).join('');
@@ -2064,7 +2065,7 @@ $('#bCfgOk').onclick = async () => {
   if (isAdmin()) {
     $('#bCfgOk').disabled = true;
     try {
-      S.cfg = await call('api_saveCfg', S.token, { cc: $('#cCC').value, mobLen: $('#cLen').value, lockRow: $('#cLock').checked, scopeOwn: $('#cScope').checked, writeExec: $('#cExec').checked, minInt: $('#cMin').value, poll: $('#cPoll').value, goal: $('#cGoal').value, waMode: $('#cWa').value, waMsg: $('#cMsg').value, mailMode: $('#cMail').value, mailSubj: $('#cSubj').value });
+      S.cfg = await call('api_saveCfg', S.token, { cc: $('#cCC').value, mobLen: $('#cLen').value, lockRow: $('#cLock').checked, scopeOwn: $('#cScope').checked, minInt: $('#cMin').value, poll: $('#cPoll').value, goal: $('#cGoal').value, waMode: $('#cWa').value, waMsg: $('#cMsg').value, mailMode: $('#cMail').value, mailSubj: $('#cSubj').value });
       startPoll(); renderNow(); renderPanel(); toast('Configuración guardada para todo el equipo. La visibilidad se aplica al volver a entrar.');
     } catch (e) { toast(e.message, true); }
     $('#bCfgOk').disabled = false;
@@ -2150,14 +2151,12 @@ $('#gbody').addEventListener('click', e => {
   else if (!e.target.closest('.cmt')) $('#grid').focus({ preventScroll: true });
 });
 $('#gbody').addEventListener('focusin', e => { if (e.target.classList.contains('cmt')) { const i = +e.target.dataset.i; if (S.view[i] !== S.active) setActive(i); } });
-$('#gbody').addEventListener('input', e => { if (e.target.classList.contains('cmt')) queueComment(S.view[+e.target.dataset.i], e.target.value, 'grid'); });
-$('#gbody').addEventListener('focusout', e => { if (e.target.classList.contains('cmt')) { const r = S.view[+e.target.dataset.i]; if (r) flushComment(r); } });
+
 $('#panel').addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b || !S.active || b.disabled) return; e.preventDefault(); act(S.active, b.dataset.act, actArg(b)); });
 $('#panel').addEventListener('input', e => {
-  if (e.target.id === 'pCmt' && S.active) queueComment(S.active, e.target.value, 'panel');
   if (e.target.id === 'pNewPhone') { S.phDraft = e.target.value; $('#pFixHint').innerHTML = fixHint(); }
 });
-$('#panel').addEventListener('focusout', e => { if (e.target.id === 'pCmt' && S.active) flushComment(S.active); });
+$('#panel').addEventListener('keydown', e => { if (e.target.id === 'pCmt' && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); act(S.active, 'cmtadd'); } });
 $('#panel').addEventListener('keydown', e => { if (e.target.id === 'pBrand' && e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); act(S.active, 'brandadd'); } });
 $('#panel').addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('bcat')) S.catOpen = e.target.open; }, true);
 $('#panel').addEventListener('change', e => {
@@ -2181,7 +2180,7 @@ document.addEventListener('keydown', e => {
   if (anyModal() || !S.me || S.tab !== 'list' || !$('#login').hidden) return;
   if (typing) {
     if (t.classList.contains('cmt') && (k === 'Enter' || k === 'ArrowDown' || k === 'ArrowUp')) {
-      e.preventDefault(); flushComment(S.active); setActive(S.active._vi + (k === 'ArrowUp' ? -1 : 1), true); focusComment();
+      e.preventDefault(); const txt = t.value, r0 = S.active; t.value = ''; if (txt.trim()) addComment(r0, txt); setActive(S.active._vi + (k === 'ArrowUp' ? -1 : 1), true); focusComment();
     }
     return;
   }

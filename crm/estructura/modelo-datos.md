@@ -1,9 +1,11 @@
 # Modelo de datos del Gestor de Cartera
 
-Hay **dos archivos** en OneDrive/SharePoint:
+Todo vive en **el mismo archivo de la cartera** en OneDrive (opción B):
 
-1. **Cartera original:** `Hoja1` con sus 18 columnas (ver `columnas-cartera.json`). No se modifica, salvo la columna `Comentario Créditos`, donde el sistema solo agrega comentarios.
-2. **Archivo paralelo de datos** (por ejemplo «Gestor de Cartera - Datos.xlsx»): contiene todas las pestañas de abajo como tablas de Excel. Cada registro se enlaza con la cartera por **Customer ID**, nunca por número de fila.
+1. **`Hoja1`:** las 18 columnas de la cartera (ver `columnas-cartera.json`). No se modifica, salvo la columna `Comentario Créditos`, donde el sistema solo agrega comentarios con fecha y usuario.
+2. **Pestañas internas «muy ocultas»:** todas las de abajo. Excel no las muestra ni permite mostrarlas desde el menú; solo el complemento las lee y escribe. Cada registro se enlaza con la cartera por **Customer ID**, nunca por número de fila.
+
+Si TI registra más adelante la app de Microsoft Graph, estas mismas pestañas se mudan a un archivo paralelo sin cambiar su estructura.
 
 ## Pestañas auxiliares
 
@@ -79,8 +81,8 @@ La opción se activa en `_Config` → «Cada ejecutivo ve solo su cartera».
 
 **Límite importante:** en Excel para la web, quien tiene permiso de edición puede abrir la hoja y ver todas las filas. El complemento filtra lo que muestra, pero no reemplaza los permisos del archivo. Si se necesita privacidad real entre ejecutivos, la alternativa es un archivo por ejecutivo, consolidado por el administrador.
 
-## Hojas que genera el sistema
+## Archivos que genera el sistema
 
-Reportes, promociones y mapeos se crean como **hojas nuevas** con un nombre fechado. Si el nombre ya existe, se crea uno con «(2)», «(3)», etc. Cada hoja trae las 18 columnas de la cartera en el mismo orden y, a la derecha:
+Reportes, promociones y mapeos se abren como **libros nuevos** en el OneDrive de quien los crea, con un nombre fechado. Si el nombre ya existe, se crea uno con «(2)», «(3)», etc. El archivo de la cartera no recibe hojas nuevas. Cada libro trae las 18 columnas de la cartera en el mismo orden y, a la derecha:
 
 Fila · Prioridad · Tipo de negocio · Marcas habituales · Marcas a veces · Marcas de interés · Líneas · Marcas actualizadas · Gestionado por · Resultado · Intentos · Último contacto · Próximo contacto · Compra · Monto · Motivo · Teléfono corregido · Depurado
