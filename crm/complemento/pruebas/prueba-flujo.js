@@ -95,8 +95,15 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
     const r = cfg.cells.find(x => x && x[0] === 'seq'); r[1] = String(+r[1] + 1);
   });
   await sync();
-  ok((await page.evaluate(() => window.__loads)) === 0 && await page.isHidden('#loading'), 'Un cambio de otro usuario se aplica sin recargar la pantalla');
-  ok((await page.textContent('#gbody .row[data-i="3"]')).includes('Volver a llamar'), 'La fila del cliente cambiado se actualiza sola');
+  ok(/Cambios del equipo/.test(await page.textContent('#syncTx')) && !(await page.textContent('#gbody .row[data-i="3"]')).includes('Volver a llamar'), 'En modo manual solo avisa «Cambios del equipo · Actualizar», sin leer el libro');
+  await page.click('#sync'); await page.waitForTimeout(300);
+  ok((await page.evaluate(() => window.__loads)) === 0 && await page.isHidden('#loading'), 'Al pulsar Actualizar trae el cambio de otro usuario sin recargar la pantalla');
+  ok((await page.textContent('#gbody .row[data-i="3"]')).includes('Volver a llamar') && /Sincronizado/.test(await page.textContent('#syncTx')), 'La fila del cliente cambiado se actualiza');
+  /* al seleccionar un cliente se lee al día solo ese cliente */
+  await page.evaluate(() => { const seg = window.__book.sheet('_Seguimiento'); const r = seg.cells.find(x => x && x[0] === '100104'); r[2] = 'No interesado'; r[3] = 'Precio'; });
+  await page.click('#gbody .row[data-i="3"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(800);
+  ok((await page.textContent('#gbody .row[data-i="3"]')).includes('No interesado') && (await page.evaluate(() => window.__loads)) === 0, 'Al seleccionar un cliente se lee al día solo ese cliente');
+  await page.click('#gbody .row[data-i="2"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(600);
 
   /* 5. resultado, tipo y marca */
   await page.click('[data-act="res"][data-n="Contestó"]'); await page.waitForTimeout(150);
@@ -249,8 +256,8 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   console.log(fails.length ? `\n${fails.length} prueba(s) fallaron` : '\nTodas las pruebas pasaron');
   process.exit(fails.length ? 1 : 0);
 })().catch(async e => {
-  console.error(e.message.split('\n')[0]);
-  try { console.error('Estado:', await PAGE.evaluate(() => ({ toast: document.querySelector('#toast').textContent, covers: [...document.querySelectorAll('.cover')].filter(c => !c.hidden).map(c => c.id), pnErr: document.querySelector('#pnErr').textContent, lgErr: document.querySelector('#lgErr').textContent, me: document.querySelector('#meName').textContent, runs: window.__book.raw.runs, pnBtn: document.querySelector('#pnBtn').disabled, pin: document.querySelector('#pnPin').value }))); } catch (er) {}
+  console.error(e.message.split('\n').slice(0, 4).join(' | '));
+  try { console.error('Estado:', await PAGE.evaluate(() => ({ toast: document.querySelector('#toast').textContent, covers: [...document.querySelectorAll('.cover')].filter(c => !c.hidden).map(c => c.id), pnErr: document.querySelector('#pnErr').textContent, lgErr: document.querySelector('#lgErr').textContent, me: document.querySelector('#meName').textContent, runs: window.__book.raw.runs, pnBtn: document.querySelector('#pnBtn').disabled, pin: document.querySelector('#pnPin').value, users: window.__book.dump('_Usuarios') }))); } catch (er) {}
   console.error(LOGS.slice(-8).join('\n'));
   process.exit(1);
 });

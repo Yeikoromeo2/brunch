@@ -179,10 +179,6 @@ rep("""      if (/SESION/.test(msg)) sessionLost(msg.replace(/^.*SESION:\\s*/, '
     """      if (window.GC_BRIDGE && /conexión con el panel/.test(msg)) { stopPoll(); showCover('#lostCover'); }
       if (/SESION/.test(msg)) sessionLost(msg.replace(/^.*SESION:\\s*/, ''));""")
 
-# sincronización incremental: los cambios de otros llegan cliente por cliente, sin recargar todo
-rep("    } else { d.changes.forEach(st => applyState(st)); S.seq = d.seq; }",
-    "    } else { d.changes.forEach(st => applyState(st)); S.seq = d.seq; if (d.orders) { S.orders = d.orders; S.sales = d.sales || S.sales; updBell(); if (S.active) renderPanel(); } }")
-
 # arranque rápido: copia de la última carga en el navegador, recarga en segundo plano
 rep("""async function loadAll(first) {
   $('#loading').hidden = false; $('#loadingTx').textContent = 'Cargando cartera…';""",
@@ -277,8 +273,8 @@ rep("  if (prev && prev !== S.active) { if (S.cmtT[prev.k]) flushComment(prev);"
     "  if (prev && prev !== S.active) { $('#panel').scrollTop = 0; if (S.cmtT[prev.k]) flushComment(prev);")
 
 # la hoja sigue al cliente elegido en el panel
-rep("  LS.set('pos', S.active.k);\n  renderPanel(); updStrip();\n}",
-    "  LS.set('pos', S.active.k);\n  renderPanel(); updStrip();\n  followSheet(S.active.k);\n}")
+rep("  if (prev !== S.active) peekSoon(S.active.k);\n}",
+    "  if (prev !== S.active) peekSoon(S.active.k);\n  followSheet(S.active.k);\n}")
 
 # ---------- inicio real ----------
 BOOT = r"""/* ---------- vínculo con la hoja: seleccionar una fila abre el cliente y viceversa ---------- */

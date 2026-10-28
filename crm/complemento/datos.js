@@ -186,6 +186,14 @@ async function readCartera(ctx) {
   return { name: f.name, rows };
 }
 
+/* ---------- de filas de las pestañas internas a datos del cliente ---------- */
+const newTrack = () => ({ rev: false, res: '', int: 0, buy: false, next: '', own: '', first: '', last: '', lastc: '', dep: '', motivo: '', monto: '', fix: '', tipo: '', brands: [], bmeta: {}, hist: [] });
+function addBrand(T, a) { const k = str(a[0]), b = str(a[1]); if (!k || !b || str(a[2]) === 'quitada') return; const t = T(k); if (!t.brands.includes(b)) t.brands.push(b); t.bmeta[b] = { rel: str(a[2]) || 'habitual', by: str(a[3]), d: str(a[4]) }; }
+function addHisRow(T, a) { const k = str(a[0]); if (k) T(k).hist.push({ d: str(a[1]), who: str(a[2]), txt: str(a[3]), k: str(a[4]) || 'clock', cm: str(a[4]) === 'msg' }); }
+const sortHist = t => { t.hist.sort((x, y) => y.d.localeCompare(x.d)); t.hist = t.hist.slice(0, 40); };
+const ordObj = a => ({ ov: str(a[0]), k: str(a[1]), d: str(a[2]), tot: num(a[3]), est: ESTADOS.includes(str(a[4])) ? str(a[4]) : 'Despachando', by: str(a[5]), fin: str(a[6]), finBy: str(a[7]), nota: str(a[8]) });
+const venObj = a => ({ ov: str(a[0]), k: str(a[1]), d: str(a[2]), b: str(a[3]), m: num(a[4]), by: str(a[5]) });
+
 /* ---------- lectura completa ---------- */
 let DB = null;
 async function loadDB(ctx) {
@@ -198,13 +206,13 @@ async function loadDB(ctx) {
   const assigns = R.asg.filter(r => str(r[0]) && str(r[6]) !== 'Liberada').map(r => ({ id: str(r[0]), user: str(r[1]), from: num(r[2]), to: num(r[3]), by: str(r[4]), date: str(r[5]) }));
   const brands = R.mar.filter(r => str(r[0]).trim() && str(r[2]) !== 'NO').map(r => ({ m: str(r[0]).trim(), c: str(r[1]) || 'Por definir' }));
   const track = {};
-  const T = k => track[k] || (track[k] = { rev: false, res: '', int: 0, buy: false, next: '', own: '', first: '', last: '', lastc: '', dep: '', motivo: '', monto: '', fix: '', tipo: '', brands: [], bmeta: {}, hist: [] });
-  R.seg.forEach(a => { const k = str(a[0]); if (!k) return; Object.assign(T(k), { rev: str(a[S_['Revisado']]) === 'SI', res: str(a[S_['Resultado']]), motivo: str(a[S_['Motivo']]), int: num(a[S_['Intentos']]), next: str(a[S_['Próximo contacto']]), tipo: str(a[S_['Tipo de negocio']]), own: str(a[S_['Gestionado por']]), first: str(a[S_['Primera gestión']]), last: str(a[S_['Última gestión']]), lastc: str(a[S_['Último contacto']]), dep: str(a[S_['Depurado']]), fix: str(a[S_['Teléfono corregido']]) }); });
-  R.cm.forEach(a => { const k = str(a[0]), b = str(a[1]); if (!k || !b || str(a[2]) === 'quitada') return; const t = T(k); if (!t.brands.includes(b)) t.brands.push(b); t.bmeta[b] = { rel: str(a[2]) || 'habitual', by: str(a[3]), d: str(a[4]) }; });
-  R.his.forEach(a => { const k = str(a[0]); if (k) T(k).hist.push({ d: str(a[1]), who: str(a[2]), txt: str(a[3]), k: str(a[4]) || 'clock', cm: str(a[4]) === 'msg' }); });
-  Object.values(track).forEach(t => { t.hist.sort((x, y) => y.d.localeCompare(x.d)); t.hist = t.hist.slice(0, 40); });
-  const orders = R.ord.filter(a => str(a[0])).map(a => ({ ov: str(a[0]), k: str(a[1]), d: str(a[2]), tot: num(a[3]), est: ESTADOS.includes(str(a[4])) ? str(a[4]) : 'Despachando', by: str(a[5]), fin: str(a[6]), finBy: str(a[7]), nota: str(a[8]) }));
-  const sales = R.ven.filter(a => str(a[0])).map(a => ({ ov: str(a[0]), k: str(a[1]), d: str(a[2]), b: str(a[3]), m: num(a[4]), by: str(a[5]) }));
+  const T = k => track[k] || (track[k] = newTrack());
+  R.seg.forEach(a => { const k = str(a[0]); if (k) Object.assign(T(k), segObj(a)); });
+  R.cm.forEach(a => addBrand(T, a));
+  R.his.forEach(a => addHisRow(T, a));
+  Object.values(track).forEach(sortHist);
+  const orders = R.ord.filter(a => str(a[0])).map(ordObj);
+  const sales = R.ven.filter(a => str(a[0])).map(venObj);
   orders.forEach(o => { if (o.est === 'Anulada') return; const t = T(o.k); t.buy = true; t.monto = String(num(t.monto) + o.tot); });
   DB = { cart, cfg, seq, users, assigns, brands, track, orders, sales, setup: R.users.length > 0, at: Date.now() };
   return DB;
@@ -318,12 +326,14 @@ const API = {
   },
   /* sincronización: si solo hubo cambios propios no se lee nada más; si otra persona cambió algo,
      se relee el libro aquí y a la pantalla solo se le envían los clientes que cambiaron */
-  async api_changes(tk) {
+  async api_changes(tk, mode) {
     const u0 = who(tk);
     return run(async ctx => {
       const cur = await readSeq(ctx);
-      const base = { assigns: DB.assigns, today: TODAY(), reload: false, changes: [], seq: cur };
+      const base = { assigns: DB.assigns, today: TODAY(), reload: false, changes: [], seq: cur, pending: false };
       if (cur === KNOWN) return base;
+      /* modo manual: solo se avisa que hay cambios; el libro se lee cuando la persona pulsa «Actualizar» */
+      if (mode === 'check') return Object.assign(base, { pending: true });
       const snap = k => { const r = rowOf(k); return JSON.stringify([r && r.v, DB.track[k] || null]); };
       const scope = () => DB.cart.rows.filter(r => inScope(who(tk), r)).map(r => r.k);
       const oldKeys = scope(), old = Object.fromEntries(oldKeys.map(k => [k, snap(k)]));
@@ -445,6 +455,34 @@ const API = {
       await addHist(ctx, o.k, u.name, `${ov}: ${curEst} → ${est}${o.nota ? ' · ' + o.nota : ''}`, est === 'Terminado' ? 'check' : est === 'Incidencia' ? 'alert' : 'cart');
       await bumpSeq(ctx);
       return { order: o, state: stateOf(row) };
+    });
+  },
+  /* lee al día un solo cliente (al seleccionarlo): seguimiento, comentario, marcas, OV, ventas e historial */
+  async api_peek(tk, k) {
+    const u = who(tk);
+    return run(async ctx => {
+      const row = rowOf(k); if (!row || !inScope(u, row)) return null;
+      const rowsOf = async (key, col, max) => {
+        const ws = await sheet(ctx, SH[key]); if (!ws) return [];
+        const kc = await keyCols(ctx, ws), idx = [];
+        kc.keys.forEach((r, j) => { if (j > 0 && str(r[col]) === k) idx.push(j); });
+        const rgs = (max ? idx.slice(-max) : idx).map(j => { const rg = ws.getRangeByIndexes(j, 0, 1, HDR[key].length); rg.load('values'); return rg; });
+        if (rgs.length) await ctx.sync();
+        return rgs.map(rg => rg.values[0]);
+      };
+      const sg = (await findRow(ctx, 'seg', r => str(r[0]) === k)).cur;
+      const cm = await rowsOf('cm', 0), ord = await rowsOf('ord', 1), ven = await rowsOf('ven', 1), his = await rowsOf('his', 0, 60);
+      const cws = cartWs(ctx), ids = cws.getRangeByIndexes(1, C.id, Math.max(1, DB.cart.rows.length + 50), 1); ids.load('text'); await ctx.sync();
+      const i = clientKeys(ids.text.map(x => str(x[0]).trim())).indexOf(k);
+      if (i >= 0) { const c = cws.getRangeByIndexes(i + 1, C.comment, 1, 1); c.load('values'); await ctx.sync(); row.v[C.comment] = str(c.values[0][0]); row.r = i + 2; }
+      const t = newTrack(), T = () => t;
+      if (sg) Object.assign(t, segObj(sg));
+      cm.forEach(a => addBrand(T, a)); his.forEach(a => addHisRow(T, a)); sortHist(t);
+      const os = ord.filter(a => str(a[0])).map(ordObj), vs = ven.filter(a => str(a[0])).map(venObj);
+      os.forEach(o => { if (o.est !== 'Anulada') { t.buy = true; t.monto = String(num(t.monto) + o.tot); } });
+      DB.track[k] = t;
+      DB.orders = DB.orders.filter(o => o.k !== k).concat(os); DB.sales = DB.sales.filter(x => x.k !== k).concat(vs);
+      return { state: stateOf(row), orders: os, sales: vs };
     });
   },
   async api_activity(tk) {

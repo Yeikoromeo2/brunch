@@ -81,6 +81,8 @@ header.top{display:flex;align-items:center;gap:6px;padding:8px 16px;background:v
 .sync i{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 20%,transparent)}
 .sync.saving i{background:var(--warn);animation:pulse 1s infinite}
 .sync.err i{background:var(--crit)}
+.sync.pend{cursor:pointer;color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));background:var(--accent-soft);font-weight:600}
+.sync.pend i{background:var(--accent);animation:pulse 1.6s infinite}
 .me{display:flex;align-items:center;gap:8px;padding:0 4px 0 4px;height:34px;border-radius:17px;border:1px solid var(--line)}
 .me b{font-weight:600}
 .role{font-size:11px;color:var(--muted)}
@@ -827,6 +829,9 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
   <div class="mb">
     <div class="sec-t">Columnas visibles (solo en tu pantalla)</div>
     <div class="colgrid" id="cCols"></div>
+    <div class="sec-t">Cambios del equipo</div>
+    <label class="fl"><span>Traer lo que hacen los demás</span><select id="cSync"><option value="manual">Cuando yo pulse «Actualizar» (recomendado: Excel trabaja más liviano)</option><option value="auto">Automáticamente, cada vez que haya cambios</option></select></label>
+    <div class="hint" style="margin:0">En los dos casos, al abrir un cliente se lee al día solo ese cliente.</div>
     <div class="sec-t">WhatsApp en este equipo</div>
     <label class="fl"><span>Al pulsar WhatsApp</span><select id="cWaMe"><option value="ask">Preguntar dónde abrirlo</option><option value="web">Abrir siempre WhatsApp Web</option><option value="app">Abrir siempre la aplicación de escritorio</option><option value="wame">Dejar que el sitio de WhatsApp pregunte (wa.me)</option></select></label>
     <div id="cAdmin">
@@ -1098,7 +1103,7 @@ const SHORT = { 'Cómputo': 'Cómputo', 'Gaming': 'Gaming', 'Componentes': 'Comp
 
 let toastT;
 function toast(msg, err) { const t = $('#toast'); t.textContent = msg; t.className = 'on' + (err ? ' err' : ''); clearTimeout(toastT); toastT = setTimeout(() => t.className = '', err ? 4500 : 2600); }
-function setSync(s, tx) { const el = $('#sync'); el.className = 'sync ' + (s || ''); $('#syncTx').textContent = tx || (s === 'saving' ? 'Guardando…' : s === 'err' ? 'Sin conexión' : 'Sincronizado'); }
+function setSync(s, tx) { if (!s && (S.pend || S.needReload)) { s = 'pend'; tx = 'Cambios del equipo · Actualizar'; } const el = $('#sync'); el.className = 'sync ' + (s || ''); el.title = s === 'pend' ? 'Otra persona hizo cambios. Pulsa para traerlos (solo se lee lo que cambió).' : 'Estado de sincronización'; $('#syncTx').textContent = tx || (s === 'saving' ? 'Guardando…' : s === 'err' ? 'Sin conexión' : 'Sincronizado'); }
 function countUp(root) {
   root.querySelectorAll('[data-count]').forEach(el => {
     const to = +el.dataset.count, pre = el.dataset.pre || '', suf = el.dataset.suf || '', dec = /\./.test(el.dataset.count);
@@ -1158,7 +1163,12 @@ function showLogin(msg) {
   $('#lgErr').textContent = msg || '';
   setTimeout(() => ($('#lgName').value ? $('#lgPin') : $('#lgName')).focus(), 50);
 }
-function sessionLost(msg) { S.token = ''; stopPoll(); showLogin(msg || 'Tu sesión venció, vuelve a ingresar.'); }
+function sessionLost(msg) {
+  const had = S.token; S.token = ''; stopPoll(); clearTimeout(peekT);
+  /* una respuesta atrasada después de salir no debe borrar lo que se está escribiendo en el ingreso */
+  if (!had && !$('#login').hidden) return;
+  showLogin(msg || 'Tu sesión venció, vuelve a ingresar.');
+}
 $('#bOut').onclick = () => { CACHE.clear(); call('api_logout', S.token).catch(() => {}); sessionLost(' '); };
 
 /* ---------- carga ---------- */
@@ -1198,20 +1208,44 @@ async function loadAll(first, quiet, pre) {
 let pollT = null, pulling = false;
 function startPoll() { stopPoll(); pollT = setInterval(pull, (S.cfg.poll || 20) * 1000); }
 function stopPoll() { if (pollT) clearInterval(pollT); pollT = null; }
-async function pull() {
-  if (pulling || !S.token || document.hidden) return;
+/* sincronización: en modo manual (por defecto) solo se revisa si hay cambios del equipo, que es muy
+   liviano; la lectura se hace cuando la persona pulsa «Actualizar». En automático se lee al detectarlos. */
+const syncAuto = () => UI.sync === 'auto';
+async function pull(force) {
+  if (pulling || !S.token || (document.hidden && !force)) return;
   pulling = true;
+  if (force) setSync('saving', 'Actualizando…');
   try {
-    const d = await call('api_changes', S.token, S.seq, S.lastRow);
+    const d = await call('api_changes', S.token, force || syncAuto() ? 'full' : 'check');
     S.assigns = d.assigns; S.today = d.today;
-    if (d.reload || S.needReload) {
+    if (d.reload || (S.needReload && force)) {
       if (S.pending || Object.keys(S.cmtT).length || isTyping()) S.needReload = true;
-      else { pulling = false; return loadAll(false); }
-    } else { d.changes.forEach(st => applyState(st)); S.seq = d.seq; if (d.orders) { S.orders = d.orders; S.sales = d.sales || S.sales; updBell(); if (S.active) renderPanel(); } }
+      else { pulling = false; S.pend = false; return loadAll(false, true); }
+    } else {
+      d.changes.forEach(st => applyState(st)); S.seq = d.seq; S.pend = !!d.pending;
+      if (d.orders) { S.orders = d.orders; S.sales = d.sales || S.sales; updBell(); if (S.active) renderPanel(); }
+    }
     if (!S.pending) setSync('', 'Sincronizado ' + new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }));
     render(); updStripSoon();
   } catch (e) { if (!/sesi[oó]n/i.test(e.message)) setSync('err', 'Sin conexión, reintentando'); }
   pulling = false;
+}
+$('#sync').addEventListener('click', () => { if (S.pend || S.needReload) pull(true); });
+/* al seleccionar un cliente se lee al día solo ese cliente (estado, quién lo gestiona, comentario, OV) */
+let peekT = null;
+function peekSoon(k) {
+  clearTimeout(peekT);
+  peekT = setTimeout(async () => {
+    if (!S.token) return;
+    try {
+      const d = await call('api_peek', S.token, k);
+      const r = S.byKey.get(k); if (!d || !r) return;
+      const before = JSON.stringify([r.v, r.t]);
+      applyState(d.state);
+      S.orders = S.orders.filter(o => o.k !== k).concat(d.orders || []); S.sales = S.sales.filter(x => x.k !== k).concat(d.sales || []);
+      if (JSON.stringify([r.v, r.t]) !== before) { updBell(); if (r === S.active) renderPanel(); updStripSoon(); }
+    } catch (e) {}
+  }, 450);
 }
 const isTyping = () => { const a = document.activeElement; return a && (a.id === 'pCmt' || a.id === 'pNewPhone' || (a.classList && a.classList.contains('cmt'))); };
 document.addEventListener('visibilitychange', () => { if (!document.hidden && S.token && S.me) pull(); });
@@ -1536,6 +1570,7 @@ function setActive(i, scroll) {
   if (scroll) ensureVisible(i);
   LS.set('pos', S.active.k);
   renderPanel(); updStrip();
+  if (prev !== S.active) peekSoon(S.active.k);
   followSheet(S.active.k);
 }
 function ensureVisible(i) {
@@ -2306,7 +2341,7 @@ $('#bDoResv').onclick = async () => {
 function openCfg() {
   $('#cCols').innerHTML = S.header.filter((h, j) => keyOf(j) !== 'comment').map(h => `<label class="ck"><input type="checkbox" data-col="${esc(norm(h))}" ${UI.hidden.includes(norm(h)) ? '' : 'checked'}> ${esc(h)}</label>`).join('');
   $('#cAdmin').hidden = !isAdmin();
-  $('#cWaMe').value = UI.wa || 'ask';
+  $('#cWaMe').value = UI.wa || 'ask'; $('#cSync').value = UI.sync === 'auto' ? 'auto' : 'manual';
   const c = S.cfg;
   $('#cCC').value = c.cc; $('#cLen').value = c.mobLen; $('#cLock').checked = c.lockRow; $('#cScope').checked = c.scopeOwn !== false; $('#cMin').value = c.minInt; $('#cPoll').value = c.poll; $('#cGoal').value = c.goal; $('#cSGoal').value = c.salesGoal || 0;
   $('#cWa').value = c.waMode; $('#cMsg').value = c.waMsg; $('#cMail').value = c.mailMode; $('#cSubj').value = c.mailSubj;
@@ -2315,7 +2350,7 @@ function openCfg() {
   openModal('#mCfg');
 }
 $('#bCfgOk').onclick = async () => {
-  UI.hidden = $$('#cCols input').filter(x => !x.checked).map(x => x.dataset.col); UI.wa = $('#cWaMe').value; saveUI();
+  UI.hidden = $$('#cCols input').filter(x => !x.checked).map(x => x.dataset.col); UI.wa = $('#cWaMe').value; UI.sync = $('#cSync').value; saveUI();
   buildCols(); renderNow();
   if (isAdmin()) {
     $('#bCfgOk').disabled = true;

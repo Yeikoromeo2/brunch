@@ -57,6 +57,15 @@ El panel de Excel tiene un ancho limitado. Con el botón **Ampliar** (arriba, en
 - Para volver, cierra la ventana o pulsa **Cerrar la ventana y volver aquí** en el panel.
 - Si Excel pregunta si permite abrir una ventana, responde **Permitir**.
 
+## Cambios del equipo: manual o automático
+
+Para que Excel trabaje liviano con varias personas a la vez, el Gestor **no relee el libro cada vez que otro cambia algo**:
+
+- Cada 20 segundos solo revisa si hubo cambios (lee una celda). Si los hay, arriba aparece **«Cambios del equipo · Actualizar»**; al pulsarlo se traen solo los clientes que cambiaron, sin recargar la pantalla.
+- **Al abrir un cliente** se lee al día solo ese cliente: estado, quién lo gestiona, comentario, marcas, OV e historial. Así siempre trabajas sobre lo último.
+- Quien prefiera que se actualice solo lo cambia en **Ajustes → Cambios del equipo → Automáticamente**.
+- Cada acción (comentario, resultado, OV) revisa el dato más reciente del libro justo antes de guardar, así que no se pisa el trabajo de otro.
+
 ## Si el panel «se duerme» y vuelve a cargar
 
 Excel para la web recarga el panel del complemento cuando el navegador suspende la pestaña por inactividad o cuando Excel se reconecta. El Gestor guarda una copia de la última carga en el navegador: al recargarse, la cartera aparece al instante en la misma pestaña y el mismo cliente, y se pone al día sola en segundo plano («Actualizando…»). La copia se borra al pulsar **Salir**.
