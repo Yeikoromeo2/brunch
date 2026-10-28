@@ -77,10 +77,12 @@ function makeWorkbook(ctx) {
 window.Excel = {
   run: async fn => {
     book.runs = (book.runs || 0) + 1;
+    /* demora opcional para imitar un libro grande en OneDrive */
+    const delay = +(sessionStorage.getItem('__mockDelay') || 0); if (delay) await new Promise(r => setTimeout(r, delay));
     const ctx = { alive: true, pending: [] };
     ctx.sync = async () => { alive(ctx); ctx.pending.splice(0).forEach(([o, p]) => o._loaded.add(p)); };
     ctx.workbook = makeWorkbook(ctx);
-    try { return await fn(ctx); } finally { ctx.alive = false; book.runs--; }
+    try { return await fn(ctx); } finally { ctx.alive = false; book.runs--; persist(); }
   },
   createWorkbook: async b64 => { book.created.push(b64); }
 };
@@ -116,8 +118,12 @@ window.Office = {
   onReady(cb) { setTimeout(() => cb({ host: 'Excel' }), 0); return Promise.resolve({ host: 'Excel' }); },
   context: { document: { addHandlerAsync(t, h) { book.handlers.push(h); } }, ui, requirements: { isSetSupported: () => true } }
 };
+/* el libro sobrevive a recargas de la página (como el archivo real cuando Excel recarga el panel) */
+function persist() { try { sessionStorage.setItem('__mockbook', JSON.stringify(book.sheets)); } catch (e) {} }
+let saved = null; try { saved = isChild ? null : JSON.parse(sessionStorage.getItem('__mockbook') || 'null'); } catch (e) {}
 /* libro inicial que la prueba deja en window.__seed = [{ name, rows }] antes de cargar la página */
-(window.__seed || []).forEach(s => { const ws = makeSheet(s.name); s.rows.forEach((r, i) => r.forEach((x, j) => set(ws, i, j, x))); });
+if (saved) saved.forEach(w => book.sheets.push(w));
+else (window.__seed || []).forEach(s => { const ws = makeSheet(s.name); s.rows.forEach((r, i) => r.forEach((x, j) => set(ws, i, j, x))); });
 /* ayudas para las pruebas */
 window.__book = {
   raw: book,

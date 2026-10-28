@@ -196,6 +196,19 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok(n === 7, `Harold ve solo su cartera: Ejecutivo + filas reservadas (${n} de 12)`);
   ok((await aux('_Usuarios')).some(r => r[0] === 'Harold' && r[5] === 'NO'), 'El PIN temporal quedó reemplazado');
 
+  /* 11b. si Excel recarga el panel, la pantalla vuelve al instante desde la copia local */
+  await page.click('#mainTabs [data-tab="brands"]');
+  await page.evaluate(() => sessionStorage.setItem('__mockDelay', '400'));
+  await page.reload();
+  const fromCache = await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Harold' && /Actualizando|Sincronizado/.test(document.querySelector('#syncTx').textContent) ? document.querySelector('#syncTx').textContent : false, null, { timeout: 5000 }).then(h => h.jsonValue());
+  ok(fromCache === 'Actualizando…', 'Tras recargar el panel la cartera aparece desde la copia local mientras se actualiza');
+  ok(await page.isVisible('#vBrands.on'), 'Tras recargar vuelve a la misma pestaña');
+  await page.waitForFunction(() => /Sincronizado/.test(document.querySelector('#syncTx').textContent), null, { timeout: 8000 }).catch(() => {});
+  ok(/Sincronizado/.test(await page.textContent('#syncTx')), 'Y se pone al día con el libro en segundo plano');
+  await page.evaluate(() => sessionStorage.removeItem('__mockDelay'));
+  await page.click('#mainTabs [data-tab="list"]');
+  ok((await page.$$('#gbody .row')).length === 7, 'Sigue mostrando solo la cartera de Harold');
+
   /* 12. la hoja de la cartera solo cambió en «Comentario Créditos» */
   const fin = await aux('Hoja1');
   let diff = [];

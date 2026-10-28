@@ -1137,14 +1137,15 @@ function showLogin(msg) {
   setTimeout(() => ($('#lgName').value ? $('#lgPin') : $('#lgName')).focus(), 50);
 }
 function sessionLost(msg) { S.token = ''; stopPoll(); showLogin(msg || 'Tu sesión venció, vuelve a ingresar.'); }
-$('#bOut').onclick = () => { call('api_logout', S.token).catch(() => {}); sessionLost(' '); };
+$('#bOut').onclick = () => { CACHE.clear(); call('api_logout', S.token).catch(() => {}); sessionLost(' '); };
 
 /* ---------- carga ---------- */
-async function loadAll(first) {
-  $('#loading').hidden = false; $('#loadingTx').textContent = 'Cargando cartera…';
+async function loadAll(first, quiet, pre) {
+  if (!quiet) { $('#loading').hidden = false; $('#loadingTx').textContent = 'Cargando cartera…'; }
   const keepKey = S.active ? S.active.k : LS.get('pos', null), keepTop = $('#grid').scrollTop;
   try {
-    const d = await call('api_load', S.token);
+    const d = pre || await call('api_load', S.token);
+    if (!pre) CACHE.set({ name: d.me.name, token: S.token, d });
     S.me = d.me; S.cfg = d.cfg; S.header = d.header; S.C = d.C; S.assigns = d.assigns; S.users = d.users;
     S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false; S.brands = d.brands; S.orders = d.orders || []; S.sales = d.sales || []; S.scoped = !!d.scoped; S.total = d.total || d.rows.length; fillBrandLists();
     S.rows = d.rows.map(([k, r, v]) => ({ k, r, v, t: Object.assign(emptyT(), d.track[k] || {}), hay: null, _vi: null }));
@@ -1159,11 +1160,11 @@ async function loadAll(first) {
     S.active = null;
     if (r && r._vi != null) { setActive(r._vi, first); if (!first) $('#grid').scrollTop = keepTop; }
     else if (S.view.length) setActive(0, true);
-    setTab(first ? 'day' : S.tab); updBell();
+    setTab(first ? (SS.get('tab') || 'day') : S.tab); updBell();
     d.warnings.forEach(w => toast(w, true));
-    setSync('', 'Sincronizado');
+    setSync(pre ? 'saving' : '', pre ? 'Actualizando…' : 'Sincronizado');
     startPoll();
-    if (first) toast(S.scoped ? `Hola ${S.me.name} · tu cartera: ${fmtN(S.rows.length)} de ${fmtN(S.total)} clientes` : `Hola ${S.me.name} · ${fmtN(S.rows.length)} clientes en «${d.sheet}»`);
+    if (first && !pre) toast(S.scoped ? `Hola ${S.me.name} · tu cartera: ${fmtN(S.rows.length)} de ${fmtN(S.total)} clientes` : `Hola ${S.me.name} · ${fmtN(S.rows.length)} clientes en «${d.sheet}»`);
   } catch (e) {
     if (!/sesi[oó]n/i.test(e.message)) { toast('No se pudo cargar: ' + e.message, true); if (!S.rows.length) showLogin(e.message); }
   }
@@ -2330,7 +2331,7 @@ function moveInd() {
   ind.style.width = on.offsetWidth + 'px'; ind.style.transform = `translateX(${on.offsetLeft}px)`;
 }
 function setTab(t) {
-  S.tab = t;
+  S.tab = t; SS.set('tab', t);
   $$('#mainTabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
   moveInd();
   $('#vDay').classList.toggle('on', t === 'day'); $('#vBrands').classList.toggle('on', t === 'brands'); $('#vList').classList.toggle('on', t === 'list'); $('#dash').classList.toggle('on', t === 'dash'); $('#rep').classList.toggle('on', t === 'rep');
@@ -2510,8 +2511,30 @@ $('#bWin').onclick = async () => {
 $('#winClose').onclick = () => GC_HOST.close();
 $('#lostClose').onclick = () => window.close();
 
+/* copia local de la última carga (IndexedDB de este navegador). Si Excel recarga el panel,
+   la pantalla aparece al instante y se pone al día en segundo plano. Se borra al salir. */
+const CACHE = (() => {
+  const open = () => new Promise((ok, ko) => { const r = indexedDB.open('gestor-cartera', 1); r.onupgradeneeded = () => r.result.createObjectStore('c'); r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error); });
+  const tx = (mode, fn) => open().then(db => new Promise((ok, ko) => { const t = db.transaction('c', mode), q = fn(t.objectStore('c')); t.oncomplete = () => ok(q && q.result); t.onerror = () => ko(t.error); }));
+  return {
+    get: () => tx('readonly', st => st.get('carga')).catch(() => null),
+    set: v => tx('readwrite', st => st.put(v, 'carga')).catch(() => {}),
+    clear: () => tx('readwrite', st => st.delete('carga')).catch(() => {})
+  };
+})();
+const SS = { get(k) { try { return sessionStorage.getItem('gc:' + k); } catch (e) { return null; } }, set(k, v) { try { sessionStorage.setItem('gc:' + k, v); } catch (e) {} } };
+/* la copia sirve solo si la sesión guardada sigue vigente y es de la misma persona */
+async function cachedStart() {
+  try {
+    const ses = JSON.parse(localStorage.getItem('gcx:sesion') || 'null'), c = await CACHE.get();
+    if (!ses || ses.exp < Date.now() || !c || !c.d || c.name !== ses.name || c.token !== ses.token) return false;
+    S.token = c.token; await loadAll(true, false, c.d); return true;
+  } catch (e) { return false; }
+}
+
 async function boot() {
-  $('#loading').hidden = false; $('#loadingTx').textContent = 'Revisando la estructura de la cartera…';
+  const fast = await cachedStart();
+  if (!fast) { $('#loading').hidden = false; $('#loadingTx').textContent = 'Revisando la estructura de la cartera…'; }
   try {
     const st = await call('api_status');
     if (!st.ok) {
@@ -2521,8 +2544,8 @@ async function boot() {
     $('#lgSheet').textContent = `Libro: hoja «${st.sheet}» · ${fmtN(st.rows)} clientes`;
     if (st.needSetup) { $('#suSheet').textContent = '«' + st.sheet + '»'; $('#suRows').textContent = fmtN(st.rows); return showCover('#setup'); }
     const ses = await call('api_resume');
-    if (ses) { S.token = ses.token; return loadAll(true); }
-    showLogin();
+    if (ses) { S.token = ses.token; return fast ? loadAll(false, true) : loadAll(true); }
+    CACHE.clear(); showLogin();
   } catch (e) { showLogin('No se pudo leer el libro: ' + e.message); }
 }
 

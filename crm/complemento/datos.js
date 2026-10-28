@@ -206,7 +206,7 @@ async function loadDB(ctx) {
   const orders = R.ord.filter(a => str(a[0])).map(a => ({ ov: str(a[0]), k: str(a[1]), d: str(a[2]), tot: num(a[3]), est: ESTADOS.includes(str(a[4])) ? str(a[4]) : 'Despachando', by: str(a[5]), fin: str(a[6]), finBy: str(a[7]), nota: str(a[8]) }));
   const sales = R.ven.filter(a => str(a[0])).map(a => ({ ov: str(a[0]), k: str(a[1]), d: str(a[2]), b: str(a[3]), m: num(a[4]), by: str(a[5]) }));
   orders.forEach(o => { if (o.est === 'Anulada') return; const t = T(o.k); t.buy = true; t.monto = String(num(t.monto) + o.tot); });
-  DB = { cart, cfg, seq, users, assigns, brands, track, orders, sales, setup: R.users.length > 0 };
+  DB = { cart, cfg, seq, users, assigns, brands, track, orders, sales, setup: R.users.length > 0, at: Date.now() };
   return DB;
 }
 const ensureDB = async () => DB || run(ctx => loadDB(ctx));
@@ -302,7 +302,9 @@ const API = {
 
   async api_load(tk) {
     return run(async ctx => {
-      await loadDB(ctx); const u = who(tk); KNOWN = DB.seq;
+      /* al arrancar, api_status acaba de leer el libro: si nadie escribió desde entonces no se lee de nuevo */
+      if (!(DB && Date.now() - DB.at < 20000 && (await readSeq(ctx)) === DB.seq)) await loadDB(ctx);
+      const u = who(tk); KNOWN = DB.seq;
       const vis = DB.cart.rows.filter(r => inScope(u, r)), ks = new Set(vis.map(r => r.k)), track = {};
       vis.forEach(r => { if (DB.track[r.k]) track[r.k] = DB.track[r.k]; });
       return { me: { name: u.name, role: u.role }, cfg: DB.cfg, scoped: vis.length < DB.cart.rows.length, total: DB.cart.rows.length, header: COLS, C, assigns: DB.assigns,

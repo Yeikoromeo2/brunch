@@ -183,6 +183,30 @@ rep("""      if (/SESION/.test(msg)) sessionLost(msg.replace(/^.*SESION:\\s*/, '
 rep("    } else { d.changes.forEach(st => applyState(st)); S.seq = d.seq; }",
     "    } else { d.changes.forEach(st => applyState(st)); S.seq = d.seq; if (d.orders) { S.orders = d.orders; S.sales = d.sales || S.sales; updBell(); if (S.active) renderPanel(); } }")
 
+# arranque rápido: copia de la última carga en el navegador, recarga en segundo plano
+rep("""async function loadAll(first) {
+  $('#loading').hidden = false; $('#loadingTx').textContent = 'Cargando cartera…';""",
+    """async function loadAll(first, quiet, pre) {
+  if (!quiet) { $('#loading').hidden = false; $('#loadingTx').textContent = 'Cargando cartera…'; }""")
+rep("""    const d = await call('api_load', S.token);
+    S.me = d.me;""",
+    """    const d = pre || await call('api_load', S.token);
+    if (!pre) CACHE.set({ name: d.me.name, token: S.token, d });
+    S.me = d.me;""")
+rep("""    setTab(first ? 'day' : S.tab); updBell();""",
+    """    setTab(first ? (SS.get('tab') || 'day') : S.tab); updBell();""")
+rep("""    setSync('', 'Sincronizado');
+    startPoll();
+    if (first) toast(""",
+    """    setSync(pre ? 'saving' : '', pre ? 'Actualizando…' : 'Sincronizado');
+    startPoll();
+    if (first && !pre) toast(""")
+rep("""function setTab(t) {
+  S.tab = t;""", """function setTab(t) {
+  S.tab = t; SS.set('tab', t);""")
+rep("""$('#bOut').onclick = () => { call('api_logout', S.token).catch(() => {}); sessionLost(' '); };""",
+    """$('#bOut').onclick = () => { CACHE.clear(); call('api_logout', S.token).catch(() => {}); sessionLost(' '); };""")
+
 # login: PIN temporal → pantalla de cambio
 rep("""    S.token = res.token; LS.set('lastName', res.name);
     $('#lgPin').value = '';
@@ -322,8 +346,30 @@ $('#bWin').onclick = async () => {
 $('#winClose').onclick = () => GC_HOST.close();
 $('#lostClose').onclick = () => window.close();
 
+/* copia local de la última carga (IndexedDB de este navegador). Si Excel recarga el panel,
+   la pantalla aparece al instante y se pone al día en segundo plano. Se borra al salir. */
+const CACHE = (() => {
+  const open = () => new Promise((ok, ko) => { const r = indexedDB.open('gestor-cartera', 1); r.onupgradeneeded = () => r.result.createObjectStore('c'); r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error); });
+  const tx = (mode, fn) => open().then(db => new Promise((ok, ko) => { const t = db.transaction('c', mode), q = fn(t.objectStore('c')); t.oncomplete = () => ok(q && q.result); t.onerror = () => ko(t.error); }));
+  return {
+    get: () => tx('readonly', st => st.get('carga')).catch(() => null),
+    set: v => tx('readwrite', st => st.put(v, 'carga')).catch(() => {}),
+    clear: () => tx('readwrite', st => st.delete('carga')).catch(() => {})
+  };
+})();
+const SS = { get(k) { try { return sessionStorage.getItem('gc:' + k); } catch (e) { return null; } }, set(k, v) { try { sessionStorage.setItem('gc:' + k, v); } catch (e) {} } };
+/* la copia sirve solo si la sesión guardada sigue vigente y es de la misma persona */
+async function cachedStart() {
+  try {
+    const ses = JSON.parse(localStorage.getItem('gcx:sesion') || 'null'), c = await CACHE.get();
+    if (!ses || ses.exp < Date.now() || !c || !c.d || c.name !== ses.name || c.token !== ses.token) return false;
+    S.token = c.token; await loadAll(true, false, c.d); return true;
+  } catch (e) { return false; }
+}
+
 async function boot() {
-  $('#loading').hidden = false; $('#loadingTx').textContent = 'Revisando la estructura de la cartera…';
+  const fast = await cachedStart();
+  if (!fast) { $('#loading').hidden = false; $('#loadingTx').textContent = 'Revisando la estructura de la cartera…'; }
   try {
     const st = await call('api_status');
     if (!st.ok) {
@@ -333,8 +379,8 @@ async function boot() {
     $('#lgSheet').textContent = `Libro: hoja «${st.sheet}» · ${fmtN(st.rows)} clientes`;
     if (st.needSetup) { $('#suSheet').textContent = '«' + st.sheet + '»'; $('#suRows').textContent = fmtN(st.rows); return showCover('#setup'); }
     const ses = await call('api_resume');
-    if (ses) { S.token = ses.token; return loadAll(true); }
-    showLogin();
+    if (ses) { S.token = ses.token; return fast ? loadAll(false, true) : loadAll(true); }
+    CACHE.clear(); showLogin();
   } catch (e) { showLogin('No se pudo leer el libro: ' + e.message); }
 }
 

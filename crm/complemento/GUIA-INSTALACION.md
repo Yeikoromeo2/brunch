@@ -57,6 +57,15 @@ El panel de Excel tiene un ancho limitado. Con el botón **Ampliar** (arriba, en
 - Para volver, cierra la ventana o pulsa **Cerrar la ventana y volver aquí** en el panel.
 - Si Excel pregunta si permite abrir una ventana, responde **Permitir**.
 
+## Si el panel «se duerme» y vuelve a cargar
+
+Excel para la web recarga el panel del complemento cuando el navegador suspende la pestaña por inactividad o cuando Excel se reconecta. El Gestor guarda una copia de la última carga en el navegador: al recargarse, la cartera aparece al instante en la misma pestaña y el mismo cliente, y se pone al día sola en segundo plano («Actualizando…»). La copia se borra al pulsar **Salir**.
+
+Para que el navegador no suspenda Excel:
+
+- **Edge:** Configuración → Sistema y rendimiento → **Pestañas en suspensión** → «Nunca poner en suspensión estos sitios» → Agregar: `office.com`, `officeapps.live.com`, `sharepoint.com` y `onedrive.live.com`.
+- **Chrome:** Configuración → Rendimiento → **Ahorro de memoria** → «Sitios que siempre deben estar activos» → Agregar los mismos sitios.
+
 ## Qué se escribe en el archivo
 
 - **Hoja de la cartera:** solo la columna «Comentario Créditos», agregando `dd/mm Usuario: texto | comentario anterior`. Nunca se escribe en `Ejecutivo`, no se pintan filas ni se cambian formatos.
