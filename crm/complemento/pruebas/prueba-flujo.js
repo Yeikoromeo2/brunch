@@ -155,6 +155,13 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await win.waitForTimeout(400);
   ok((await win.textContent('#panel h2')).includes('Comercial Rímac'), 'Seleccionar una fila en la hoja abre el cliente en la ventana');
   if (SHOTS) await win.screenshot({ path: path.join(SHOTS, '09-ventana.png') });
+  /* si el panel de Excel deja de responder, la ventana lo avisa en vez de quedarse guardando */
+  await page.evaluate(() => { window.__fromChildOk = window.__fromChild; window.__fromChild = () => { throw new Error('panel cerrado'); }; });
+  await win.click('#bReload');
+  await win.waitForSelector('#lostCover:not([hidden])', { timeout: 5000 }).catch(() => {});
+  ok(await win.isVisible('#lostCover'), 'Sin el panel de Excel la ventana muestra «Sin conexión con Excel»');
+  if (SHOTS) await win.screenshot({ path: path.join(SHOTS, '10-ventana-sin-panel.png') });
+  await page.evaluate(() => { window.__fromChild = window.__fromChildOk; });
   await page.click('#winClose');
   await page.waitForFunction(() => document.querySelector('#winCover').hidden && document.querySelector('#loading').hidden);
   ok(win.isClosed() && (await page.textContent('#meName')) === 'Ana', 'Al cerrar la ventana el panel vuelve a funcionar');

@@ -64,6 +64,7 @@ if (window.GC_API) {
 } else {
   /* ---------- lado de la ventana aparte ---------- */
   const pend = {}; let seq = 0, selCb = null, send = null;
+  const LOST = 'Se perdió la conexión con el panel de Excel. Lo que hagas aquí no se guarda: cierra esta ventana y vuelve a abrir el Gestor desde Excel.';
   const ready = new Promise(ok => {
     Office.onReady(() => {
       send = sender(t => Office.context.ui.messageParent(t));
@@ -80,8 +81,11 @@ if (window.GC_API) {
     if (fn === 'withFailureHandler') return f => runner(ok, f);
     return (...args) => ready.then(() => {
       const id = ++seq;
-      pend[id] = { ok: r => ok && ok(r), ko: e => ko && ko(e) };
-      send({ t: 'call', id, fn, args });
+      /* si el panel de Excel se cerró, la llamada nunca tendría respuesta: se avisa en vez de esperar */
+      const fail = () => { const p = pend[id]; if (!p) return; delete pend[id]; p.ko(new Error(LOST)); };
+      const timer = setTimeout(fail, 60000);
+      pend[id] = { ok: r => { clearTimeout(timer); ok && ok(r); }, ko: e => { clearTimeout(timer); ko && ko(e); } };
+      try { send({ t: 'call', id, fn, args }); } catch (e) { fail(); }
     });
   } });
   window.google = { script: { get run() { return runner(); } } };

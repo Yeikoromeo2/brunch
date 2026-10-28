@@ -134,6 +134,16 @@ COVERS = """
     <p class="ok-note">Si cierras este panel, la ventana deja de guardar.</p>
   </div>
 </div>
+
+<!-- LA VENTANA PERDIÓ AL PANEL DE EXCEL (solo en la ventana aparte) -->
+<div class="cover" id="lostCover" hidden>
+  <div class="login">
+    <div class="logo" style="background:var(--crit)"><svg><use href="#i-alert"/></svg></div>
+    <div><h1>Sin conexión con Excel</h1><p>Se cerró el panel del Gestor en Excel, que es el que guarda en el libro. Lo que hagas en esta ventana ya no se guarda.</p></div>
+    <ol class="steps"><li>Cierra esta ventana.</li><li>En Excel, abre otra vez el Gestor de Cartera.</li><li>Si quieres la vista grande, pulsa <b>Ampliar</b>.</li></ol>
+    <button class="btn primary" id="lostClose" type="button" style="height:40px;justify-content:center">Cerrar esta ventana</button>
+  </div>
+</div>
 <div class="cover" id="loading">"""
 rep('<div class="cover" id="loading" hidden>', COVERS)
 rep('<div id="loadingTx">Cargando cartera…</div>', '<div id="loadingTx">Abriendo el libro…</div>')
@@ -164,6 +174,11 @@ rep("const money = n => 'S/ ' + Math.round(Number(n) || 0).toLocaleString('es-PE
 rep("const d = daysSince(val(r, 'last')), cr = +val(r, 'credit') || 0,",
     "const d = daysSince(val(r, 'last')), cr = +val(r, 'credit').replace(/[^\\d.]/g, '') || 0,")
 
+# ventana aparte: si se pierde el panel de Excel, se bloquea con un aviso claro
+rep("""      if (/SESION/.test(msg)) sessionLost(msg.replace(/^.*SESION:\\s*/, ''));""",
+    """      if (window.GC_BRIDGE && /conexión con el panel/.test(msg)) { stopPoll(); showCover('#lostCover'); }
+      if (/SESION/.test(msg)) sessionLost(msg.replace(/^.*SESION:\\s*/, ''));""")
+
 # login: PIN temporal → pantalla de cambio
 rep("""    S.token = res.token; LS.set('lastName', res.name);
     $('#lgPin').value = '';
@@ -174,7 +189,7 @@ rep("""    S.token = res.token; LS.set('lastName', res.name);
 rep("""function showLogin(msg) {
   $('#login').hidden = false; $('#loading').hidden = true;""",
     """function showCover(id) {
-  ['#login', '#setup', '#pinCover', '#probCover', '#winCover'].forEach(s => $(s).hidden = s !== id);
+  ['#login', '#setup', '#pinCover', '#probCover', '#winCover', '#lostCover'].forEach(s => $(s).hidden = s !== id);
   $('#loading').hidden = true;
   const f = $(id).querySelector('input'); if (f) setTimeout(() => { const a = document.activeElement; if (!a || a === document.body) f.focus(); }, 50);
 }
@@ -301,6 +316,7 @@ $('#bWin').onclick = async () => {
   } catch (e) { toast('No se pudo abrir la ventana: ' + e.message + '. Si Excel lo pregunta, permite las ventanas emergentes.', true); }
 };
 $('#winClose').onclick = () => GC_HOST.close();
+$('#lostClose').onclick = () => window.close();
 
 async function boot() {
   $('#loading').hidden = false; $('#loadingTx').textContent = 'Revisando la estructura de la cartera…';
