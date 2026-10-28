@@ -22,12 +22,14 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
 
 (async () => {
   const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } }); PAGE = page;
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage(); PAGE = page;
   const errors = [];
   page.on('pageerror', e => errors.push(e.message)); page.on('console', m => LOGS.push(m.text()));
   page.on('dialog', d => d.accept());
-  await page.addInitScript(seed => { window.__seed = seed; }, SEED);
-  await page.route('**/*', route => {
+  /* trozos chicos para que el puente de la ventana pruebe el armado de mensajes grandes */
+  await context.addInitScript(seed => { window.__seed = seed; window.GC_CHUNK = 2000; }, SEED);
+  await context.route('**/*', route => {
     const u = new URL(route.request().url());
     if (u.hostname === 'appsforoffice.microsoft.com') return route.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(path.join(__dirname, 'office-mock.js'), 'utf8') });
     if (u.hostname === 'cdnjs.cloudflare.com' && XLSX_JS) return route.fulfill({ contentType: 'text/javascript', body: XLSX_JS });
@@ -134,6 +136,28 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.evaluate(() => window.__book.selectRow('Hoja1', 8));
   await page.waitForTimeout(300);
   ok((await page.textContent('#panel h2')).includes('Textiles Majes'), 'Seleccionar la fila 9 de la hoja abre ese cliente');
+
+  /* 10b. ventana aparte: el panel queda de puente y guarda en el libro */
+  const [win] = await Promise.all([page.waitForEvent('popup'), page.click('#bWin')]);
+  win.on('pageerror', e => errors.push('ventana: ' + e.message)); win.on('dialog', d => d.accept());
+  await win.setViewportSize({ width: 1500, height: 900 });
+  await win.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana');
+  ok(await page.isVisible('#winCover'), 'El panel de Excel muestra «Abierto en otra ventana»');
+  ok(await win.isHidden('#bWin'), 'La ventana no ofrece abrir otra ventana');
+  await win.click('#mainTabs [data-tab="list"]');
+  await win.waitForSelector('#gbody .row');
+  ok((await win.$$('#gbody .row')).length === 12, 'La ventana carga la cartera completa a través del panel');
+  await win.click('#gbody .row[data-i="7"]', { position: { x: 20, y: 20 } });
+  await win.fill('#pCmt', 'Desde la ventana');
+  await win.click('[data-act="cmtadd"]'); await win.waitForTimeout(300);
+  ok(/^\d\d\/\d\d Ana: Desde la ventana$/.test((await aux('Hoja1'))[8][17]), 'Comentario hecho en la ventana queda guardado en el libro');
+  await page.evaluate(() => window.__book.selectRow('Hoja1', 4));
+  await win.waitForTimeout(400);
+  ok((await win.textContent('#panel h2')).includes('Comercial Rímac'), 'Seleccionar una fila en la hoja abre el cliente en la ventana');
+  if (SHOTS) await win.screenshot({ path: path.join(SHOTS, '09-ventana.png') });
+  await page.click('#winClose');
+  await page.waitForFunction(() => document.querySelector('#winCover').hidden && document.querySelector('#loading').hidden);
+  ok(win.isClosed() && (await page.textContent('#meName')) === 'Ana', 'Al cerrar la ventana el panel vuelve a funcionar');
 
   /* 11. Harold entra con PIN temporal y ve solo su cartera */
   await page.click('#bOut');

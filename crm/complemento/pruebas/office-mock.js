@@ -59,11 +59,37 @@ window.Excel = {
   run: async fn => { book.runs = (book.runs || 0) + 1; try { return await fn({ workbook, sync: async () => {} }); } finally { book.runs--; } },
   createWorkbook: async b64 => { book.created.push(b64); }
 };
+/* ventana de diálogo: el panel la abre con window.open y se hablan por mensajes de texto */
+const EV = { DocumentSelectionChanged: 'documentSelectionChanged', DialogMessageReceived: 'dialogMessageReceived', DialogEventReceived: 'dialogEventReceived', DialogParentMessageReceived: 'dialogParentMessageReceived' };
+const ui = {
+  displayDialogAsync(url, opts, cb) {
+    const w = window.open(url, '_blank');
+    if (!w) return cb({ status: 'failed', error: { message: 'Ventana bloqueada' } });
+    const on = { [EV.DialogMessageReceived]: [], [EV.DialogEventReceived]: [] }, queue = [];
+    window.__fromChild = m => on[EV.DialogMessageReceived].forEach(h => h({ message: m }));
+    const timer = setInterval(() => { if (w.closed) { clearInterval(timer); on[EV.DialogEventReceived].forEach(h => h({ error: 12006 })); } }, 200);
+    book.dialog = w;
+    cb({ status: 'succeeded', value: {
+      addEventHandler(t, h) { on[t].push(h); },
+      messageChild(m) { if (w.__toChild) w.__toChild(m); else queue.push(m); },
+      close() { clearInterval(timer); w.close(); }
+    } });
+    window.__dlgReady = () => { while (queue.length) w.__toChild(queue.shift()); };
+  }
+};
+const isChild = !!(window.opener && window.opener.__fromChild);
+if (isChild) {
+  /* en la ventana no hay acceso al libro */
+  delete window.Excel;
+  ui.messageParent = m => window.opener.__fromChild(m);
+  ui.addHandlerAsync = (t, h, cb) => { window.__toChild = m => h({ message: m }); if (window.opener.__dlgReady) window.opener.__dlgReady(); cb && cb({ status: 'succeeded' }); };
+}
 window.Office = {
   HostType: { Excel: 'Excel' },
-  EventType: { DocumentSelectionChanged: 'documentSelectionChanged' },
+  EventType: EV,
+  AsyncResultStatus: { Succeeded: 'succeeded', Failed: 'failed' },
   onReady(cb) { setTimeout(() => cb({ host: 'Excel' }), 0); return Promise.resolve({ host: 'Excel' }); },
-  context: { document: { addHandlerAsync(t, h) { book.handlers.push(h); } }, ui: {} }
+  context: { document: { addHandlerAsync(t, h) { book.handlers.push(h); } }, ui, requirements: { isSetSupported: () => true } }
 };
 /* libro inicial que la prueba deja en window.__seed = [{ name, rows }] antes de cargar la página */
 (window.__seed || []).forEach(s => { const ws = makeSheet(s.name); s.rows.forEach((r, i) => r.forEach((x, j) => set(ws, i, j, x))); });

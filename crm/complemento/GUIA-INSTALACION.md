@@ -7,6 +7,8 @@ Complemento de Excel para la web que trabaja directamente sobre el archivo de la
 | Archivo | Para qué sirve |
 |---|---|
 | `taskpane.html` | El panel del Gestor (Mi día, Lista, Marcas, Dashboard, Reportes). Se genera con `construir.py` a partir del prototipo aprobado. |
+| `ventana.html` | La misma interfaz en una ventana aparte, grande (botón **Ampliar**). También la genera `construir.py`. |
+| `puente.js` | Conecta la ventana aparte con el panel: la ventana no puede tocar el libro, así que le pide todo al panel. |
 | `datos.js` | Lee y escribe el libro con Office.js. Aquí están las reglas: la cartera no se modifica y todo lo demás va a pestañas muy ocultas. |
 | `commands.html` | Archivo técnico que pide Excel para el botón de la cinta. |
 | `instalar.html` | Página que genera el `manifest.xml` con la dirección correcta y explica cómo cargarlo. |
@@ -44,6 +46,15 @@ Si «Cargar mi complemento» no aparece, la organización lo tiene bloqueado y s
 2. La primera persona que abre el panel ve **Configurar este libro**: escribe su nombre y un PIN y queda como **administrador**. En ese momento se crean las pestañas internas (`_Config`, `_Usuarios`, `_Seguimiento`, `_ClienteMarcas`, `_Marcas`, `_Ordenes`, `_Ventas`, `_Historial`, `_Telefonos`, `_Asignaciones`) como **muy ocultas**.
 3. El administrador abre **Usuarios** y crea a cada ejecutivo con un **PIN temporal**. Al entrar por primera vez, el sistema le pide crear su propio PIN.
 4. Cinco PIN incorrectos seguidos bloquean al usuario durante 5 minutos. Si alguien olvida su PIN, el administrador le asigna uno temporal nuevo.
+
+## Trabajar en una ventana grande
+
+El panel de Excel tiene un ancho limitado. Con el botón **Ampliar** (arriba, en el panel) el Gestor se abre en una **ventana aparte** al 92 % de la pantalla, con la lista y el detalle lado a lado. La ventana se puede mover, maximizar o llevar a otro monitor.
+
+- El panel de Excel muestra «Abierto en otra ventana» y **debe quedar abierto**: es el que lee y guarda en el libro. Si se cierra el panel, la ventana deja de guardar.
+- Seleccionar una fila en la hoja abre ese cliente en la ventana.
+- Para volver, cierra la ventana o pulsa **Cerrar la ventana y volver aquí** en el panel.
+- Si Excel pregunta si permite abrir una ventana, responde **Permitir**.
 
 ## Qué se escribe en el archivo
 

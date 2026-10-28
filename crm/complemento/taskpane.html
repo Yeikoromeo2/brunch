@@ -594,6 +594,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
 </head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-ext" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 3h7v7M21 3l-9 9M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/></symbol>
   <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4a.5.5 0 0 0 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3Z"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm-1 1 9 7 9-7"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 9h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1Zm-4 6H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
@@ -694,6 +695,16 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
     <button class="btn primary" id="probRetry" type="button" style="height:40px;justify-content:center">Volver a revisar</button>
   </div>
 </div>
+
+<!-- EL GESTOR ESTÁ ABIERTO EN LA VENTANA APARTE (solo en el panel de Excel) -->
+<div class="cover" id="winCover" hidden>
+  <div class="login">
+    <div class="logo"><svg><use href="#i-ext"/></svg></div>
+    <div><h1>Abierto en otra ventana</h1><p>El Gestor está trabajando en la ventana aparte. Deja este panel abierto: es el que guarda los cambios en el libro.</p></div>
+    <button class="btn primary" id="winClose" type="button" style="height:40px;justify-content:center">Cerrar la ventana y volver aquí</button>
+    <p class="ok-note">Si cierras este panel, la ventana deja de guardar.</p>
+  </div>
+</div>
 <div class="cover" id="loading"><div style="text-align:center;position:relative"><div class="spin"></div><div id="loadingTx">Abriendo el libro…</div></div></div>
 
 <header class="top">
@@ -712,6 +723,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
   <span class="vsep hide-sm"></span>
   <span class="bellwrap"><button class="btn ghost" id="bBell" title="OV por cerrar"><svg><use href="#i-bell"/></svg></button><span class="bellct" id="bellCt" hidden></span>
     <div class="bellpop" id="bellPop" hidden></div></span>
+  <button class="btn" id="bWin" title="Abrir el Gestor en una ventana aparte, más grande"><svg><use href="#i-ext"/></svg>Ampliar</button>
   <button class="btn ghost" id="bReload" title="Recargar datos"><svg><use href="#i-refresh"/></svg></button>
   <button class="btn ghost" id="bPanel" title="Mostrar u ocultar el panel"><svg><use href="#i-panel"/></svg></button>
   <button class="btn ghost hide-sm" id="bKeys" title="Atajos de teclado"><svg><use href="#i-key"/></svg></button>
@@ -880,6 +892,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
 <div id="tip"></div>
 
 <script src="datos.js"></script>
+<script src="puente.js"></script>
 
 <script>
 /* ======================================================================
@@ -1103,7 +1116,7 @@ $('#loginForm').addEventListener('submit', async e => {
   $('#lgBtn').disabled = false; $('#lgBtn').textContent = 'Entrar';
 });
 function showCover(id) {
-  ['#login', '#setup', '#pinCover', '#probCover'].forEach(s => $(s).hidden = s !== id);
+  ['#login', '#setup', '#pinCover', '#probCover', '#winCover'].forEach(s => $(s).hidden = s !== id);
   $('#loading').hidden = true;
   const f = $(id).querySelector('input'); if (f) setTimeout(() => { const a = document.activeElement; if (!a || a === document.body) f.focus(); }, 50);
 }
@@ -1126,7 +1139,7 @@ async function loadAll(first) {
     S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false; S.brands = d.brands; S.orders = d.orders || []; S.sales = d.sales || []; S.scoped = !!d.scoped; S.total = d.total || d.rows.length; fillBrandLists();
     S.rows = d.rows.map(([k, r, v]) => ({ k, r, v, t: Object.assign(emptyT(), d.track[k] || {}), hay: null, _vi: null }));
     S.byKey = new Map(S.rows.map(r => [r.k, r]));
-    ['#login', '#setup', '#pinCover', '#probCover'].forEach(s => $(s).hidden = true);
+    ['#login', '#setup', '#pinCover', '#probCover', '#winCover'].forEach(s => $(s).hidden = true);
     $('#brandSheet').textContent = 'Excel · ' + d.sheet;
     $('#meName').textContent = S.me.name; $('#meRole').textContent = isAdmin() ? 'Administrador' : 'Ejecutivo';
     $('#meAv').textContent = initials(S.me.name); $('#meAv').style.background = userColor(S.me.name);
@@ -2436,6 +2449,7 @@ function followSheet(k) {
   }, 600);
 }
 function onSheetSelection() {
+  if (window.GC_HOST && GC_HOST.open) return GC_HOST.selection();
   if (!S.me) return;
   call('api_selection').then(k => {
     /* se ignora el eco de nuestra propia selección, nunca una fila distinta elegida por la persona */
@@ -2473,6 +2487,18 @@ $('#pinForm').addEventListener('submit', async e => {
 });
 $('#probRetry').onclick = () => boot();
 
+/* ---------- ventana aparte: el panel queda de puente y guarda en el libro ---------- */
+if (window.GC_BRIDGE) $('#bWin').hidden = true;
+$('#bWin').onclick = async () => {
+  if (!window.GC_HOST || !GC_HOST.supported()) return toast('Tu versión de Excel no permite abrir ventanas aparte.', true);
+  flushAll();
+  try {
+    await GC_HOST.openWindow(location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '') + 'ventana.html', () => { $('#winCover').hidden = true; boot(); });
+    stopPoll(); showCover('#winCover');
+  } catch (e) { toast('No se pudo abrir la ventana: ' + e.message + '. Si Excel lo pregunta, permite las ventanas emergentes.', true); }
+};
+$('#winClose').onclick = () => GC_HOST.close();
+
 async function boot() {
   $('#loading').hidden = false; $('#loadingTx').textContent = 'Revisando la estructura de la cartera…';
   try {
@@ -2493,10 +2519,11 @@ async function boot() {
 applyTheme(); applyPanel();
 const start = () => {
   boot();
+  if (window.GC_BRIDGE) return GC_BRIDGE.onSelection(onSheetSelection);
   try { Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, onSheetSelection); } catch (e) {}
 };
 if (window.Office && Office.onReady) Office.onReady(info => {
-  if (info && info.host && info.host !== Office.HostType.Excel) { $('#loading').hidden = true; return showLogin('Este complemento funciona solo dentro de Excel.'); }
+  if (!window.GC_BRIDGE && info && info.host && info.host !== Office.HostType.Excel) { $('#loading').hidden = true; return showLogin('Este complemento funciona solo dentro de Excel.'); }
   start();
 });
 else showLogin('Abre este archivo desde Excel: Inicio → Complementos → Gestor de Cartera.');

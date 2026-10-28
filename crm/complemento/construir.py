@@ -1,10 +1,11 @@
-"""Genera complemento/taskpane.html a partir del prototipo aprobado.
+"""Genera complemento/taskpane.html y complemento/ventana.html a partir del prototipo aprobado.
 
 Uso:  python3 crm/complemento/construir.py
 
 Toma la interfaz de crm/prototipo-pro/index.html, quita el servidor simulado,
 la conecta a datos.js (Office.js) y agrega las pantallas reales: configuración
-inicial, cambio de PIN y error de estructura. Cada reemplazo debe encontrarse
+inicial, cambio de PIN y error de estructura. ventana.html es la misma interfaz
+para la ventana aparte: no toca el libro, le pide todo al panel por puente.js. Cada reemplazo debe encontrarse
 exactamente una vez; si el prototipo cambia y algo no calza, el script falla.
 """
 import re
@@ -14,6 +15,7 @@ from pathlib import Path
 AQUI = Path(__file__).resolve().parent
 SRC = AQUI.parent / "prototipo-pro" / "index.html"
 OUT = AQUI / "taskpane.html"
+OUT_WIN = AQUI / "ventana.html"
 
 html = SRC.read_text(encoding="utf-8")
 
@@ -122,12 +124,26 @@ COVERS = """
     <button class="btn primary" id="probRetry" type="button" style="height:40px;justify-content:center">Volver a revisar</button>
   </div>
 </div>
+
+<!-- EL GESTOR ESTÁ ABIERTO EN LA VENTANA APARTE (solo en el panel de Excel) -->
+<div class="cover" id="winCover" hidden>
+  <div class="login">
+    <div class="logo"><svg><use href="#i-ext"/></svg></div>
+    <div><h1>Abierto en otra ventana</h1><p>El Gestor está trabajando en la ventana aparte. Deja este panel abierto: es el que guarda los cambios en el libro.</p></div>
+    <button class="btn primary" id="winClose" type="button" style="height:40px;justify-content:center">Cerrar la ventana y volver aquí</button>
+    <p class="ok-note">Si cierras este panel, la ventana deja de guardar.</p>
+  </div>
+</div>
 <div class="cover" id="loading">"""
 rep('<div class="cover" id="loading" hidden>', COVERS)
 rep('<div id="loadingTx">Cargando cartera…</div>', '<div id="loadingTx">Abriendo el libro…</div>')
 
 # ---------- barra superior ----------
 rep('Gestor de Cartera<small>Datos de ejemplo</small>', 'Gestor de Cartera<small id="brandSheet">Excel · OneDrive</small>')
+rep('<button class="btn ghost" id="bReload" title="Recargar datos">',
+    '<button class="btn" id="bWin" title="Abrir el Gestor en una ventana aparte, más grande"><svg><use href="#i-ext"/></svg>Ampliar</button>\n  <button class="btn ghost" id="bReload" title="Recargar datos">')
+rep('<svg style="display:none" xmlns="http://www.w3.org/2000/svg">',
+    '<svg style="display:none" xmlns="http://www.w3.org/2000/svg">\n  <symbol id="i-ext" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 3h7v7M21 3l-9 9M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/></symbol>')
 rep('<div class="field search"><svg><use href="#i-search"/></svg>',
     '<button class="btn ghost" id="bFilt" type="button" title="Mostrar filtros"><svg><use href="#i-flag"/></svg>Filtros</button>\n  <div class="field search"><svg><use href="#i-search"/></svg>')
 
@@ -138,7 +154,7 @@ rep('<div class="mf"><button class="btn ghost" id="uNew">Nuevo</button>',
     '<div class="hint" style="margin:0 20px 10px">La persona entra con el PIN temporal y el sistema le pide crear el suyo. Si olvida su PIN, escribe uno temporal nuevo aquí.</div>\n  <div class="mf"><button class="btn ghost" id="uNew">Nuevo</button>')
 
 # ---------- quitar el servidor simulado ----------
-rep_re(r"<script>\n/\* =+\n   SERVIDOR SIMULADO.*?</script>\n", '<script src="datos.js"></script>\n')
+rep_re(r"<script>\n/\* =+\n   SERVIDOR SIMULADO.*?</script>\n", '<!--CAPA-DATOS-->\n')
 
 # ---------- aplicación ----------
 rep("const DEMO = true;", "const DEMO = false;")
@@ -158,13 +174,13 @@ rep("""    S.token = res.token; LS.set('lastName', res.name);
 rep("""function showLogin(msg) {
   $('#login').hidden = false; $('#loading').hidden = true;""",
     """function showCover(id) {
-  ['#login', '#setup', '#pinCover', '#probCover'].forEach(s => $(s).hidden = s !== id);
+  ['#login', '#setup', '#pinCover', '#probCover', '#winCover'].forEach(s => $(s).hidden = s !== id);
   $('#loading').hidden = true;
   const f = $(id).querySelector('input'); if (f) setTimeout(() => { const a = document.activeElement; if (!a || a === document.body) f.focus(); }, 50);
 }
 function showLogin(msg) {
   showCover('#login');""")
-rep("    $('#login').hidden = true;\n    $('#meName')", "    ['#login', '#setup', '#pinCover', '#probCover'].forEach(s => $(s).hidden = true);\n    $('#brandSheet').textContent = 'Excel · ' + d.sheet;\n    $('#meName')")
+rep("    $('#login').hidden = true;\n    $('#meName')", "    ['#login', '#setup', '#pinCover', '#probCover', '#winCover'].forEach(s => $(s).hidden = true);\n    $('#brandSheet').textContent = 'Excel · ' + d.sheet;\n    $('#meName')")
 
 # abrir enlaces: ventana real, o el navegador del sistema en Excel de escritorio
 rep("""  if (DEMO) return toast('En la versión real se abre ' + label + '. Se registró el intento.');
@@ -236,6 +252,7 @@ function followSheet(k) {
   }, 600);
 }
 function onSheetSelection() {
+  if (window.GC_HOST && GC_HOST.open) return GC_HOST.selection();
   if (!S.me) return;
   call('api_selection').then(k => {
     /* se ignora el eco de nuestra propia selección, nunca una fila distinta elegida por la persona */
@@ -273,6 +290,18 @@ $('#pinForm').addEventListener('submit', async e => {
 });
 $('#probRetry').onclick = () => boot();
 
+/* ---------- ventana aparte: el panel queda de puente y guarda en el libro ---------- */
+if (window.GC_BRIDGE) $('#bWin').hidden = true;
+$('#bWin').onclick = async () => {
+  if (!window.GC_HOST || !GC_HOST.supported()) return toast('Tu versión de Excel no permite abrir ventanas aparte.', true);
+  flushAll();
+  try {
+    await GC_HOST.openWindow(location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '') + 'ventana.html', () => { $('#winCover').hidden = true; boot(); });
+    stopPoll(); showCover('#winCover');
+  } catch (e) { toast('No se pudo abrir la ventana: ' + e.message + '. Si Excel lo pregunta, permite las ventanas emergentes.', true); }
+};
+$('#winClose').onclick = () => GC_HOST.close();
+
 async function boot() {
   $('#loading').hidden = false; $('#loadingTx').textContent = 'Revisando la estructura de la cartera…';
   try {
@@ -293,10 +322,11 @@ async function boot() {
 applyTheme(); applyPanel();
 const start = () => {
   boot();
+  if (window.GC_BRIDGE) return GC_BRIDGE.onSelection(onSheetSelection);
   try { Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, onSheetSelection); } catch (e) {}
 };
 if (window.Office && Office.onReady) Office.onReady(info => {
-  if (info && info.host && info.host !== Office.HostType.Excel) { $('#loading').hidden = true; return showLogin('Este complemento funciona solo dentro de Excel.'); }
+  if (!window.GC_BRIDGE && info && info.host && info.host !== Office.HostType.Excel) { $('#loading').hidden = true; return showLogin('Este complemento funciona solo dentro de Excel.'); }
   start();
 });
 else showLogin('Abre este archivo desde Excel: Inicio → Complementos → Gestor de Cartera.');
@@ -305,5 +335,8 @@ else showLogin('Abre este archivo desde Excel: Inicio → Complementos → Gesto
 rep("/* ---------- inicio ---------- */\napplyTheme(); applyPanel();\nshowLogin();\n})();\n</script>", BOOT)
 
 html = html.rstrip() + "\n</body>\n</html>\n"
-OUT.write_text(html, encoding="utf-8")
-print(f"OK {OUT.relative_to(AQUI.parent.parent)} · {len(html.splitlines())} líneas")
+panel = html.replace("<!--CAPA-DATOS-->", '<script src="datos.js"></script>\n<script src="puente.js"></script>')
+ventana = html.replace("<!--CAPA-DATOS-->", '<script src="puente.js"></script>').replace("<title>Gestor de Cartera</title>", "<title>Gestor de Cartera · ventana</title>")
+for out, txt in ((OUT, panel), (OUT_WIN, ventana)):
+    out.write_text(txt, encoding="utf-8")
+    print(f"OK {out.relative_to(AQUI.parent.parent)} · {len(txt.splitlines())} líneas")
