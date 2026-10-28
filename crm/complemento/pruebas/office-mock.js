@@ -25,7 +25,7 @@ function loadable(ctx, obj, props) {
   return need;
 }
 function range(ws, r0, c0, nr, nc, ctx) {
-  const o = { isNullObject: false, worksheet: api(ws, ctx) };
+  const o = { isNullObject: false, worksheet: api(ws, ctx), _cart: ws.name === 'Hoja1' && c0 === 0 && nc === 18 && nr > 1 };
   const need = loadable(ctx, o, ['values']);
   const vals = () => Array.from({ length: nr }, (_, i) => Array.from({ length: nc }, (_, j) => get(ws, r0 + i, c0 + j)));
   Object.defineProperties(o, {
@@ -80,7 +80,8 @@ window.Excel = {
     /* demora opcional para imitar un libro grande en OneDrive */
     const delay = +(sessionStorage.getItem('__mockDelay') || 0); if (delay) await new Promise(r => setTimeout(r, delay));
     const ctx = { alive: true, pending: [] };
-    ctx.sync = async () => { alive(ctx); ctx.pending.splice(0).forEach(([o, p]) => o._loaded.add(p)); };
+    /* cuenta las lecturas completas de la cartera, para medir que no se relea sin necesidad */
+    ctx.sync = async () => { alive(ctx); ctx.pending.splice(0).forEach(([o, p]) => { o._loaded.add(p); if (o._cart && p === 'values') { book.cartReads = (book.cartReads || 0) + 1; persist(); } }); };
     ctx.workbook = makeWorkbook(ctx);
     try { return await fn(ctx); } finally { ctx.alive = false; book.runs--; persist(); }
   },
@@ -119,10 +120,10 @@ window.Office = {
   context: { document: { addHandlerAsync(t, h) { book.handlers.push(h); } }, ui, requirements: { isSetSupported: () => true } }
 };
 /* el libro sobrevive a recargas de la página (como el archivo real cuando Excel recarga el panel) */
-function persist() { try { sessionStorage.setItem('__mockbook', JSON.stringify(book.sheets)); } catch (e) {} }
+function persist() { try { sessionStorage.setItem('__mockbook', JSON.stringify(book.sheets)); sessionStorage.setItem('__mockreads', String(book.cartReads || 0)); } catch (e) {} }
 let saved = null; try { saved = isChild ? null : JSON.parse(sessionStorage.getItem('__mockbook') || 'null'); } catch (e) {}
 /* libro inicial que la prueba deja en window.__seed = [{ name, rows }] antes de cargar la página */
-if (saved) saved.forEach(w => book.sheets.push(w));
+if (saved) { saved.forEach(w => book.sheets.push(w)); book.cartReads = +(sessionStorage.getItem('__mockreads') || 0); }
 else (window.__seed || []).forEach(s => { const ws = makeSheet(s.name); s.rows.forEach((r, i) => r.forEach((x, j) => set(ws, i, j, x))); });
 /* ayudas para las pruebas */
 window.__book = {

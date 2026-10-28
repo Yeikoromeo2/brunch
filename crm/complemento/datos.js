@@ -134,6 +134,8 @@ async function bumpSeq(ctx) {
   if (before === KNOWN) KNOWN = num(a[1]);
   if (DB) DB.seq = num(a[1]);
 }
+/* el libro en memoria sigue al día si existe y el seq del libro no cambió */
+const fresh = async ctx => !!(DB && DB.users.length) && (await readSeq(ctx)) === DB.seq;
 const readSeq = async ctx => { const f = await findRow(ctx, 'cfg', r => str(r[0]) === 'seq'); return f.cur ? num(f.cur[1]) : 0; };
 /* la hoja de la cartera se pide de nuevo en cada acceso: Excel no deja reutilizar objetos de otro acceso */
 const cartWs = ctx => ctx.workbook.worksheets.getItem(DB.cart.name);
@@ -257,9 +259,11 @@ const CREATED = [];
    API: mismas funciones que la versión Sheets
    ====================================================================== */
 const API = {
-  async api_status() {
+  /* opt 'reuse': si el panel ya tiene el libro en memoria y nadie escribió desde entonces, no se relee
+     (lo usa la ventana grande al abrirse) */
+  async api_status(opt) {
     return run(async ctx => {
-      try { await loadDB(ctx); } catch (e) { if (e.problems) return { ok: false, problems: e.problems }; throw e; }
+      try { if (!(opt === 'reuse' && (await fresh(ctx)))) await loadDB(ctx); } catch (e) { if (e.problems) return { ok: false, problems: e.problems }; throw e; }
       return { ok: true, needSetup: !DB.users.length, sheet: DB.cart.name, rows: DB.cart.rows.length };
     });
   },
@@ -312,11 +316,15 @@ const API = {
   },
   api_logout(tk) { dropSess(tk); return true; },
 
-  async api_load(tk) {
+  async api_load(tk, opt, have) {
     return run(async ctx => {
-      /* al arrancar, api_status acaba de leer el libro: si nadie escribió desde entonces no se lee de nuevo */
-      if (!(DB && Date.now() - DB.at < 20000 && (await readSeq(ctx)) === DB.seq)) await loadDB(ctx);
+      /* opt 'reuse': al arrancar (api_status acaba de leer) o al abrir la ventana grande se usa lo que el panel
+         ya tiene en memoria si nadie escribió desde entonces. Si la pantalla ya tiene ese mismo seq (copia
+         local al día), solo se le confirma sin enviarle todo otra vez. «Recargar» siempre lee todo. */
+      const reuse = opt === 'reuse' && (await fresh(ctx));
+      if (!reuse) await loadDB(ctx);
       const u = who(tk); KNOWN = DB.seq;
+      if (reuse && have != null && num(have) === DB.seq) return { same: true, seq: DB.seq };
       const vis = DB.cart.rows.filter(r => inScope(u, r)), ks = new Set(vis.map(r => r.k)), track = {};
       vis.forEach(r => { if (DB.track[r.k]) track[r.k] = DB.track[r.k]; });
       return { me: { name: u.name, role: u.role }, cfg: DB.cfg, scoped: vis.length < DB.cart.rows.length, total: DB.cart.rows.length, header: COLS, C, assigns: DB.assigns,

@@ -196,7 +196,9 @@ rep("""async function loadAll(first) {
   if (!quiet) { $('#loading').hidden = false; $('#loadingTx').textContent = 'Cargando cartera…'; }""")
 rep("""    const d = await call('api_load', S.token);
     S.me = d.me;""",
-    """    const d = pre || await call('api_load', S.token);
+    """    /* al arrancar o al actualizar en silencio se reutiliza lo que el panel ya tiene; «Recargar» lee todo */
+    const d = pre || await call('api_load', S.token, first || quiet ? 'reuse' : '', quiet && S.seq ? S.seq : null);
+    if (d.same) { S.needReload = false; setSync('', 'Sincronizado'); startPoll(); $('#loading').hidden = true; return; }
     if (!pre) CACHE.set({ name: d.me.name, token: S.token, d });
     S.me = d.me;""")
 rep("""    setTab(first ? 'day' : S.tab); updBell();""",
@@ -345,7 +347,7 @@ $('#bWin').onclick = async () => {
   if (!window.GC_HOST || !GC_HOST.supported()) return toast('Tu versión de Excel no permite abrir ventanas aparte.', true);
   flushAll();
   try {
-    await GC_HOST.openWindow(location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '') + 'ventana.html', () => { SS.set('win', ''); $('#winCover').hidden = true; boot(); });
+    await GC_HOST.openWindow(location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '') + 'ventana.html', () => { SS.set('win', ''); $('#winCover').hidden = true; boot('reuse'); });
     SS.set('win', '1'); stopPoll(); showCover('#winCover');
   } catch (e) { toast('No se pudo abrir la ventana: ' + e.message + '. Si Excel lo pregunta, permite las ventanas emergentes.', true); }
 };
@@ -373,16 +375,18 @@ const SS = { get(k) { try { return sessionStorage.getItem('gc:' + k); } catch (e
 async function cachedStart() {
   try {
     const ses = JSON.parse(localStorage.getItem('gcx:sesion') || 'null'), c = await CACHE.get();
-    if (!ses || ses.exp < Date.now() || !c || !c.d || c.name !== ses.name || c.token !== ses.token) return false;
+    /* en la ventana grande la sesión vive en el panel: la copia se confirma después con api_resume */
+    if (!c || !c.d || (!window.GC_BRIDGE && (!ses || ses.exp < Date.now() || c.name !== ses.name || c.token !== ses.token))) return false;
     S.token = c.token; await loadAll(true, false, c.d); return true;
   } catch (e) { return false; }
 }
 
-async function boot() {
+/* opt 'reuse': vuelve de la ventana grande; el panel ya tiene el libro al día en memoria */
+async function boot(opt) {
   const fast = await cachedStart();
   if (!fast) { $('#loading').hidden = false; $('#loadingTx').textContent = 'Revisando la estructura de la cartera…'; }
   try {
-    const st = await call('api_status');
+    const st = await call('api_status', window.GC_BRIDGE || opt === 'reuse' ? 'reuse' : '');
     if (!st.ok) {
       $('#probList').innerHTML = st.problems.map(p => `<li>${esc(p)}</li>`).join('');
       return showCover('#probCover');
@@ -390,7 +394,7 @@ async function boot() {
     $('#lgSheet').textContent = `Libro: hoja «${st.sheet}» · ${fmtN(st.rows)} clientes`;
     if (st.needSetup) { $('#suSheet').textContent = '«' + st.sheet + '»'; $('#suRows').textContent = fmtN(st.rows); return showCover('#setup'); }
     const ses = await call('api_resume');
-    if (ses) { S.token = ses.token; return fast ? loadAll(false, true) : loadAll(true); }
+    if (ses) { const same = fast && ses.token === S.token; S.token = ses.token; return same ? loadAll(false, true) : loadAll(true); }
     CACHE.clear(); showLogin();
   } catch (e) { showLogin('No se pudo leer el libro: ' + e.message); }
 }
