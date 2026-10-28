@@ -280,7 +280,9 @@ rep("  if (prev !== S.active) peekSoon(S.active.k);\n}",
 BOOT = r"""/* ---------- vínculo con la hoja: seleccionar una fila abre el cliente y viceversa ---------- */
 let selT = null, selQuiet = 0, selLast = '';
 function followSheet(k) {
-  if (!UI.follow || !S.me || k === selLast) return;
+  /* desde la ventana grande no se mueve la selección de la hoja: Excel traería su página al frente
+     y taparía la ventana (con dos pantallas se nota mucho) */
+  if (window.GC_BRIDGE || !UI.follow || !S.me || k === selLast) return;
   clearTimeout(selT);
   selT = setTimeout(() => {
     const a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return;

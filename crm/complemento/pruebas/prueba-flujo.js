@@ -198,6 +198,16 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await win.waitForSelector('#gbody .row');
   ok((await win.$$('#gbody .row')).length === 12, 'La ventana carga la cartera completa a través del panel');
   await win.click('#gbody .row[data-i="7"]', { position: { x: 20, y: 20 } });
+  /* desde la ventana: elegir clientes no mueve la selección de la hoja (no trae Excel al frente) y la
+     aplicación de WhatsApp se lanza sin abrir ventanas */
+  const selBefore = await page.evaluate(() => JSON.stringify(window.__book.raw.selection));
+  await win.waitForTimeout(900);
+  ok((await page.evaluate(() => JSON.stringify(window.__book.raw.selection))) === selBefore, 'Desde la ventana grande, elegir un cliente no mueve la selección de Excel');
+  await win.evaluate(() => { window.__hrefs = []; window.__wopen = 0; HTMLAnchorElement.prototype.click = function () { window.__hrefs.push(this.href); }; const o = window.open; window.open = (...a) => { window.__wopen++; return o(...a); }; });
+  await win.click('#panel .p-actions [data-act="wa"]'); await win.waitForTimeout(200);
+  if (await win.$('#mWa.on')) { await win.click('#mWa [data-wa="app"]'); await win.waitForTimeout(200); }
+  const wl = await win.evaluate(() => [window.__hrefs, window.__wopen]);
+  ok(wl[0].length === 1 && /^whatsapp:\/\/send\?phone=51/.test(wl[0][0]) && wl[1] === 0, 'Desde la ventana grande la aplicación de WhatsApp se lanza sin abrir ventanas');
   await win.fill('#pCmt', 'Desde la ventana');
   await win.click('[data-act="cmtadd"]'); await win.waitForTimeout(300);
   ok(/^\d\d\/\d\d Ana: Desde la ventana$/.test((await aux('Hoja1'))[8][17]), 'Comentario hecho en la ventana queda guardado en el libro');

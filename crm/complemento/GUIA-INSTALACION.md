@@ -53,6 +53,7 @@ El panel de Excel tiene un ancho limitado. Con el botón **Ampliar** (arriba, en
 
 - El panel de Excel muestra «Abierto en otra ventana» y **debe quedar abierto**: es el que lee y guarda en el libro. Si se cierra el panel, la ventana deja de guardar.
 - Seleccionar una fila en la hoja abre ese cliente en la ventana.
+- Desde la ventana, elegir un cliente **no** mueve la selección de la hoja (eso traería Excel al frente y taparía la ventana, sobre todo con dos pantallas). En el panel lateral sí la mueve.
 - Si el panel de Excel se cierra, la ventana lo detecta (al hacer algo o en la siguiente sincronización) y muestra «Sin conexión con Excel». Lo que ya se guardó no se pierde; basta abrir otra vez el Gestor en Excel.
 - Para volver, cierra la ventana o pulsa **Cerrar la ventana y volver aquí** en el panel.
 - Si Excel pregunta si permite abrir una ventana, responde **Permitir**.

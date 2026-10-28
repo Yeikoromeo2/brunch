@@ -1483,6 +1483,9 @@ function openWaLink(m, u, label) {
   if (DEMO) return openUrl(u, label);
   let w = null;
   if (m === 'app') {
+    /* en la ventana grande (página propia) se lanza con un enlace: no se abre ni cierra ninguna ventana,
+       así no cambia qué ventana queda al frente en ninguna pantalla */
+    if (window.GC_BRIDGE) { const a = document.createElement('a'); a.href = u; a.rel = 'noopener'; a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove(); return; }
     try { w = window.open(u, 'gcWaApp'); } catch (e) {}
     if (!w) return openUrl(u, label);
     setTimeout(() => { try { if (w && !w.closed) w.close(); } catch (e) {} }, 2500);

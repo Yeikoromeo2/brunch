@@ -1359,6 +1359,9 @@ function openWaLink(m, u, label) {
   if (DEMO) return openUrl(u, label);
   let w = null;
   if (m === 'app') {
+    /* en la ventana grande (página propia) se lanza con un enlace: no se abre ni cierra ninguna ventana,
+       así no cambia qué ventana queda al frente en ninguna pantalla */
+    if (window.GC_BRIDGE) { const a = document.createElement('a'); a.href = u; a.rel = 'noopener'; a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove(); return; }
     try { w = window.open(u, 'gcWaApp'); } catch (e) {}
     if (!w) return openUrl(u, label);
     setTimeout(() => { try { if (w && !w.closed) w.close(); } catch (e) {} }, 2500);
@@ -2545,7 +2548,9 @@ document.addEventListener('mousemove', e => { if (tip.style.display !== 'block')
 /* ---------- vínculo con la hoja: seleccionar una fila abre el cliente y viceversa ---------- */
 let selT = null, selQuiet = 0, selLast = '';
 function followSheet(k) {
-  if (!UI.follow || !S.me || k === selLast) return;
+  /* desde la ventana grande no se mueve la selección de la hoja: Excel traería su página al frente
+     y taparía la ventana (con dos pantallas se nota mucho) */
+  if (window.GC_BRIDGE || !UI.follow || !S.me || k === selLast) return;
   clearTimeout(selT);
   selT = setTimeout(() => {
     const a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return;
