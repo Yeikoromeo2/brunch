@@ -66,7 +66,7 @@ Customer ID · Fecha y hora · Usuario · Acción (resultado, comentario, marca,
 Customer ID · Teléfono original · Teléfono corregido · Corregido por · Fecha. La columna `Cust. Telephone` de la cartera conserva el original.
 
 ### `_Usuarios`, `_Asignaciones`, `_Config`
-- `_Usuarios`: nombre, rol (admin / ejecutivo), activo, PIN cifrado (SHA-256 con sal), si debe cambiar el PIN temporal, intentos fallidos y bloqueo temporal.
+- `_Usuarios`: nombre, rol (admin / ejecutivo), activo, «Nombre en cartera» (cómo aparece en la columna `Ejecutivo`; se compara sin mayúsculas ni acentos y admite varios separados por `;`), PIN cifrado (SHA-256 con sal), si debe cambiar el PIN temporal, intentos fallidos y bloqueo temporal.
 - `_Asignaciones`: rangos de filas reservados por ejecutivo (las liberadas quedan con estado «Liberada», no se borran).
 - `_Config`: ajustes del equipo (meta diaria, meta mensual de venta, intentos para purga, visibilidad, WhatsApp…) y el contador `seq`, que sube con cada cambio para que los demás paneles sepan que deben recargar.
 

@@ -16,7 +16,7 @@ const C = Object.fromEntries(KEYS.map((k, i) => [k, i]));
 const SH = { cfg: '_Config', users: '_Usuarios', asg: '_Asignaciones', seg: '_Seguimiento', cm: '_ClienteMarcas', mar: '_Marcas', ord: '_Ordenes', ven: '_Ventas', his: '_Historial', tel: '_Telefonos' };
 const HDR = {
   cfg: ['Clave', 'Valor'],
-  users: ['Nombre', 'Rol', 'Activo', 'PinHash', 'Salt', 'CambiarPin', 'Intentos', 'BloqueadoHasta'],
+  users: ['Nombre', 'Rol', 'Activo', 'PinHash', 'Salt', 'CambiarPin', 'Intentos', 'BloqueadoHasta', 'Nombre en cartera'],
   asg: ['ID', 'Usuario', 'Desde fila', 'Hasta fila', 'Creado por', 'Fecha', 'Estado'],
   seg: ['Customer ID', 'Revisado', 'Resultado', 'Motivo', 'Intentos', 'Próximo contacto', 'Tipo de negocio', 'Gestionado por', 'Primera gestión', 'Última gestión', 'Último contacto', 'Depurado', 'Teléfono corregido'],
   cm: ['Customer ID', 'Marca', 'Relación', 'Registrado por', 'Fecha'],
@@ -194,7 +194,7 @@ async function loadDB(ctx) {
   const cfg = Object.assign({}, CFG_DEF);
   let seq = 0;
   R.cfg.forEach(r => { const k = str(r[0]), v = str(r[1]); if (k === 'seq') seq = num(v); else if (k in CFG_DEF) cfg[k] = NUM_CFG.includes(k) ? num(v) : BOOL_CFG.includes(k) ? v === 'SI' : v; });
-  const users = R.users.filter(r => str(r[0]).trim()).map((r, i) => ({ row: i + 1, name: str(r[0]).trim(), role: /admin/i.test(r[1]) ? 'admin' : 'ejecutivo', active: str(r[2]) !== 'NO', hash: str(r[3]), salt: str(r[4]), mustChange: str(r[5]) === 'SI', tries: num(r[6]), lockUntil: num(r[7]) }));
+  const users = R.users.filter(r => str(r[0]).trim()).map((r, i) => ({ row: i + 1, name: str(r[0]).trim(), role: /admin/i.test(r[1]) ? 'admin' : 'ejecutivo', active: str(r[2]) !== 'NO', hash: str(r[3]), salt: str(r[4]), mustChange: str(r[5]) === 'SI', tries: num(r[6]), lockUntil: num(r[7]) , alias: str(r[8]).trim() }));
   const assigns = R.asg.filter(r => str(r[0]) && str(r[6]) !== 'Liberada').map(r => ({ id: str(r[0]), user: str(r[1]), from: num(r[2]), to: num(r[3]), by: str(r[4]), date: str(r[5]) }));
   const brands = R.mar.filter(r => str(r[0]).trim() && str(r[2]) !== 'NO').map(r => ({ m: str(r[0]).trim(), c: str(r[1]) || 'Por definir' }));
   const track = {};
@@ -219,7 +219,11 @@ function who(tk) {
 }
 const isAdm = u => u.role === 'admin';
 const resvFor = n => DB.assigns.find(a => n >= a.from && n <= a.to);
-const inScope = (u, row) => isAdm(u) || !DB.cfg.scopeOwn || str(row.v[C.exec]).trim() === u.name || (DB.track[row.k] || {}).own === u.name || (resvFor(row.r) || {}).user === u.name;
+/* la columna «Ejecutivo» se compara sin mayúsculas, acentos ni espacios extra, contra el nombre del
+   usuario o el «Nombre en cartera» que el administrador le vinculó (se aceptan varios separados por ;) */
+const execNames = u => [u.name, ...str(u.alias).split(';')].map(norm).filter(Boolean);
+const execMatch = (u, row) => { const e = norm(row.v[C.exec]); return !!e && execNames(u).includes(e); };
+const inScope = (u, row) => isAdm(u) || !DB.cfg.scopeOwn || execMatch(u, row) || (DB.track[row.k] || {}).own === u.name || (resvFor(row.r) || {}).user === u.name;
 const stateOf = row => ({ k: row.k, r: row.r, v: row.v.slice(), t: JSON.parse(JSON.stringify(DB.track[row.k] || { brands: [], bmeta: {}, hist: [] })) });
 const rowOf = k => DB.cart.rows.find(r => r.k === k);
 function segArr(k, t) {
@@ -501,7 +505,14 @@ const API = {
       return DB.assigns;
     });
   },
-  async api_users(tk) { const u = who(tk); if (!isAdm(u)) err('Solo el administrador.'); return DB.users.map(x => ({ row: x.row, name: x.name, role: x.role, active: x.active, hasPin: !!x.hash, mustChange: x.mustChange })); },
+  async api_users(tk) { const u = who(tk); if (!isAdm(u)) err('Solo el administrador.'); return DB.users.map(x => ({ row: x.row, name: x.name, role: x.role, active: x.active, hasPin: !!x.hash, mustChange: x.mustChange, alias: x.alias, n: DB.cart.rows.filter(r => execMatch(x, r)).length })); },
+  /* valores distintos de la columna «Ejecutivo», para vincular cada usuario con el suyo */
+  async api_execs(tk) {
+    const u = who(tk); if (!isAdm(u)) err('Solo el administrador.');
+    /* «Luis», « LUIS » y «luis» cuentan como el mismo nombre */
+    const m = {}; DB.cart.rows.forEach(r => { const e = str(r.v[C.exec]).trim(), k = norm(e); if (k) (m[k] = m[k] || { name: e, n: 0 }).n++; });
+    return Object.values(m).sort((a, b) => b.n - a.n);
+  },
   async api_saveUser(tk, p) {
     const u = who(tk); if (!isAdm(u)) err('Solo el administrador.');
     const name = str(p.name).trim(); if (!name) err('Escribe un nombre.');
@@ -513,7 +524,9 @@ const API = {
     return run(async ctx => {
       let hash = ex ? ex.hash : '', salt = ex ? ex.salt : '', must = ex ? (ex.mustChange ? 'SI' : 'NO') : 'SI';
       if (p.pin) { salt = randId(); hash = await sha(salt + ':' + p.pin); must = 'SI'; }
-      await upsert(ctx, 'users', r => norm(r[0]) === norm(ex ? ex.name : name), () => [name, p.role === 'admin' ? 'admin' : 'ejecutivo', p.active ? 'SI' : 'NO', hash, salt, must, '0', '0']);
+      writeRow(await sheet(ctx, SH.users), 0, HDR.users);
+      const alias = p.alias != null ? str(p.alias).trim() : (ex ? ex.alias : '');
+      await upsert(ctx, 'users', r => norm(r[0]) === norm(ex ? ex.name : name), () => [name, p.role === 'admin' ? 'admin' : 'ejecutivo', p.active ? 'SI' : 'NO', hash, salt, must, '0', '0', alias]);
       await bumpSeq(ctx); await loadDB(ctx);
       return API.api_users(tk);
     });

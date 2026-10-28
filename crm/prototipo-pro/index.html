@@ -780,6 +780,9 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
         <label class="fl"><span>Rol</span><select id="uRole"><option value="ejecutivo">Ejecutivo</option><option value="admin">Administrador</option></select></label>
         <label class="ck" style="align-self:end;height:36px"><input type="checkbox" id="uActive" checked> Activo</label>
       </div>
+      <label class="fl"><span>Nombre en la columna «Ejecutivo» de la cartera</span><input type="text" id="uAlias" list="dlExecs" placeholder="Como aparece en la cartera, ej.: LUIS PEREZ"></label>
+      <datalist id="dlExecs"></datalist>
+      <div class="hint" style="margin:0" id="uAliasHint">El ejecutivo ve los clientes donde la columna «Ejecutivo» dice este nombre (sin importar mayúsculas ni acentos), más sus filas reservadas y los que gestione. Si tiene varios, sepáralos con «;».</div>
     </div>
   </div>
   <div class="mf"><button class="btn ghost" id="uNew">Nuevo</button><button class="btn ghost" data-close>Cerrar</button><button class="btn primary" id="uSave">Guardar usuario</button></div>
@@ -1019,14 +1022,15 @@ const API = {
     SEQ++; return { assigns: ASSIGNS, updated: 0, reload: true };
   },
   api_release(tk, id) { const u = who(tk), a = ASSIGNS.find(x => x.id === id); if (!a) throw new Error('Reserva no encontrada.'); if (u.role !== 'admin' && a.user !== u.name) throw new Error('Solo puedes liberar tus propias filas.'); ASSIGNS = ASSIGNS.filter(x => x !== a); return ASSIGNS; },
-  api_users(tk) { const u = who(tk); if (u.role !== 'admin') throw new Error('Solo el administrador.'); return USERS.map(x => ({ row: x.row, name: x.name, role: x.role, active: x.active, hasPin: !!x.pin })); },
+  api_users(tk) { const u = who(tk); if (u.role !== 'admin') throw new Error('Solo el administrador.'); return USERS.map(x => ({ row: x.row, name: x.name, role: x.role, active: x.active, hasPin: !!x.pin, alias: x.alias || '', n: ROWS.filter(r => r.v[C.exec] && [x.name, ...(x.alias || '').split(';')].some(a => a.trim().toLowerCase() === r.v[C.exec].toLowerCase())).length })); },
+  api_execs(tk) { who(tk); const m = {}; ROWS.forEach(r => { if (r.v[C.exec]) m[r.v[C.exec]] = (m[r.v[C.exec]] || 0) + 1; }); return Object.entries(m).map(([name, n]) => ({ name, n })); },
   api_saveUser(tk, p) {
     const u = who(tk); if (u.role !== 'admin') throw new Error('Solo el administrador.');
     const name = String(p.name || '').trim(); if (!name) throw new Error('Escribe un nombre.');
     if (p.pin && !/^\d{4,8}$/.test(p.pin)) throw new Error('El PIN debe tener de 4 a 8 números.');
     let x = p.row ? USERS.find(y => y.row === p.row) : null;
     if (!x) { if (USERS.some(y => y.name.toLowerCase() === name.toLowerCase())) throw new Error('Ya existe un usuario con ese nombre.'); x = { row: USERS.length + 2, pin: '' }; USERS.push(x); }
-    Object.assign(x, { name, role: p.role, active: !!p.active }); if (p.pin) x.pin = p.pin;
+    Object.assign(x, { name, role: p.role, active: !!p.active, alias: String(p.alias || '').trim() }); if (p.pin) x.pin = p.pin;
     return API.api_users(tk);
   },
   api_addBrand(tk, b) {
@@ -1308,6 +1312,7 @@ async function loadAll(first) {
     setSync('', 'Sincronizado');
     startPoll();
     if (first) toast(S.scoped ? `Hola ${S.me.name} · tu cartera: ${fmtN(S.rows.length)} de ${fmtN(S.total)} clientes` : `Hola ${S.me.name} · ${fmtN(S.rows.length)} clientes en «${d.sheet}»`);
+    if (first && S.me.role !== 'admin' && !S.rows.length) toast('Aún no tienes clientes. Pide al administrador que vincule tu usuario con tu nombre de la columna «Ejecutivo» (Usuarios → Editar) o que te reserve filas.', true);
   } catch (e) {
     if (!/sesi[oó]n/i.test(e.message)) { toast('No se pudo cargar: ' + e.message, true); if (!S.rows.length) showLogin(e.message); }
   }
@@ -2449,20 +2454,24 @@ $('#bAddBrand').onclick = async () => {
   catch (e) { toast(e.message, true); }
 };
 let USERS = [];
-async function openUsers() { openModal('#mUsers'); uForm(null); $('#uList').innerHTML = '<div class="it">Cargando…</div>'; try { USERS = await call('api_users', S.token); renderUsers(); } catch (e) { toast(e.message, true); } }
+async function openUsers() {
+  openModal('#mUsers'); uForm(null); $('#uList').innerHTML = '<div class="it">Cargando…</div>';
+  try { USERS = await call('api_users', S.token); renderUsers(); } catch (e) { toast(e.message, true); }
+  call('api_execs', S.token).then(l => { $('#dlExecs').innerHTML = l.map(x => `<option value="${esc(x.name)}">${fmtN(x.n)} clientes</option>`).join(''); }).catch(() => {});
+}
 function renderUsers() {
-  $('#uList').innerHTML = USERS.map((u, i) => `<div class="it"><span class="av" style="background:${userColor(u.name)}">${esc(initials(u.name))}</span><div class="grow"><b>${esc(u.name)}</b><small>${u.role === 'admin' ? 'Administrador' : 'Ejecutivo'} · ${u.active ? 'Activo' : 'Inactivo'}${u.hasPin ? '' : ' · sin PIN'}</small></div><button class="btn" data-ue="${i}" style="height:28px">Editar</button></div>`).join('');
+  $('#uList').innerHTML = USERS.map((u, i) => `<div class="it"><span class="av" style="background:${userColor(u.name)}">${esc(initials(u.name))}</span><div class="grow"><b>${esc(u.name)}</b><small>${u.role === 'admin' ? 'Administrador' : 'Ejecutivo'} · ${u.active ? 'Activo' : 'Inactivo'}${u.hasPin ? '' : ' · sin PIN'}${u.role !== 'admin' && u.n != null ? ` · <span style="color:${u.n ? 'inherit' : 'var(--crit)'}">${fmtN(u.n)} clientes en la columna Ejecutivo${u.alias ? ' («' + esc(u.alias) + '»)' : ''}</span>` : ''}</small></div><button class="btn" data-ue="${i}" style="height:28px">Editar</button></div>`).join('');
 }
 function uForm(u) {
   $('#uFormT').textContent = u ? 'Editar «' + u.name + '»' : 'Nuevo usuario';
-  $('#uRow').value = u ? u.row : ''; $('#uName').value = u ? u.name : ''; $('#uPin').value = ''; $('#uRole').value = u ? u.role : 'ejecutivo'; $('#uActive').checked = u ? u.active : true;
+  $('#uRow').value = u ? u.row : ''; $('#uName').value = u ? u.name : ''; $('#uPin').value = ''; $('#uRole').value = u ? u.role : 'ejecutivo'; $('#uActive').checked = u ? u.active : true; $('#uAlias').value = u ? (u.alias || '') : '';
   $('#uPin').placeholder = u ? 'Vacío = no cambiar' : 'Ej.: 4821';
 }
 $('#uList').addEventListener('click', e => { const b = e.target.closest('[data-ue]'); if (b) uForm(USERS[+b.dataset.ue]); });
 $('#uNew').onclick = () => uForm(null);
 $('#uSave').onclick = async () => {
   $('#uSave').disabled = true;
-  try { USERS = await call('api_saveUser', S.token, { row: +$('#uRow').value || null, name: $('#uName').value, pin: $('#uPin').value.trim(), role: $('#uRole').value, active: $('#uActive').checked }); renderUsers(); uForm(null); S.users = USERS.filter(u => u.active).map(u => u.name); toast('Usuario guardado'); }
+  try { USERS = await call('api_saveUser', S.token, { row: +$('#uRow').value || null, name: $('#uName').value, pin: $('#uPin').value.trim(), role: $('#uRole').value, active: $('#uActive').checked, alias: $('#uAlias').value }); renderUsers(); uForm(null); S.users = USERS.filter(u => u.active).map(u => u.name); toast('Usuario guardado'); }
   catch (e) { toast(e.message, true); }
   $('#uSave').disabled = false;
 };

@@ -12,7 +12,8 @@ const SHOTS = process.argv[3] || null;
 
 const COLS = ['Organization', 'KAM ID', 'Ejecutivo', 'Customer ID', 'Legal Name', 'Tax Reg No', 'Cust. Address1', 'State Name', 'City Name', 'Cust. Telephone', 'Cust. Mail Address', 'Term ID', 'Report Code', 'Credit Limit', 'Creation Date', 'Last Purchase', 'Clasif.', 'Comentario Créditos'];
 const NAMES = ['Ferretería San Martín SAC', 'Distribuidora El Sol EIRL', 'Inversiones Kallpa SRL', 'Comercial Rímac SAC', 'Grupo Pachamama SAC', 'Bodega Don Lucho EIRL', 'Constructora Huascarán SAC', 'Textiles Majes SRL', 'Servicios Altiplano SAC', 'Importaciones Mistura SAC', 'Maderera Piura Norte EIRL', 'Botica Titicaca SAC'];
-const execs = ['Harold', 'Harold', 'Harold', 'Luis', 'Luis', '', '', '', 'Harold', '', 'Luis', ''];
+/* como en una cartera real: mayúsculas, espacios de más y el nombre completo en vez del usuario */
+const execs = ['Harold', ' HAROLD ', 'harold', 'Luis', 'Luis', '', '', '', 'HAROLD QUISPE', '', 'Luis', ''];
 const cartera = [COLS, ...NAMES.map((n, i) => ['PE01', 'K21' + (i % 4), execs[i], String(100101 + i), n, '20600' + (100101 + i), 'Av. Ejemplo ' + (100 + i), 'Lima', 'Lima', 987650000 + i * 111, `compras${i}@ejemplo.pe`, '30D', 'R1' + (i % 5), 5000 + i * 7000, 43500 + i * 30, 45900 + i * 20, ['A', 'B', 'C'][i % 3], i === 2 ? 'Tiene tienda en galería Wilson' : ''])];
 const SEED = [{ name: 'Hoja1', rows: cartera }, { name: 'Resumen', rows: [['Notas'], ['hoja ajena al sistema']] }];
 
@@ -58,10 +59,13 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
 
   /* 2. usuario con PIN temporal */
   await page.click('#bUsers');
-  await page.fill('#uName', 'Harold'); await page.fill('#uPin', '1111');
+  await page.waitForFunction(() => document.querySelectorAll('#dlExecs option').length === 3);
+  ok(true, 'Usuarios ofrece los nombres de la columna Ejecutivo para vincular');
+  await page.fill('#uName', 'Harold'); await page.fill('#uPin', '1111'); await page.fill('#uAlias', 'HAROLD QUISPE');
   await page.click('#uSave'); await page.waitForTimeout(150);
+  ok(/4 clientes en la columna Ejecutivo/.test(await page.textContent('#uList')), 'El usuario muestra cuántos clientes le corresponden (mayúsculas, espacios y nombre en cartera)');
   const u1 = await aux('_Usuarios');
-  ok(u1.some(r => r[0] === 'Harold' && r[5] === 'SI'), 'Harold creado con PIN temporal (CambiarPin = SI)');
+  ok(u1.some(r => r[0] === 'Harold' && r[5] === 'SI' && r[8] === 'HAROLD QUISPE'), 'Harold creado con PIN temporal y su nombre en cartera');
   await page.click('#mUsers [data-close]');
 
   /* 3. lista y panel */

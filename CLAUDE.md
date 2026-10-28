@@ -31,7 +31,7 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 
 ## Visibilidad
 
-- El ejecutivo solo ve su cartera: clientes con su nombre en `Ejecutivo`, en sus filas reservadas o gestionados por él. El administrador ve todo, incluido el mapeo de marcas por ejecutivo.
+- El ejecutivo solo ve su cartera: clientes cuyo `Ejecutivo` coincide con su usuario o con su «Nombre en cartera» (sin distinguir mayúsculas, acentos ni espacios), en sus filas reservadas o gestionados por él. El administrador ve todo, incluido el mapeo de marcas por ejecutivo.
 - El modelo completo de pestañas auxiliares está en `crm/estructura/modelo-datos.md`.
 
 ## Complemento de Excel (`crm/complemento/`)
