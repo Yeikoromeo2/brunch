@@ -13,50 +13,75 @@ function makeSheet(name) {
 const get = (ws, r, c) => (ws.cells[r] && ws.cells[r][c] != null) ? ws.cells[r][c] : '';
 const set = (ws, r, c, v) => { (ws.cells[r] = ws.cells[r] || [])[c] = v; };
 
-function range(ws, r0, c0, nr, nc) {
-  return {
-    rowIndex: r0, columnIndex: c0, rowCount: nr, columnCount: nc, isNullObject: false,
-    worksheet: api(ws),
-    load() { return this; },
-    get values() { return Array.from({ length: nr }, (_, i) => Array.from({ length: nc }, (_, j) => get(ws, r0 + i, c0 + j))); },
-    set values(v) { v.forEach((row, i) => row.forEach((x, j) => set(ws, r0 + i, c0 + j, x))); },
-    get text() { return this.values.map(row => row.map(x => typeof x === 'number' ? String(x) : String(S(x)))); },
-    set numberFormat(f) { f.forEach((row, i) => row.forEach((x, j) => { (ws.formats[r0 + i] = ws.formats[r0 + i] || [])[c0 + j] = x; })); },
-    select() { book.selection = { sheet: ws.name, row: r0, col: c0 }; }
-  };
+/* Cada Excel.run tiene su propio contexto, como en Excel real:
+   - una propiedad solo se puede leer después de load() y de ctx.sync() de ESE contexto;
+   - un objeto de un Excel.run que ya terminó no se puede volver a usar. */
+const NOT_LOADED = p => new Error(`La propiedad "${p}" no está disponible. Antes de leer el valor de la propiedad, llame al método de carga en el objeto contenedor y llame a "context.sync()" en el contexto de solicitud asociado.`);
+const alive = ctx => { if (!ctx.alive) throw new Error('InvalidObjectPath: el objeto pertenece a otro Excel.run que ya terminó.'); };
+function loadable(ctx, obj, props) {
+  obj._loaded = new Set();
+  obj.load = function (list) { alive(ctx); String(list || props.join(',')).split(',').map(x => x.trim()).filter(Boolean).forEach(x => ctx.pending.push([obj, x])); return obj; };
+  const need = p => { if (!obj._loaded.has(p)) throw NOT_LOADED(p); };
+  return need;
 }
-function used(ws) {
+function range(ws, r0, c0, nr, nc, ctx) {
+  const o = { isNullObject: false, worksheet: api(ws, ctx) };
+  const need = loadable(ctx, o, ['values']);
+  const vals = () => Array.from({ length: nr }, (_, i) => Array.from({ length: nc }, (_, j) => get(ws, r0 + i, c0 + j)));
+  Object.defineProperties(o, {
+    rowIndex: { get() { need('rowIndex'); return r0; } },
+    columnIndex: { get() { need('columnIndex'); return c0; } },
+    rowCount: { get() { need('rowCount'); return nr; } },
+    columnCount: { get() { need('columnCount'); return nc; } },
+    values: { get() { need('values'); return vals(); }, set(v) { alive(ctx); v.forEach((row, i) => row.forEach((x, j) => set(ws, r0 + i, c0 + j, x))); } },
+    text: { get() { need('text'); return vals().map(row => row.map(x => typeof x === 'number' ? String(x) : String(S(x)))); } },
+    numberFormat: { set(f) { alive(ctx); f.forEach((row, i) => row.forEach((x, j) => { (ws.formats[r0 + i] = ws.formats[r0 + i] || [])[c0 + j] = x; })); } }
+  });
+  o.select = () => { alive(ctx); book.selection = { sheet: ws.name, row: r0, col: c0 }; };
+  return o;
+}
+function used(ws, ctx) {
   let maxR = -1, maxC = -1;
   ws.cells.forEach((row, r) => row && row.forEach((x, c) => { if (x !== '' && x != null) { if (r > maxR) maxR = r; if (c > maxC) maxC = c; } }));
   if (maxR < 0) return { isNullObject: true, load() { return this; } };
-  return Object.assign(range(ws, 0, 0, maxR + 1, maxC + 1), {});
+  return range(ws, 0, 0, maxR + 1, maxC + 1, ctx);
 }
-function api(ws) {
+function api(ws, ctx) {
   return {
     get name() { return ws.name; },
     get visibility() { return ws.visibility; },
-    set visibility(v) { ws.visibility = v; },
+    set visibility(v) { alive(ctx); ws.visibility = v; },
     isNullObject: false,
     load() { return this; },
-    getUsedRangeOrNullObject() { return used(ws); },
-    getRangeByIndexes(r, c, nr, nc) { return range(ws, r, c, nr, nc); },
-    activate() { book.active = ws.name; }
+    getUsedRangeOrNullObject() { alive(ctx); return used(ws, ctx); },
+    getRangeByIndexes(r, c, nr, nc) { alive(ctx); return range(ws, r, c, nr, nc, ctx); },
+    activate() { alive(ctx); book.active = ws.name; }
   };
 }
-const workbook = {
-  worksheets: {
-    load() { return this; },
-    get items() { return book.sheets.map(api); },
-    getItemOrNullObject(n) { const ws = book.sheets.find(s => s.name === n); return ws ? api(ws) : { isNullObject: true }; },
-    add(n) { if (book.sheets.some(s => s.name === n)) throw new Error('Ya existe la hoja ' + n); return api(makeSheet(n)); }
-  },
-  getSelectedRange() {
-    const ws = book.sheets.find(s => s.name === book.selection.sheet) || book.sheets[0];
-    return range(ws, book.selection.row, book.selection.col, 1, 1);
-  }
-};
+function makeWorkbook(ctx) {
+  return {
+    worksheets: {
+      load() { return this; },
+      get items() { return book.sheets.map(w => api(w, ctx)); },
+      getItem(n) { alive(ctx); const ws = book.sheets.find(x => x.name === n); if (!ws) throw new Error('ItemNotFound: ' + n); return api(ws, ctx); },
+      getItemOrNullObject(n) { alive(ctx); const ws = book.sheets.find(x => x.name === n); return ws ? api(ws, ctx) : { isNullObject: true }; },
+      add(n) { alive(ctx); if (book.sheets.some(x => x.name === n)) throw new Error('Ya existe la hoja ' + n); return api(makeSheet(n), ctx); }
+    },
+    getSelectedRange() {
+      alive(ctx);
+      const ws = book.sheets.find(x => x.name === book.selection.sheet) || book.sheets[0];
+      return range(ws, book.selection.row, book.selection.col, 1, 1, ctx);
+    }
+  };
+}
 window.Excel = {
-  run: async fn => { book.runs = (book.runs || 0) + 1; try { return await fn({ workbook, sync: async () => {} }); } finally { book.runs--; } },
+  run: async fn => {
+    book.runs = (book.runs || 0) + 1;
+    const ctx = { alive: true, pending: [] };
+    ctx.sync = async () => { alive(ctx); ctx.pending.splice(0).forEach(([o, p]) => o._loaded.add(p)); };
+    ctx.workbook = makeWorkbook(ctx);
+    try { return await fn(ctx); } finally { ctx.alive = false; book.runs--; }
+  },
   createWorkbook: async b64 => { book.created.push(b64); }
 };
 /* ventana de diálogo: el panel la abre con window.open y se hablan por mensajes de texto */

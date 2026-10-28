@@ -73,6 +73,17 @@ async function readAll(ctx, ws, prop) {
   const rg = ws.getRangeByIndexes(0, 0, u.rowIndex + u.rowCount, u.columnIndex + u.columnCount); rg.load(prop || 'values'); await ctx.sync();
   return rg[prop || 'values'];
 }
+/* el historial solo crece: se leen sus últimos movimientos (el panel muestra los 40 más recientes de cada cliente) */
+const HIS_MAX = 6000;
+async function readTail(ctx, key, max) {
+  const ws = await sheet(ctx, SH[key]); if (!ws) return [];
+  const u = ws.getUsedRangeOrNullObject(true); u.load('rowIndex,rowCount'); await ctx.sync();
+  if (u.isNullObject) return [];
+  const n = u.rowIndex + u.rowCount, from = Math.max(1, n - max);
+  if (n <= 1) return [];
+  const rg = ws.getRangeByIndexes(from, 0, n - from, HDR[key].length); rg.load('values'); await ctx.sync();
+  return rg.values;
+}
 async function readAux(ctx, key) { const ws = await sheet(ctx, SH[key]); if (!ws) return { ws: null, rows: [] }; const v = await readAll(ctx, ws); return { ws, rows: v.slice(1) }; }
 /* escribe una fila como texto (las pestañas internas guardan todo como texto) */
 function writeRow(ws, excelRow, arr) {
@@ -91,20 +102,41 @@ async function appendRows(ctx, key, rows) {
   rg.values = rows.map(r => r.map(str));
   await ctx.sync();
 }
+/* lee solo las dos primeras columnas (las claves) de una pestaña interna, no la pestaña completa */
+async function keyCols(ctx, ws) {
+  const u = ws.getUsedRangeOrNullObject(true); u.load('rowIndex,rowCount'); await ctx.sync();
+  const n = u.isNullObject ? 0 : u.rowIndex + u.rowCount;
+  if (n < 1) return { n: 0, keys: [] };
+  const rg = ws.getRangeByIndexes(0, 0, n, 2); rg.load('values'); await ctx.sync();
+  return { n, keys: rg.values };
+}
+/* ubica la fila que cumple `match` (sobre las columnas clave) y lee solo esa fila */
+async function findRow(ctx, key, match) {
+  const ws = await sheet(ctx, SH[key]), kc = await keyCols(ctx, ws);
+  const i = kc.keys.findIndex((r, j) => j > 0 && match(r));
+  let cur = null;
+  if (i > 0) { const rg = ws.getRangeByIndexes(i, 0, 1, HDR[key].length); rg.load('values'); await ctx.sync(); cur = rg.values[0].map(str); }
+  return { ws, i, n: kc.n, cur, keys: kc.keys };
+}
 /* actualiza la fila que cumpla `match` leyendo la pestaña en ese momento (otro usuario pudo agregar filas) */
 async function upsert(ctx, key, match, build) {
-  const ws = await sheet(ctx, SH[key]);
-  const v = await readAll(ctx, ws);
-  let i = v.findIndex((r, j) => j > 0 && match(r));
-  const cur = i > 0 ? v[i].map(str) : null;
-  if (i < 1) i = Math.max(v.length, 1);
-  const arr = build(cur);
-  writeRow(ws, i, arr); await ctx.sync();
+  const f = await findRow(ctx, key, match);
+  const arr = build(f.cur);
+  writeRow(f.ws, f.i > 0 ? f.i : Math.max(f.n, 1), arr); await ctx.sync();
   return arr;
 }
+/* seq sube con cada cambio. KNOWN es el seq que ya refleja esta pantalla: si al subirlo
+   nadie más había escrito, la pantalla sigue al día y no necesita recargar */
+let KNOWN = -1;
 async function bumpSeq(ctx) {
-  await upsert(ctx, 'cfg', r => str(r[0]) === 'seq', cur => ['seq', String((cur ? num(cur[1]) : 0) + 1)]);
+  let before = 0;
+  const a = await upsert(ctx, 'cfg', r => str(r[0]) === 'seq', cur => { before = cur ? num(cur[1]) : 0; return ['seq', String(before + 1)]; });
+  if (before === KNOWN) KNOWN = num(a[1]);
+  if (DB) DB.seq = num(a[1]);
 }
+const readSeq = async ctx => { const f = await findRow(ctx, 'cfg', r => str(r[0]) === 'seq'); return f.cur ? num(f.cur[1]) : 0; };
+/* la hoja de la cartera se pide de nuevo en cada acceso: Excel no deja reutilizar objetos de otro acceso */
+const cartWs = ctx => ctx.workbook.worksheets.getItem(DB.cart.name);
 
 /* ---------- la cartera ---------- */
 function headerProblems(row) {
@@ -136,27 +168,29 @@ async function readCartera(ctx) {
   if (f.problems.length) { const e = new Error('ESTRUCTURA: ' + f.problems.join('\n')); e.problems = f.problems; throw e; }
   const u = f.ws.getUsedRangeOrNullObject(true); u.load('rowIndex,rowCount'); await ctx.sync();
   const n = u.isNullObject ? 1 : u.rowIndex + u.rowCount;
-  const rg = f.ws.getRangeByIndexes(0, 0, Math.max(1, n), COLS.length); rg.load('values,text'); await ctx.sync();
-  const ks = clientKeys(rg.values.slice(1).map(r => r[C.id]));
+  /* valores de todo el rango; el texto tal como se ve solo para ID, RUC, teléfono y fechas (es la mitad de datos) */
+  const N = Math.max(1, n), rg = f.ws.getRangeByIndexes(0, 0, N, COLS.length); rg.load('values');
+  const TX = [C.id, C.tax, C.phone, C.created, C.last].map(j => { const t = f.ws.getRangeByIndexes(0, j, N, 1); t.load('text'); return [j, t]; });
+  await ctx.sync();
+  const txt = Object.fromEntries(TX.map(([j, t]) => [j, t.text.map(x => str(x[0]))]));
+  const ks = clientKeys(rg.values.slice(1).map((r, i) => txt[C.id][i + 1].trim() || r[C.id]));
   const rows = [];
   rg.values.slice(1).forEach((vals, i) => {
-    const tx = rg.text[i + 1];
     if (!vals.some(x => str(x).trim() !== '')) return;
-    const v = tx.map(str);
-    v[C.created] = isoDate(vals[C.created], tx[C.created]);
-    v[C.last] = isoDate(vals[C.last], tx[C.last]);
-    if (typeof vals[C.credit] === 'number') v[C.credit] = String(vals[C.credit]);
-    v[C.id] = str(vals[C.id]).trim() || v[C.id];
+    const v = vals.map(x => typeof x === 'number' && !Number.isInteger(x) ? String(Math.round(x * 100) / 100) : str(x));
+    [C.id, C.tax, C.phone].forEach(j => { const t = txt[j][i + 1].trim(); if (t) v[j] = t; });
+    v[C.created] = isoDate(vals[C.created], txt[C.created][i + 1]);
+    v[C.last] = isoDate(vals[C.last], txt[C.last][i + 1]);
     rows.push({ k: ks[i], r: i + 2, v });
   });
-  return { name: f.name, ws: f.ws, rows };
+  return { name: f.name, rows };
 }
 
 /* ---------- lectura completa ---------- */
 let DB = null;
 async function loadDB(ctx) {
   const cart = await readCartera(ctx);
-  const R = {}; for (const k in SH) R[k] = (await readAux(ctx, k)).rows;
+  const R = {}; for (const k in SH) R[k] = k === 'his' ? await readTail(ctx, k, HIS_MAX) : (await readAux(ctx, k)).rows;
   const cfg = Object.assign({}, CFG_DEF);
   let seq = 0;
   R.cfg.forEach(r => { const k = str(r[0]), v = str(r[1]); if (k === 'seq') seq = num(v); else if (k in CFG_DEF) cfg[k] = NUM_CFG.includes(k) ? num(v) : BOOL_CFG.includes(k) ? v === 'SI' : v; });
@@ -230,7 +264,7 @@ const API = {
         ws.visibility = 'VeryHidden';
       }
       await ctx.sync();
-      DB.cart.ws.activate();
+      cartWs(ctx).activate();
       await appendRows(ctx, 'cfg', [...Object.entries(CFG_DEF).map(([k, v]) => [k, typeof v === 'boolean' ? (v ? 'SI' : 'NO') : String(v)]), ['seq', '1']]);
       await appendRows(ctx, 'mar', Object.entries(CATALOGO).flatMap(([c, l]) => l.map(m => [m, c, 'SI'])));
       const salt = randId();
@@ -268,7 +302,7 @@ const API = {
 
   async api_load(tk) {
     return run(async ctx => {
-      await loadDB(ctx); const u = who(tk);
+      await loadDB(ctx); const u = who(tk); KNOWN = DB.seq;
       const vis = DB.cart.rows.filter(r => inScope(u, r)), ks = new Set(vis.map(r => r.k)), track = {};
       vis.forEach(r => { if (DB.track[r.k]) track[r.k] = DB.track[r.k]; });
       return { me: { name: u.name, role: u.role }, cfg: DB.cfg, scoped: vis.length < DB.cart.rows.length, total: DB.cart.rows.length, header: COLS, C, assigns: DB.assigns,
@@ -276,11 +310,25 @@ const API = {
         rows: vis.map(r => [r.k, r.r, r.v]), track, brands: DB.brands, orders: DB.orders.filter(o => ks.has(o.k)), sales: DB.sales.filter(x => ks.has(x.k)), warnings: [] };
     });
   },
-  async api_changes(tk, seq) {
-    who(tk);
+  /* sincronización: si solo hubo cambios propios no se lee nada más; si otra persona cambió algo,
+     se relee el libro aquí y a la pantalla solo se le envían los clientes que cambiaron */
+  async api_changes(tk) {
+    const u0 = who(tk);
     return run(async ctx => {
-      const c = await readAux(ctx, 'cfg'), r = c.rows.find(x => str(x[0]) === 'seq'), cur = r ? num(r[1]) : 0;
-      return { assigns: DB.assigns, today: TODAY(), reload: cur !== seq, changes: [], seq: cur };
+      const cur = await readSeq(ctx);
+      const base = { assigns: DB.assigns, today: TODAY(), reload: false, changes: [], seq: cur };
+      if (cur === KNOWN) return base;
+      const snap = k => { const r = rowOf(k); return JSON.stringify([r && r.v, DB.track[k] || null]); };
+      const scope = () => DB.cart.rows.filter(r => inScope(who(tk), r)).map(r => r.k);
+      const oldKeys = scope(), old = Object.fromEntries(oldKeys.map(k => [k, snap(k)]));
+      const oldMeta = JSON.stringify([DB.cfg, DB.users.map(x => [x.name, x.role, x.active]), DB.brands.length]);
+      await loadDB(ctx); KNOWN = DB.seq;
+      if (!DB.users.some(x => x.name === u0.name && x.active)) return Object.assign(base, { reload: true });
+      const keys = scope();
+      if (keys.join('|') !== oldKeys.join('|') || JSON.stringify([DB.cfg, DB.users.map(x => [x.name, x.role, x.active]), DB.brands.length]) !== oldMeta) return Object.assign(base, { reload: true, assigns: DB.assigns, seq: DB.seq });
+      const ks = new Set(keys);
+      return Object.assign(base, { assigns: DB.assigns, seq: DB.seq, changes: keys.filter(k => snap(k) !== old[k]).map(k => stateOf(rowOf(k))),
+        orders: DB.orders.filter(o => ks.has(o.k)), sales: DB.sales.filter(x => ks.has(x.k)) });
     });
   },
 
@@ -289,7 +337,7 @@ const API = {
     return run(async ctx => {
       const row = rowOf(p.k); if (!row) err('Cliente no encontrado. Pulsa recargar.');
       if (!inScope(u, row)) err('Este cliente no está en tu cartera.');
-      const seg = await readAux(ctx, 'seg'), cur = seg.rows.find(a => str(a[0]) === row.k);
+      const cur = (await findRow(ctx, 'seg', a => str(a[0]) === row.k)).cur;
       const t = Object.assign(DB.track[row.k] || (DB.track[row.k] = { buy: false, monto: '', brands: [], bmeta: {}, hist: [] }), cur ? segObj(cur) : {});
       if (!isAdm(u) && p.op !== 'unlock') {
         const a = resvFor(row.r);
@@ -301,10 +349,10 @@ const API = {
         case 'comment': {
           const txt = str(p.val).trim(); if (!txt) err('El comentario está vacío.');
           /* vuelve a ubicar la fila por Customer ID y relee la celda justo antes de agregar */
-          const ids = DB.cart.ws.getRangeByIndexes(1, C.id, Math.max(1, DB.cart.rows.length + 50), 1); ids.load('values'); await ctx.sync();
-          const ks = clientKeys(ids.values.map(x => x[0])), i = ks.indexOf(row.k);
+          const cws = cartWs(ctx), ids = cws.getRangeByIndexes(1, C.id, Math.max(1, DB.cart.rows.length + 50), 1); ids.load('text'); await ctx.sync();
+          const ks = clientKeys(ids.text.map(x => str(x[0]).trim())), i = ks.indexOf(row.k);
           if (i < 0) err('No se encontró al cliente en la hoja. Pulsa recargar.');
-          const cell = DB.cart.ws.getRangeByIndexes(i + 1, C.comment, 1, 1); cell.load('values'); await ctx.sync();
+          const cell = cws.getRangeByIndexes(i + 1, C.comment, 1, 1); cell.load('values'); await ctx.sync();
           const prev = str(cell.values[0][0]).trim(), line = `${now.slice(8, 10)}/${now.slice(5, 7)} ${u.name}: ${txt}`;
           cell.values = [[prev ? line + ' | ' + prev : line]]; await ctx.sync();
           row.r = i + 2; row.v[C.comment] = prev ? line + ' | ' + prev : line;
@@ -352,7 +400,7 @@ const API = {
       const ov = str(p.ov).trim().toUpperCase();
       if (!ov) err('El número de OV es obligatorio.');
       if (!/^[A-Z0-9][A-Z0-9\-\/]{2,24}$/.test(ov)) err('La OV solo puede tener letras, números, guiones o barras (3 a 25 caracteres).');
-      const ord = await readAux(ctx, 'ord'), dup = ord.rows.find(a => str(a[0]).toUpperCase() === ov);
+      const kc = await keyCols(ctx, await sheet(ctx, SH.ord)), dup = kc.keys.slice(1).find(a => str(a[0]).toUpperCase() === ov);
       if (dup) { const c = rowOf(str(dup[1])); err(`La OV ${ov} ya está registrada para ${c ? c.v[C.legal] : 'otro cliente'}.`); }
       const lines = (p.lines || []).map(l => ({ b: l.b, m: Math.round(num(l.m) * 100) / 100 })).filter(l => l.m > 0);
       if (!lines.length) err('Agrega al menos una marca con su monto sin IGV.');
@@ -381,7 +429,7 @@ const API = {
     return run(async ctx => {
       const o = DB.orders.find(x => x.ov === ov); if (!o) err('OV no encontrada.');
       const row = rowOf(o.k); if (!row || !inScope(u, row)) err('Esta OV no es de tu cartera.');
-      const ord = await readAux(ctx, 'ord'), a = ord.rows.find(x => str(x[0]) === ov), curEst = a ? str(a[4]) : o.est;
+      const a = (await findRow(ctx, 'ord', x => str(x[0]) === ov)).cur, curEst = a ? str(a[4]) : o.est;
       if ((curEst === 'Terminado' || curEst === 'Anulada') && !isAdm(u)) err('Solo el administrador puede reabrir una OV cerrada.');
       if (est === 'Anulada' && !isAdm(u)) err('Solo el administrador puede anular una OV.');
       o.est = est; if (nota != null) o.nota = str(nota);
@@ -492,7 +540,7 @@ const API = {
   },
   async api_select(k) {
     const row = DB && rowOf(k); if (!row) return false;
-    return run(async ctx => { DB.cart.ws.getRangeByIndexes(row.r - 1, C.id, 1, 1).select(); await ctx.sync(); return true; });
+    return run(async ctx => { cartWs(ctx).getRangeByIndexes(row.r - 1, C.id, 1, 1).select(); await ctx.sync(); return true; });
   }
 };
 

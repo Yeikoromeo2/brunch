@@ -1184,7 +1184,7 @@ async function pull() {
     if (d.reload || S.needReload) {
       if (S.pending || Object.keys(S.cmtT).length || isTyping()) S.needReload = true;
       else { pulling = false; return loadAll(false); }
-    } else { d.changes.forEach(st => applyState(st)); S.seq = d.seq; }
+    } else { d.changes.forEach(st => applyState(st)); S.seq = d.seq; if (d.orders) { S.orders = d.orders; S.sales = d.sales || S.sales; updBell(); if (S.active) renderPanel(); } }
     if (!S.pending) setSync('', 'Sincronizado ' + new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }));
     render(); updStripSoon();
   } catch (e) { if (!/sesi[oó]n/i.test(e.message)) setSync('err', 'Sin conexión, reintentando'); }

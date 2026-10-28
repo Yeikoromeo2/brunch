@@ -79,6 +79,21 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   const h1 = await aux('Hoja1');
   ok(/^\d\d\/\d\d Ana: Pidió precios de HP \| Tiene tienda en galería Wilson$/.test(h1[3][17]), 'Comentario agregado con fecha y usuario, conserva el anterior');
 
+  /* 4b. sincronizar después de un cambio propio no recarga la cartera */
+  await page.evaluate(() => { window.__loads = 0; const f = window.GC_API.api_load; window.GC_API.api_load = (...a) => { window.__loads++; return f(...a); }; });
+  const sync = async () => { await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await page.waitForTimeout(300); };
+  await sync();
+  ok((await page.evaluate(() => window.__loads)) === 0, 'Tras un cambio propio la sincronización no vuelve a cargar todo');
+  /* 4c. un cambio de otra persona llega solo para ese cliente */
+  await page.evaluate(() => {
+    const seg = window.__book.sheet('_Seguimiento'), cfg = window.__book.sheet('_Config');
+    const n = seg.cells.length; seg.cells[n] = ['100104', 'SI', 'Volver a llamar', '', '1', '2030-01-01', '', 'Luis', '', '', '', '', ''];
+    const r = cfg.cells.find(x => x && x[0] === 'seq'); r[1] = String(+r[1] + 1);
+  });
+  await sync();
+  ok((await page.evaluate(() => window.__loads)) === 0 && await page.isHidden('#loading'), 'Un cambio de otro usuario se aplica sin recargar la pantalla');
+  ok((await page.textContent('#gbody .row[data-i="3"]')).includes('Volver a llamar'), 'La fila del cliente cambiado se actualiza sola');
+
   /* 5. resultado, tipo y marca */
   await page.click('[data-act="res"][data-n="Contestó"]'); await page.waitForTimeout(150);
   await page.click('[data-act="tipo"][data-n="Tienda"]'); await page.waitForTimeout(150);

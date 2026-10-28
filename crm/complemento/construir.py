@@ -179,6 +179,10 @@ rep("""      if (/SESION/.test(msg)) sessionLost(msg.replace(/^.*SESION:\\s*/, '
     """      if (window.GC_BRIDGE && /conexión con el panel/.test(msg)) { stopPoll(); showCover('#lostCover'); }
       if (/SESION/.test(msg)) sessionLost(msg.replace(/^.*SESION:\\s*/, ''));""")
 
+# sincronización incremental: los cambios de otros llegan cliente por cliente, sin recargar todo
+rep("    } else { d.changes.forEach(st => applyState(st)); S.seq = d.seq; }",
+    "    } else { d.changes.forEach(st => applyState(st)); S.seq = d.seq; if (d.orders) { S.orders = d.orders; S.sales = d.sales || S.sales; updBell(); if (S.active) renderPanel(); } }")
+
 # login: PIN temporal → pantalla de cambio
 rep("""    S.token = res.token; LS.set('lastName', res.name);
     $('#lgPin').value = '';
