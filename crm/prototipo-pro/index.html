@@ -1477,9 +1477,26 @@ function openUrl(u, label) {
 }
 /* WhatsApp: cada persona elige en su equipo (UI.wa); si aún no eligió, se le pregunta una vez */
 const waUrl = (m, wa, t) => m === 'app' ? `whatsapp://send?phone=${wa}${t ? '&text=' + t : ''}` : m === 'wame' ? `https://wa.me/${wa}${t ? '?text=' + t : ''}` : `https://web.whatsapp.com/send?phone=${wa}${t ? '&text=' + t : ''}`;
+/* WhatsApp Web se abre en UNA ventana al costado (se reutiliza en cada cliente) para que Excel siga a la
+   vista; la aplicación se lanza desde una ventana en blanco que se cierra sola */
+function openWaLink(m, u, label) {
+  if (DEMO) return openUrl(u, label);
+  let w = null;
+  if (m === 'app') {
+    try { w = window.open(u, 'gcWaApp'); } catch (e) {}
+    if (!w) return openUrl(u, label);
+    setTimeout(() => { try { if (w && !w.closed) w.close(); } catch (e) {} }, 2500);
+    return;
+  }
+  const W = Math.min(560, Math.round(screen.availWidth * 0.36)), H = Math.round(screen.availHeight * 0.9);
+  const L = (screen.availLeft || 0) + screen.availWidth - W - 12, T = (screen.availTop || 0) + Math.round(screen.availHeight * 0.04);
+  try { w = window.open(u, 'gcWhatsApp', `popup=yes,width=${W},height=${H},left=${L},top=${T}`); } catch (e) {}
+  if (!w) return openUrl(u, label);
+  try { w.focus(); } catch (e) {}
+}
 let waPend = null;
 function openWa(wa, t, label, after) {
-  if (UI.wa && UI.wa !== 'ask') { openUrl(waUrl(UI.wa, wa, t), label); if (after) after(); return; }
+  if (UI.wa && UI.wa !== 'ask') { openWaLink(UI.wa, waUrl(UI.wa, wa, t), label); if (after) after(); return; }
   waPend = { wa, t, label, after };
   $('#waTo').textContent = 'Vas a abrir ' + label + '.';
   $$('#mWa [data-wa]').forEach(b => b.classList.toggle('primary', b.dataset.wa === (S.cfg.waMode === 'app' ? 'app' : 'web')));
@@ -1490,7 +1507,7 @@ $('#mWa').addEventListener('click', e => {
   const b = e.target.closest('[data-wa]'); if (!b || !waPend) return;
   const p = waPend, m = b.dataset.wa; waPend = null;
   if ($('#waRemember').checked) { UI.wa = m; saveUI(); toast('WhatsApp se abrirá siempre en ' + (m === 'app' ? 'la aplicación' : 'WhatsApp Web') + '. Lo cambias en Ajustes.'); }
-  closeModal('#mWa'); openUrl(waUrl(m, p.wa, p.t), p.label); if (p.after) p.after();
+  closeModal('#mWa'); openWaLink(m, waUrl(m, p.wa, p.t), p.label); if (p.after) p.after();
 });
 function act(r, a, n) {
   if (!r) return;

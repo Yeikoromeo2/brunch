@@ -114,7 +114,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok(cm.some(r => r[0] === '100103' && r[1] === 'HP' && r[2] === 'habitual'), '_ClienteMarcas guarda la marca con su relación');
 
   /* 5b. WhatsApp: la primera vez pregunta web o aplicación y luego recuerda la elección */
-  await page.evaluate(() => { window.__opened = []; const o = window.open; window.open = (u, ...a) => { window.__opened.push(u); return /^https:\/\/gcx\.local/.test(u) ? o(u, ...a) : {}; }; });
+  await page.evaluate(() => { window.__opened = []; const o = window.open; window.__openedArgs = []; window.open = (u, ...a) => { window.__opened.push(u); window.__openedArgs.push(a); return /^https:\/\/gcx\.local/.test(u) ? o(u, ...a) : { close() { window.__closed = (window.__closed || 0) + 1; }, focus() {} }; }; });
   await page.click('#panel .p-actions [data-act="wa"]');
   await page.waitForSelector('#mWa.on'); await page.waitForTimeout(250); await shot('11-whatsapp');
   ok((await page.evaluate(() => window.__opened.length)) === 0, 'La primera vez WhatsApp pregunta antes de abrir');
@@ -126,6 +126,16 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.click('#bCfg');
   ok((await page.inputValue('#cWaMe')) === 'app', 'Ajustes muestra la elección guardada en este equipo');
   await page.click('#mCfg [data-close]');
+  await page.waitForTimeout(2700);
+  ok((await page.evaluate(() => window.__closed)) === 2, 'En modo aplicación la ventana en blanco se cierra sola');
+  await page.evaluate(() => { const u = JSON.parse(localStorage.getItem('gcp:ui')); u.wa = 'web'; localStorage.setItem('gcp:ui', JSON.stringify(u)); });
+  await page.reload(); await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana');
+  await page.evaluate(() => { window.__opened = []; window.__openedArgs = []; const o = window.open; window.open = (u, ...a) => { window.__opened.push(u); window.__openedArgs.push(a); return /^https:\/\/gcx\.local/.test(u) ? o(u, ...a) : { close() {}, focus() {} }; }; });
+  await page.click('#mainTabs [data-tab="list"]'); await page.click('#gbody .row[data-i="2"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(200);
+  await page.click('#panel .p-actions [data-act="wa"]'); await page.waitForTimeout(200);
+  const wa = await page.evaluate(() => [window.__opened[0], window.__openedArgs[0]]);
+  ok(/^https:\/\/web\.whatsapp\.com\/send\?phone=51987650222/.test(wa[0]) && wa[1][0] === 'gcWhatsApp' && /popup=yes,width=\d+/.test(wa[1][1]), 'WhatsApp Web se abre en una ventana al costado, siempre la misma');
+  await page.evaluate(() => { const u = JSON.parse(localStorage.getItem('gcp:ui')); u.wa = 'app'; localStorage.setItem('gcp:ui', JSON.stringify(u)); });
 
   /* 6. venta con OV */
   await page.click('[data-act="ovopen"]');
