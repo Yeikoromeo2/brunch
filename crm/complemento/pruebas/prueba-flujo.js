@@ -102,6 +102,20 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok(seg.some(r => r[0] === '100103' && r[2] === 'Contestó' && r[6] === 'Tienda' && r[7] === 'Ana'), '_Seguimiento guarda resultado, tipo y gestor por Customer ID');
   ok(cm.some(r => r[0] === '100103' && r[1] === 'HP' && r[2] === 'habitual'), '_ClienteMarcas guarda la marca con su relación');
 
+  /* 5b. WhatsApp: la primera vez pregunta web o aplicación y luego recuerda la elección */
+  await page.evaluate(() => { window.__opened = []; const o = window.open; window.open = (u, ...a) => { window.__opened.push(u); return /^https:\/\/gcx\.local/.test(u) ? o(u, ...a) : {}; }; });
+  await page.click('#panel .p-actions [data-act="wa"]');
+  await page.waitForSelector('#mWa.on'); await page.waitForTimeout(250); await shot('11-whatsapp');
+  ok((await page.evaluate(() => window.__opened.length)) === 0, 'La primera vez WhatsApp pregunta antes de abrir');
+  await page.click('#mWa [data-wa="app"]'); await page.waitForTimeout(200);
+  await page.click('#panel .p-actions [data-act="wa"]'); await page.waitForTimeout(200);
+  const opened = await page.evaluate(() => window.__opened);
+  ok(opened.length === 2 && opened.every(u => /^whatsapp:\/\/send\?phone=51987650222/.test(u)) && !(await page.$('#mWa.on')), 'Recuerda «aplicación» y la segunda vez abre directo');
+  ok((await aux('_Historial')).filter(r => r[0] === '100103' && /WhatsApp/.test(r[3])).length === 2, 'Cada apertura de WhatsApp queda como intento de contacto');
+  await page.click('#bCfg');
+  ok((await page.inputValue('#cWaMe')) === 'app', 'Ajustes muestra la elección guardada en este equipo');
+  await page.click('#mCfg [data-close]');
+
   /* 6. venta con OV */
   await page.click('[data-act="ovopen"]');
   await page.fill('#oNum', 'ov-5001');

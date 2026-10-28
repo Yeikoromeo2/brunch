@@ -269,6 +269,8 @@ kbd{font:10px var(--fm);padding:1px 5px;border:1px solid var(--line2);border-bot
 .login .logo svg{width:22px;height:22px}
 .login h1{margin:0;font-size:21px;letter-spacing:-.02em}
 .login p{margin:0;color:var(--ink2)}
+.waopt{height:auto;min-height:64px;flex-direction:column;justify-content:center;gap:2px;padding:10px;white-space:normal;text-align:center}
+.waopt small{font-weight:400;font-size:12px;opacity:.8}
 .demo{font-size:12px;color:var(--ink2);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
 .demo b{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .demo button{border:1px solid var(--line2);background:var(--surface);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;text-align:left}
@@ -825,6 +827,8 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
   <div class="mb">
     <div class="sec-t">Columnas visibles (solo en tu pantalla)</div>
     <div class="colgrid" id="cCols"></div>
+    <div class="sec-t">WhatsApp en este equipo</div>
+    <label class="fl"><span>Al pulsar WhatsApp</span><select id="cWaMe"><option value="ask">Preguntar dónde abrirlo</option><option value="web">Abrir siempre WhatsApp Web</option><option value="app">Abrir siempre la aplicación de escritorio</option><option value="wame">Dejar que el sitio de WhatsApp pregunte (wa.me)</option></select></label>
     <div id="cAdmin">
       <div class="sec-t" style="margin-bottom:8px">Configuración del equipo (administrador)</div>
       <div class="box">
@@ -840,7 +844,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
           <label class="fl"><span>Meta mensual de venta por ejecutivo (S/ sin IGV)</span><input type="number" id="cSGoal" min="0" step="1000"></label>
         </div>
         <label class="fl"><span>Sincronizar cada (seg.)</span><input type="number" id="cPoll" min="10" max="300"></label>
-        <label class="fl"><span>Abrir WhatsApp en</span><select id="cWa"><option value="web">WhatsApp Web (no requiere instalar)</option><option value="wame">Automático (wa.me)</option><option value="app">Aplicación de escritorio</option></select></label>
+        <label class="fl"><span>WhatsApp sugerido al equipo (cada persona elige el suyo)</span><select id="cWa"><option value="web">WhatsApp Web (no requiere instalar)</option><option value="wame">Automático (wa.me)</option><option value="app">Aplicación de escritorio</option></select></label>
         <label class="fl"><span>Mensaje inicial de WhatsApp</span><textarea id="cMsg" placeholder="Hola {legal}, le saluda {ejecutivo}…"></textarea></label>
         <label class="fl"><span>Abrir correo con</span><select id="cMail"><option value="outlook">Outlook web (Office 365)</option><option value="gmail">Gmail web</option><option value="mailto">Programa predeterminado</option></select></label>
         <label class="fl"><span>Asunto del correo</span><input type="text" id="cSubj" placeholder="Atención cliente {id} – {legal}"></label>
@@ -875,6 +879,20 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
   </div>
   <div class="hint" style="margin:0 20px 10px">La persona entra con el PIN temporal y el sistema le pide crear el suyo. Si olvida su PIN, escribe uno temporal nuevo aquí.</div>
   <div class="mf"><button class="btn ghost" id="uNew">Nuevo</button><button class="btn ghost" data-close>Cerrar</button><button class="btn primary" id="uSave">Guardar usuario</button></div>
+</div></div>
+
+<!-- WhatsApp: web o aplicación (se pregunta una vez y se recuerda en este equipo) -->
+<div class="modal-bg" id="mWa"><div class="modal" role="dialog" aria-labelledby="mWaT">
+  <h2 id="mWaT">¿Dónde abro WhatsApp?</h2>
+  <div class="mb">
+    <div class="hint" style="margin:0" id="waTo"></div>
+    <div class="two">
+      <button class="btn waopt" data-wa="web" type="button"><b>WhatsApp Web</b><small>En el navegador, sin instalar nada</small></button>
+      <button class="btn waopt" data-wa="app" type="button"><b>Aplicación</b><small>WhatsApp instalado en esta PC</small></button>
+    </div>
+    <label class="ck"><input type="checkbox" id="waRemember" checked> Recordar en este equipo (se cambia en Ajustes)</label>
+  </div>
+  <div class="mf"><button class="btn ghost" data-close>Cancelar</button></div>
 </div></div>
 
 <!-- Atajos -->
@@ -1295,6 +1313,23 @@ function openUrl(u, label) {
   try { if (window.Office && Office.context && Office.context.ui && Office.context.ui.openBrowserWindow) return Office.context.ui.openBrowserWindow(u); } catch (e) {}
   toast('Tu navegador bloqueó la ventana. Permite ventanas emergentes para este sitio.', true);
 }
+/* WhatsApp: cada persona elige en su equipo (UI.wa); si aún no eligió, se le pregunta una vez */
+const waUrl = (m, wa, t) => m === 'app' ? `whatsapp://send?phone=${wa}${t ? '&text=' + t : ''}` : m === 'wame' ? `https://wa.me/${wa}${t ? '?text=' + t : ''}` : `https://web.whatsapp.com/send?phone=${wa}${t ? '&text=' + t : ''}`;
+let waPend = null;
+function openWa(wa, t, label, after) {
+  if (UI.wa && UI.wa !== 'ask') { openUrl(waUrl(UI.wa, wa, t), label); if (after) after(); return; }
+  waPend = { wa, t, label, after };
+  $('#waTo').textContent = 'Vas a abrir ' + label + '.';
+  $$('#mWa [data-wa]').forEach(b => b.classList.toggle('primary', b.dataset.wa === (S.cfg.waMode === 'app' ? 'app' : 'web')));
+  $('#waRemember').checked = UI.wa !== 'ask';
+  openModal('#mWa');
+}
+$('#mWa').addEventListener('click', e => {
+  const b = e.target.closest('[data-wa]'); if (!b || !waPend) return;
+  const p = waPend, m = b.dataset.wa; waPend = null;
+  if ($('#waRemember').checked) { UI.wa = m; saveUI(); toast('WhatsApp se abrirá siempre en ' + (m === 'app' ? 'la aplicación' : 'WhatsApp Web') + '. Lo cambias en Ajustes.'); }
+  closeModal('#mWa'); openUrl(waUrl(m, p.wa, p.t), p.label); if (p.after) p.after();
+});
 function act(r, a, n) {
   if (!r) return;
   const lk = lockedBy(r);
@@ -1304,9 +1339,7 @@ function act(r, a, n) {
     const p = n != null ? all[n] : all.find(x => x.wa);
     if (!p || !p.wa) return toast('Este cliente no tiene un celular válido', true);
     const msg = tpl(S.cfg.waMsg, r).trim(), t = msg ? encodeURIComponent(msg) : '';
-    const m = S.cfg.waMode;
-    openUrl(m === 'app' ? `whatsapp://send?phone=${p.wa}${t ? '&text=' + t : ''}` : m === 'wame' ? `https://wa.me/${p.wa}${t ? '?text=' + t : ''}` : `https://web.whatsapp.com/send?phone=${p.wa}${t ? '&text=' + t : ''}`, 'WhatsApp con +' + p.wa);
-    send(r, { op: 'contact', val: 'WhatsApp ' + p.wa });
+    openWa(p.wa, t, 'WhatsApp con +' + p.wa, () => send(r, { op: 'contact', val: 'WhatsApp ' + p.wa }));
   } else if (a === 'mail') {
     if (lk) return toast(lk, true);
     const ms = parseMails(val(r, 'mail')); if (!ms.length) return toast('Este cliente no tiene correo', true);
@@ -1357,7 +1390,7 @@ function act(r, a, n) {
   else if (a === 'phtry' || a === 'phsave') {
     const ok = validPhone(S.phDraft);
     if (!ok) { const i = $('#pNewPhone'); if (i) i.focus(); return toast('Escribe un celular válido: 9 dígitos que empiecen con 9.', true); }
-    if (a === 'phtry') { const wa = String(S.cfg.cc || '51') + ok.replace(/\D/g, ''); openUrl(S.cfg.waMode === 'app' ? `whatsapp://send?phone=${wa}` : S.cfg.waMode === 'wame' ? `https://wa.me/${wa}` : `https://web.whatsapp.com/send?phone=${wa}`, 'WhatsApp con +' + wa); send(r, { op: 'contact', val: 'WhatsApp (número nuevo) ' + ok }); }
+    if (a === 'phtry') openWa(String(S.cfg.cc || '51') + ok.replace(/\D/g, ''), '', 'WhatsApp con +51 ' + ok + ' para confirmar que es del cliente', () => send(r, { op: 'contact', val: 'WhatsApp (número nuevo) ' + ok }));
     else { S.fixOpen = null; S.phDraft = ''; send(r, { op: 'fixphone', val: ok }).then(x => x && toast('Número ' + ok + ' guardado. El original se conserva y el cliente sale de la lista de purga.')); }
   }
 }
@@ -2268,6 +2301,7 @@ $('#bDoResv').onclick = async () => {
 function openCfg() {
   $('#cCols').innerHTML = S.header.filter((h, j) => keyOf(j) !== 'comment').map(h => `<label class="ck"><input type="checkbox" data-col="${esc(norm(h))}" ${UI.hidden.includes(norm(h)) ? '' : 'checked'}> ${esc(h)}</label>`).join('');
   $('#cAdmin').hidden = !isAdmin();
+  $('#cWaMe').value = UI.wa || 'ask';
   const c = S.cfg;
   $('#cCC').value = c.cc; $('#cLen').value = c.mobLen; $('#cLock').checked = c.lockRow; $('#cScope').checked = c.scopeOwn !== false; $('#cMin').value = c.minInt; $('#cPoll').value = c.poll; $('#cGoal').value = c.goal; $('#cSGoal').value = c.salesGoal || 0;
   $('#cWa').value = c.waMode; $('#cMsg').value = c.waMsg; $('#cMail').value = c.mailMode; $('#cSubj').value = c.mailSubj;
@@ -2276,7 +2310,7 @@ function openCfg() {
   openModal('#mCfg');
 }
 $('#bCfgOk').onclick = async () => {
-  UI.hidden = $$('#cCols input').filter(x => !x.checked).map(x => x.dataset.col); saveUI();
+  UI.hidden = $$('#cCols input').filter(x => !x.checked).map(x => x.dataset.col); UI.wa = $('#cWaMe').value; saveUI();
   buildCols(); renderNow();
   if (isAdmin()) {
     $('#bCfgOk').disabled = true;

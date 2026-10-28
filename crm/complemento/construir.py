@@ -233,8 +233,6 @@ rep("""  if (DEMO) return toast('En la versión real se abre ' + label + '. Se r
   if (w) return;
   try { if (window.Office && Office.context && Office.context.ui && Office.context.ui.openBrowserWindow) return Office.context.ui.openBrowserWindow(u); } catch (e) {}
   toast('Tu navegador bloqueó la ventana. Permite ventanas emergentes para este sitio.', true);""")
-rep("""    if (a === 'phtry') { openUrl('', 'WhatsApp con +51 ' + ok + ' para confirmar que es del cliente');""",
-    """    if (a === 'phtry') { const wa = String(S.cfg.cc || '51') + ok.replace(/\\D/g, ''); openUrl(S.cfg.waMode === 'app' ? `whatsapp://send?phone=${wa}` : S.cfg.waMode === 'wame' ? `https://wa.me/${wa}` : `https://web.whatsapp.com/send?phone=${wa}`, 'WhatsApp con +' + wa);""")
 
 # reportes: libro nuevo real, sin botón de descarga simulada
 rep("""        <button class="btn" id="rXlsx" ${rows.length ? '' : 'disabled'}>${icon('down')}Descargar Excel</button>\n""", "")
