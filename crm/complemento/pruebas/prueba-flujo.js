@@ -188,7 +188,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok((await page.textContent('#panel h2')).includes('Textiles Majes'), 'Seleccionar la fila 9 de la hoja abre ese cliente');
 
   /* 10b. ventana aparte: el panel queda de puente y guarda en el libro */
-  const [win] = await Promise.all([page.waitForEvent('popup'), page.click('#bWin')]);
+  let [win] = await Promise.all([page.waitForEvent('popup'), page.click('#bWin')]);
   win.on('pageerror', e => errors.push('ventana: ' + e.message)); win.on('dialog', d => d.accept());
   await win.setViewportSize({ width: 1500, height: 900 });
   await win.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana');
@@ -222,6 +222,14 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok(await win.isVisible('#lostCover'), 'Sin el panel de Excel la ventana muestra «Sin conexión con Excel»');
   if (SHOTS) await win.screenshot({ path: path.join(SHOTS, '10-ventana-sin-panel.png') });
   await page.evaluate(() => { window.__fromChild = window.__fromChildOk; });
+  /* si Excel recarga el panel con la ventana abierta, la ventana se cierra y el panel ofrece reabrirla */
+  await page.reload();
+  await page.waitForSelector('#winLost:not([hidden])', { timeout: 10000 }).catch(() => {});
+  ok(win.isClosed(), 'Si Excel recarga el panel, la ventana grande desconectada se cierra sola');
+  ok(await page.isVisible('#winLost'), 'Al volver, el panel ofrece «Volver a abrir la ventana grande»');
+  [win] = await Promise.all([page.waitForEvent('popup'), page.click('#winReopen')]);
+  await win.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana');
+  ok(await page.isVisible('#winCover'), 'La ventana grande se vuelve a abrir con un clic y funciona');
   await page.click('#winClose');
   await page.waitForFunction(() => document.querySelector('#winCover').hidden && document.querySelector('#loading').hidden);
   ok(win.isClosed() && (await page.textContent('#meName')) === 'Ana', 'Al cerrar la ventana el panel vuelve a funcionar');

@@ -56,6 +56,7 @@ El panel de Excel tiene un ancho limitado. Con el botón **Ampliar** (arriba, en
 - Desde la ventana, elegir un cliente **no** mueve la selección de la hoja (eso traería Excel al frente y taparía la ventana, sobre todo con dos pantallas). En el panel lateral sí la mueve.
 - Si el panel de Excel se cierra, la ventana lo detecta (al hacer algo o en la siguiente sincronización) y muestra «Sin conexión con Excel». Lo que ya se guardó no se pierde; basta abrir otra vez el Gestor en Excel.
 - Para volver, cierra la ventana o pulsa **Cerrar la ventana y volver aquí** en el panel.
+- Excel web a veces recarga el panel por su cuenta (abajo aparece «Cargando complementos»). Si pasa con la ventana abierta, la ventana se cierra y el panel muestra **Volver a abrir la ventana grande**: un clic y sigues donde estabas. Si la ventana quedara abierta con «Sin conexión con Excel», ciérrala y usa ese botón.
 - Si Excel pregunta si permite abrir una ventana, responde **Permitir**.
 
 ## Cambios del equipo: manual o automático

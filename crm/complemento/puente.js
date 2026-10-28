@@ -58,6 +58,8 @@ if (window.GC_API) {
       });
     },
     close() { const d = dlg, cb = closed; dlg = null; send = null; closed = null; try { d && d.close(); } catch (e) {} if (cb) cb(); },
+    /* cierra la ventana sin avisar (cuando Excel está por recargar este panel) */
+    drop() { const d = dlg; dlg = null; send = null; closed = null; try { d && d.close(); } catch (e) {} },
     /* avisa a la ventana que cambió la selección en la hoja */
     selection() { if (send) send({ t: 'sel' }); }
   };
