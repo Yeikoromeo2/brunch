@@ -137,6 +137,33 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok(/^https:\/\/web\.whatsapp\.com\/send\?phone=51987650222/.test(wa[0]) && wa[1][0] === 'gcWhatsApp' && /popup=yes,width=\d+/.test(wa[1][1]), 'WhatsApp Web se abre en una ventana al costado, siempre la misma');
   await page.evaluate(() => { const u = JSON.parse(localStorage.getItem('gcp:ui')); u.wa = 'app'; localStorage.setItem('gcp:ui', JSON.stringify(u)); });
 
+  /* 5c. lista sin franja de botones ni prioridad; colores por estado sin leyenda */
+  ok(!(await page.$('#gbody .acts')) && !(await page.$('#gbody .tier')) && !(await page.$('#panel .score')), 'La lista no repite los botones de contacto y no se muestra la prioridad');
+  ok(!(await page.$('#sAtt')) && (await page.$$('#sBar i')).length >= 3, 'La barrita usa los colores de cada estado, sin leyenda');
+  ok(await page.$('#gbody .row.cat-att') && await page.$('#gbody .row.cat-noint') && await page.$('#gbody .row.cat-none'), 'Cada fila se pinta con el color de su estado');
+  /* 5d. lo que se escribe no se pierde al tocar otras opciones ni al cambiar de cliente */
+  await page.click('#gbody .row[data-i="6"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(600);
+  await page.fill('#pCmt', 'Borrador a medias');
+  await page.fill('#pBrand', 'Lenovo'); await page.press('#pBrand', 'Enter'); await page.waitForTimeout(300);
+  ok((await page.inputValue('#pCmt')) === 'Borrador a medias' && await page.isVisible('#pDraft'), 'Agregar una marca no borra el comentario a medio escribir');
+  await page.click('#gbody .row[data-i="5"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(300);
+  await page.click('#gbody .row[data-i="6"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(700);
+  ok((await page.inputValue('#pCmt')) === 'Borrador a medias' && !!(await page.$('#gbody .row[data-i="6"].draft')), 'Al cambiar de cliente y volver, el borrador sigue ahí (y la fila lo marca)');
+  ok(!(await aux('Hoja1'))[7][17], 'El borrador no se escribe en Excel hasta pulsar «Agregar comentario»');
+  await page.fill('#pCmt', ''); await page.waitForTimeout(400);
+  /* 5e. Mi día: solo mis pendientes (volver a llamar y revisados sin comentario) */
+  await page.click('[data-act="res"][data-n="Volver a llamar"]'); await page.waitForTimeout(250);
+  await page.click('#gbody .row[data-i="7"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(400);
+  await page.click('#panel [data-act="rev"]'); await page.waitForTimeout(250);
+  await page.click('#mainTabs [data-tab="day"]'); await page.waitForTimeout(300);
+  await page.waitForTimeout(600); await shot('12-mi-dia');
+  const day = await page.textContent('#vDay');
+  ok(/Volver a llamar · 1/.test(day) && day.includes('Constructora Huascarán') && /Revisados sin comentario · 1/.test(day) && day.includes('Textiles Majes') && !day.includes('Comercial Rímac'), 'Mi día muestra solo mis pendientes: volver a llamar y revisados sin comentario (no los de Luis)');
+  await page.click('#dList'); await page.waitForTimeout(300);
+  ok((await page.$$('#gbody .row')).length === 2 && await page.isVisible('#chips .chip.on[data-st="mypend"]'), '«Ver mis pendientes en la lista» filtra la lista con el chip «Mis pendientes»');
+  await page.click('#chips [data-st="all"]'); await page.waitForTimeout(400); await shot('13-lista-colores');
+  await page.click('#gbody .row[data-i="2"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(500);
+
   /* 6. venta con OV */
   await page.click('[data-act="ovopen"]');
   await page.fill('#oNum', 'ov-5001');
@@ -224,20 +251,25 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok(await win.isVisible('#lostCover'), 'Sin el panel de Excel la ventana muestra «Sin conexión con Excel»');
   if (SHOTS) await win.screenshot({ path: path.join(SHOTS, '10-ventana-sin-panel.png') });
   await page.evaluate(() => { window.__fromChild = window.__fromChildOk; });
-  /* si Excel recarga el panel con la ventana abierta, la ventana se cierra y el panel ofrece reabrirla */
-  await page.reload();
-  await page.waitForSelector('#winLost:not([hidden])', { timeout: 10000 }).catch(() => {});
-  ok(win.isClosed(), 'Si Excel recarga el panel, la ventana grande desconectada se cierra sola');
-  ok(await page.isVisible('#winLost'), 'Al volver, el panel ofrece «Volver a abrir la ventana grande»');
-  const reads1 = await page.evaluate(() => window.__book.raw.cartReads);
+  /* si Excel recarga el panel con la ventana abierta, la ventana vieja se cierra y se reabre sola */
+  const readsR = await page.evaluate(() => window.__book.raw.cartReads), oldWin = win;
   await page.evaluate(() => sessionStorage.setItem('__mockDelay', '300'));
-  [win] = await Promise.all([page.waitForEvent('popup'), page.click('#winReopen')]);
-  const winFast = await win.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana' ? document.querySelector('#syncTx').textContent : false, null, { timeout: 4000 }).then(h => h.jsonValue()).catch(() => '');
+  [win] = await Promise.all([page.waitForEvent('popup', { timeout: 15000 }), page.reload()]);
+  ok(oldWin.isClosed(), 'Si Excel recarga el panel, la ventana grande desconectada se cierra');
+  const winFast = await win.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana' ? document.querySelector('#syncTx').textContent : false, null, { timeout: 6000 }).then(h => h.jsonValue()).catch(() => '');
   await win.waitForFunction(() => /Sincronizado/.test(document.querySelector('#syncTx').textContent), null, { timeout: 8000 }).catch(() => {});
   await page.evaluate(() => sessionStorage.removeItem('__mockDelay'));
-  ok(winFast === 'Actualizando…', 'La ventana grande reabierta aparece al instante desde su copia');
-  ok((await page.evaluate(() => window.__book.raw.cartReads)) === reads1, 'Y no vuelve a leer la cartera de Excel');
-  ok(await page.isVisible('#winCover'), 'La ventana grande se vuelve a abrir con un clic y funciona');
+  ok(winFast === 'Actualizando…' && await page.isVisible('#winCover'), 'Y se reabre sola, al instante desde su copia, sin pedir nada');
+  ok((await page.evaluate(() => window.__book.raw.cartReads)) === readsR + 1, 'Solo se relee la cartera una vez (por la recarga del panel); la ventana no suma lecturas');
+  /* si el navegador bloquea la reapertura, el panel ofrece el botón */
+  await page.evaluate(() => sessionStorage.setItem('__mockNoPopup', '1'));
+  await page.reload();
+  await page.waitForSelector('#winLost:not([hidden])', { timeout: 10000 }).catch(() => {});
+  ok(win.isClosed() && await page.isVisible('#winLost'), 'Si el navegador bloquea la reapertura, el panel ofrece «Volver a abrir la ventana grande»');
+  await page.evaluate(() => sessionStorage.removeItem('__mockNoPopup'));
+  [win] = await Promise.all([page.waitForEvent('popup'), page.click('#winReopen')]);
+  await win.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana');
+  ok(await page.isVisible('#winCover'), 'Con un clic se vuelve a abrir y funciona');
   const reads2 = await page.evaluate(() => window.__book.raw.cartReads);
   await page.click('#winClose');
   await page.waitForFunction(() => document.querySelector('#winCover').hidden && document.querySelector('#loading').hidden);

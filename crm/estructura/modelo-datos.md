@@ -85,4 +85,4 @@ La opción se activa en `_Config` → «Cada ejecutivo ve solo su cartera».
 
 Reportes, promociones y mapeos se abren como **libros nuevos** en el OneDrive de quien los crea, con un nombre fechado. Si el nombre ya existe, se crea uno con «(2)», «(3)», etc. El archivo de la cartera no recibe hojas nuevas. Cada libro trae las 18 columnas de la cartera en el mismo orden y, a la derecha:
 
-Fila · Prioridad · Tipo de negocio · Marcas habituales · Marcas a veces · Marcas de interés · Líneas · Marcas actualizadas · Gestionado por · Resultado · Intentos · Último contacto · Próximo contacto · Compra · Monto · Motivo · Teléfono corregido · Depurado
+Fila · Tipo de negocio · Marcas habituales · Marcas a veces · Marcas de interés · Líneas · Marcas actualizadas · Gestionado por · Resultado · Intentos · Último contacto · Próximo contacto · Compra · Monto · Motivo · Teléfono corregido · Depurado

@@ -91,7 +91,8 @@ window.Excel = {
 const EV = { DocumentSelectionChanged: 'documentSelectionChanged', DialogMessageReceived: 'dialogMessageReceived', DialogEventReceived: 'dialogEventReceived', DialogParentMessageReceived: 'dialogParentMessageReceived' };
 const ui = {
   displayDialogAsync(url, opts, cb) {
-    const w = window.open(url, '_blank');
+    /* la prueba puede simular que el navegador bloquea la ventana */
+    const w = sessionStorage.getItem('__mockNoPopup') ? null : window.open(url, '_blank');
     if (!w) return cb({ status: 'failed', error: { message: 'Ventana bloqueada' } });
     const on = { [EV.DialogMessageReceived]: [], [EV.DialogEventReceived]: [] }, queue = [];
     window.__fromChild = m => on[EV.DialogMessageReceived].forEach(h => h({ message: m }));

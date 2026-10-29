@@ -149,7 +149,7 @@ COVERS = """
 <div class="cover" id="winLost" hidden>
   <div class="login">
     <div class="logo"><svg><use href="#i-ext"/></svg></div>
-    <div><h1>Excel recargó el panel</h1><p>Estabas trabajando en la ventana grande. Excel volvió a cargar este panel por su cuenta, así que la ventana se cerró. Todo lo que guardaste está en el libro.</p></div>
+    <div><h1>Excel recargó el panel</h1><p>Estabas trabajando en la ventana grande. Excel volvió a cargar este panel y el navegador no dejó reabrirla sola. Todo lo que guardaste está en el libro. Para que la próxima vez se reabra sola, permite las ventanas emergentes de Excel en tu navegador.</p></div>
     <button class="btn primary" id="winReopen" type="button" style="height:40px;justify-content:center">Volver a abrir la ventana grande</button>
     <button class="btn ghost" id="winStay" type="button" style="justify-content:center">Seguir en este panel</button>
   </div>
@@ -254,8 +254,8 @@ rep("Archivos creados en tu OneDrive", "Libros creados en esta sesión")
 rep("Las de «Por definir» se pueden reasignar en la versión real.", "Para cambiar la línea de una marca, pídeselo al administrador del libro.")
 
 # panel angosto: volver a la lista y anterior / siguiente
-rep("""  p.innerHTML = `<div class="p-head" style="--tc:var(--t${tr})">""",
-    """  p.innerHTML = `<div class="p-nav"><button class="btn" data-act="navback">${icon('list')}Lista</button><span class="spacer"></span><span style="font-size:12px;color:var(--muted)">${r._vi != null ? fmtN(r._vi + 1) + ' de ' + fmtN(S.view.length) : ''}</span><button class="btn" data-act="navprev" title="Anterior">‹</button><button class="btn" data-act="navnext" title="Siguiente">›</button></div><div class="p-head" style="--tc:var(--t${tr})">""")
+rep("""  p.innerHTML = `<div class="p-head">""",
+    """  p.innerHTML = `<div class="p-nav"><button class="btn" data-act="navback">${icon('list')}Lista</button><span class="spacer"></span><span style="font-size:12px;color:var(--muted)">${r._vi != null ? fmtN(r._vi + 1) + ' de ' + fmtN(S.view.length) : ''}</span><button class="btn" data-act="navprev" title="Anterior">‹</button><button class="btn" data-act="navnext" title="Siguiente">›</button></div><div class="p-head">""")
 rep("""$('#panel').addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b || !S.active || b.disabled) return; e.preventDefault(); act(S.active, b.dataset.act, actArg(b)); });""",
     """$('#panel').addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b || !S.active || b.disabled) return; e.preventDefault();
@@ -275,14 +275,14 @@ rep("$('#bReload').onclick = () => { flushAll(); loadAll(false); };",
 rep("""  const FIRST = ['id', 'legal', 'tax', 'phone', 'mail', 'state', 'city', 'exec'];""",
     """  const narrow = innerWidth <= 760; NARROW = narrow;
   const FIRST = narrow ? ['legal', 'id', 'phone', 'tax', 'mail', 'state', 'city', 'exec'] : ['id', 'legal', 'tax', 'phone', 'mail', 'state', 'city', 'exec'];""")
-rep("""  const w = [78, 176, 200, ...COLS.map(c => WIDTH[c.k] || 130), 300];
+rep("""  const w = [78, 200, ...COLS.map(c => WIDTH[c.k] || 130), 300];
   const g = $('#grid');""",
-    """  const w = narrow ? [70, 124, ...COLS.map(c => c.k === 'legal' ? 210 : WIDTH[c.k] || 130)] : [78, 176, 200, ...COLS.map(c => WIDTH[c.k] || 130), 300];
+    """  const w = narrow ? [70, 124, ...COLS.map(c => c.k === 'legal' ? 210 : WIDTH[c.k] || 130)] : [78, 200, ...COLS.map(c => WIDTH[c.k] || 130), 300];
   const g = $('#grid'); g.classList.toggle('narrow', narrow);""")
 rep("window.addEventListener('resize', () => { render(); applyPanel(); moveInd(); });",
     "let NARROW = null;\nwindow.addEventListener('resize', () => { if (S.me && (innerWidth <= 760) !== NARROW) buildCols(); render(); applyPanel(); moveInd(); });")
-rep("  if (prev && prev !== S.active) { if (S.cmtT[prev.k]) flushComment(prev);",
-    "  if (prev && prev !== S.active) { $('#panel').scrollTop = 0; if (S.cmtT[prev.k]) flushComment(prev);")
+rep("  if (prev && prev !== S.active) {\n    if (S.cmtT[prev.k]) flushComment(prev);",
+    "  if (prev && prev !== S.active) {\n    $('#panel').scrollTop = 0; if (S.cmtT[prev.k]) flushComment(prev);")
 
 # la hoja sigue al cliente elegido en el panel
 rep("  if (prev !== S.active) peekSoon(S.active.k);\n}",
@@ -343,14 +343,20 @@ $('#probRetry').onclick = () => boot();
 
 /* ---------- ventana aparte: el panel queda de puente y guarda en el libro ---------- */
 if (window.GC_BRIDGE) $('#bWin').hidden = true;
-$('#bWin').onclick = async () => {
-  if (!window.GC_HOST || !GC_HOST.supported()) return toast('Tu versión de Excel no permite abrir ventanas aparte.', true);
+/* auto: reapertura sola después de que Excel recargó el panel; si el navegador la bloquea, se ofrece el botón */
+async function openBig(auto) {
+  if (!window.GC_HOST || !GC_HOST.supported()) { if (!auto) toast('Tu versión de Excel no permite abrir ventanas aparte.', true); return false; }
   flushAll();
   try {
     await GC_HOST.openWindow(location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '') + 'ventana.html', () => { SS.set('win', ''); $('#winCover').hidden = true; boot('reuse'); });
-    SS.set('win', '1'); stopPoll(); showCover('#winCover');
-  } catch (e) { toast('No se pudo abrir la ventana: ' + e.message + '. Si Excel lo pregunta, permite las ventanas emergentes.', true); }
-};
+    SS.set('win', '1'); stopPoll(); showCover('#winCover'); return true;
+  } catch (e) {
+    if (auto) showCover('#winLost');
+    else toast('No se pudo abrir la ventana: ' + e.message + '. Si Excel lo pregunta, permite las ventanas emergentes.', true);
+    return false;
+  }
+}
+$('#bWin').onclick = () => openBig(false);
 $('#winClose').onclick = () => GC_HOST.close();
 /* si Excel recarga el panel con la ventana abierta: se cierra la ventana antes de irse (quedaría sin
    conexión) y, al volver, se ofrece abrirla de nuevo con un clic */
@@ -402,7 +408,7 @@ async function boot(opt) {
 /* ---------- inicio ---------- */
 applyTheme(); applyPanel();
 const start = () => {
-  boot().then(() => { if (!window.GC_BRIDGE && SS.get('win') === '1' && S.me && $('#login').hidden) showCover('#winLost'); });
+  boot().then(() => { if (!window.GC_BRIDGE && SS.get('win') === '1' && S.me && $('#login').hidden) openBig(true); });
   if (window.GC_BRIDGE) return GC_BRIDGE.onSelection(onSheetSelection);
   try { Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, onSheetSelection); } catch (e) {}
 };

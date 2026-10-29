@@ -47,6 +47,12 @@ Si «Cargar mi complemento» no aparece, la organización lo tiene bloqueado y s
 3. El administrador abre **Usuarios** y crea a cada ejecutivo con un **PIN temporal**. Al entrar por primera vez, el sistema le pide crear su propio PIN.
 4. Cinco PIN incorrectos seguidos bloquean al usuario durante 5 minutos. Si alguien olvida su PIN, el administrador le asigna uno temporal nuevo.
 
+## Mi día y borradores
+
+- **Mi día** muestra solo tus pendientes: los clientes cuya última gestión hiciste tú y que quedaron en **Volver a llamar** (primero los vencidos y los de hoy) o **Revisados sin comentario**. Lo de tus compañeros no se mezcla. En la lista, el chip **Mis pendientes** filtra lo mismo.
+- Lo que escribes en un comentario se guarda como **borrador** en tu equipo: no se pierde al tocar una marca u otra opción, al cambiar de cliente ni si Excel recarga el panel. La fila lo marca con un lápiz. Se escribe en Excel solo al pulsar «Agregar comentario».
+- Cada fila de la lista y la barrita de arriba usan el color de su estado: compra (azul), atendido (verde), volver a llamar (violeta), no contesta (rojo), número errado (naranja), no interesado (gris), revisado (amarillo) y pendiente (sin color).
+
 ## Trabajar en una ventana grande
 
 El panel de Excel tiene un ancho limitado. Con el botón **Ampliar** (arriba, en el panel) el Gestor se abre en una **ventana aparte** al 92 % de la pantalla, con la lista y el detalle lado a lado. La ventana se puede mover, maximizar o llevar a otro monitor.
@@ -56,7 +62,10 @@ El panel de Excel tiene un ancho limitado. Con el botón **Ampliar** (arriba, en
 - Desde la ventana, elegir un cliente **no** mueve la selección de la hoja (eso traería Excel al frente y taparía la ventana, sobre todo con dos pantallas). En el panel lateral sí la mueve.
 - Si el panel de Excel se cierra, la ventana lo detecta (al hacer algo o en la siguiente sincronización) y muestra «Sin conexión con Excel». Lo que ya se guardó no se pierde; basta abrir otra vez el Gestor en Excel.
 - Para volver, cierra la ventana o pulsa **Cerrar la ventana y volver aquí** en el panel.
-- Excel web a veces recarga el panel por su cuenta (abajo aparece «Cargando complementos»). Si pasa con la ventana abierta, la ventana se cierra y el panel muestra **Volver a abrir la ventana grande**: un clic y sigues donde estabas. Si la ventana quedara abierta con «Sin conexión con Excel», ciérrala y usa ese botón.
+- Excel web a veces recarga el panel por su cuenta (abajo aparece «Cargando complementos»). Si pasa con la ventana abierta, la ventana vieja se cierra y **se reabre sola** al instante. Para que el navegador lo permita, autoriza una vez las ventanas emergentes de Excel:
+  - **Edge:** Configuración → Cookies y permisos del sitio → **Elementos emergentes y redireccionamientos** → Permitir → Agregar `https://[*.]officeapps.live.com`, `https://[*.]office.com` y `https://[*.]sharepoint.com`.
+  - **Chrome:** Configuración → Privacidad y seguridad → Configuración de sitios → **Ventanas emergentes y redirecciones** → Permitido → agregar los mismos sitios.
+  - Si el navegador la bloquea igual, el panel muestra **Volver a abrir la ventana grande**: un clic y sigues donde estabas.
 - Si Excel pregunta si permite abrir una ventana, responde **Permitir**.
 
 ## Cambios del equipo: manual o automático

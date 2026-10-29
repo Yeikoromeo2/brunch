@@ -112,7 +112,7 @@ header.top{display:flex;align-items:center;gap:6px;padding:8px 16px;background:v
 .ck input{accent-color:var(--accent)}
 .strip{display:flex;align-items:center;gap:16px;padding:7px 16px;font-size:12px;color:var(--ink2);background:var(--surface2);border-bottom:1px solid var(--line);flex-wrap:wrap}
 .strip b{color:var(--ink);font-variant-numeric:tabular-nums}
-.mini{flex:1 1 140px;max-width:320px;height:6px;display:flex;gap:2px;border-radius:3px;overflow:hidden;background:var(--line)}
+.mini{flex:1 1 160px;max-width:420px;height:8px;display:flex;gap:2px;border-radius:3px;overflow:hidden;background:var(--line)}
 .mini i{display:block;height:100%;transition:width .4s}
 .resv{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:10px;background:var(--accent-soft);color:var(--ink);font-weight:500}
 .resv svg{width:12px;height:12px;color:var(--accent)}
@@ -132,8 +132,13 @@ main{flex:1;display:flex;min-height:0;position:relative}
 .s1{position:sticky;left:78px;z-index:2;box-shadow:6px 0 8px -6px rgba(0,0,0,.14)}
 .sr{position:sticky;right:0;z-index:2;box-shadow:-6px 0 8px -6px rgba(0,0,0,.14);padding:0 6px}
 .row:hover .c{background:var(--hover)}
-.row.st-rev .c{background:var(--rev-bg)}
-.row.st-att .c{background:var(--att-bg)}
+.row.cat-buy .c{background:color-mix(in srgb,var(--s1) 9%,var(--surface))}
+.row.cat-att .c{background:var(--att-bg)}
+.row.cat-call .c{background:color-mix(in srgb,var(--violet) 10%,var(--surface))}
+.row.cat-noc .c{background:color-mix(in srgb,var(--crit) 8%,var(--surface))}
+.row.cat-wrong .c{background:color-mix(in srgb,var(--serious) 10%,var(--surface))}
+.row.cat-noint .c{background:color-mix(in srgb,var(--muted) 10%,var(--surface))}
+.row.cat-rev .c{background:var(--rev-bg)}
 .row.locked .c{background:var(--lock-bg);color:var(--muted)}
 .row.active .c{background:var(--act-bg)}
 .row.active::after{content:"";position:absolute;inset:0;border:2px solid var(--accent);border-radius:3px;pointer-events:none;z-index:5}
@@ -142,9 +147,14 @@ main{flex:1;display:flex;min-height:0;position:relative}
 @keyframes flash{0%{background:color-mix(in srgb,var(--accent) 22%,var(--surface))}}
 .fila{font:500 12px var(--fm);color:var(--ink2);justify-content:space-between;padding-left:12px;gap:4px}
 .fila::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
-.row.st-rev .fila::before{background:var(--warn)}
-.row.st-att .fila::before{background:var(--good)}
-.row.buy .fila::before{background:var(--s1)}
+.row.cat-buy .fila::before{background:var(--s1)}
+.row.cat-att .fila::before{background:var(--good)}
+.row.cat-call .fila::before{background:var(--violet)}
+.row.cat-noc .fila::before{background:var(--crit)}
+.row.cat-wrong .fila::before{background:var(--serious)}
+.row.cat-noint .fila::before{background:var(--muted)}
+.row.cat-rev .fila::before{background:var(--warn)}
+.row.draft .fila .dfi{display:inline-flex;color:var(--accent)}
 .fila .ico{display:none;color:var(--s1)}
 .fila .ico svg{width:13px;height:13px}
 .row.buy .fila .buyi{display:inline-flex}
@@ -367,6 +377,7 @@ table.bt td.nm{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-spac
 .sbar{display:flex;gap:2px;height:8px;border-radius:4px;overflow:hidden;background:var(--line);min-width:90px}
 .sbar i{display:block;height:100%}
 .seg-att{background:var(--good)}.seg-rev{background:var(--warn)}.seg-pend{background:var(--pend)}.seg-buy{background:var(--s1)}.seg-noc{background:var(--crit)}
+.seg-call{background:var(--violet)}.seg-wrong{background:var(--serious)}.seg-noint{background:var(--muted)}.seg-none{background:var(--pend)}
 .d-empty{color:var(--muted);font-size:12px;padding:12px 0}
 .rank{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font-size:11px;font-weight:700;background:var(--surface3);color:var(--ink2)}
 .rank.g{background:var(--accent);color:var(--accent-ink)}
@@ -676,7 +687,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
   <div class="chips" id="chips">
     <button class="chip on" data-st="all">Todos <span class="n" data-n="all">0</span></button>
     <button class="chip" data-st="mine"><span class="sw mine"></span>Mis clientes <span class="n" data-n="mine">0</span></button>
-    <button class="chip" data-st="prio"><span class="sw prio"></span>Prioridad A <span class="n" data-n="prio">0</span></button>
+    <button class="chip" data-st="mypend"><span class="sw agenda"></span>Mis pendientes <span class="n" data-n="mypend">0</span></button>
     <button class="chip" data-st="none"><span class="sw none"></span>Pendientes <span class="n" data-n="none">0</span></button>
     <button class="chip" data-st="rev"><span class="sw rev"></span>Revisados <span class="n" data-n="rev">0</span></button>
     <button class="chip" data-st="att"><span class="sw att"></span>Atendidos <span class="n" data-n="att">0</span></button>
@@ -689,10 +700,6 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
 <div class="strip" id="strip">
   <span>Mostrando <b id="sShow">0</b></span>
   <div class="mini" id="sBar"></div>
-  <span><span class="sw att"></span> <b id="sAtt">0</b> atendidos</span>
-  <span><span class="sw rev"></span> <b id="sRev">0</b> revisados</span>
-  <span><span class="sw none"></span> <b id="sNone">0</b> pendientes</span>
-  <span><span class="sw buy"></span> <b id="sBuy">0</b> compras</span>
   <span id="sResv"></span>
   <span class="hide-sm" id="sPos"></span>
 </div>
@@ -1103,7 +1110,7 @@ function call(fn, ...args) {
 }
 
 /* ---------- estado ---------- */
-const S = { token: '', me: null, cfg: {}, header: [], C: {}, rows: [], byKey: new Map(), view: [], active: null, st: 'all', tab: 'list',
+const S = { drafts: {}, phMap: {}, ovMap: {}, token: '', me: null, cfg: {}, header: [], C: {}, rows: [], byKey: new Map(), view: [], active: null, st: 'all', tab: 'list',
   assigns: [], users: [], seq: 0, lastRow: 0, today: '', pending: 0, cmtT: {}, needReload: false, activity: null, activityAt: 0, rep: { type: 'noc' }, sheets: [], fixOpen: null, phDraft: '', brands: [], catOf: {}, cats: [], catOpen: false, addRel: 'habitual', scoped: false, total: 0, bf: { q: '', cat: '', marca: '', rel: '', exec: '', tipo: '', empty: false, mode: 'cli' }, orders: [], sales: [], ov: null, dashMode: 'gest', sf: { per: 'mes', marca: '', cat: '', exec: '', tipo: '' } };
 
 /* ---------- utilidades ---------- */
@@ -1123,6 +1130,15 @@ const daysSince = s => s ? Math.round((new Date(S.today + 'T12:00:00') - new Dat
 const val = (r, k) => S.C[k] == null ? '' : String(r.v[S.C[k]] == null ? '' : r.v[S.C[k]]);
 const status = r => val(r, 'comment').trim() ? 'att' : (r.t.rev ? 'rev' : 'none');
 const isNoc = r => r.t.res === 'No contesta';
+/* un solo color por cliente, en este orden: compra, atendido (con comentario), volver a llamar, no contesta,
+   número errado, no interesado, revisado y pendiente. Lo usan la barrita y las filas de la lista. */
+const CATS = [['buy', r => r.t.buy], ['att', r => !!val(r, 'comment').trim()], ['call', r => r.t.res === 'Volver a llamar'], ['noc', r => r.t.res === 'No contesta'],
+  ['wrong', r => r.t.res === 'Número errado'], ['noint', r => r.t.res === 'No interesado'], ['rev', r => r.t.rev], ['none', () => true]];
+const CAT_TX = { buy: 'Con compra', att: 'Atendidos', call: 'Volver a llamar', noc: 'No contesta', wrong: 'Número errado', noint: 'No interesado', rev: 'Revisados', none: 'Pendientes' };
+const cat = r => CATS.find(([, f]) => f(r))[0];
+/* «mis pendientes»: clientes cuya última gestión hice yo y que quedaron en volver a llamar o revisados sin comentario */
+const lastBy = r => (r.t.hist[0] && r.t.hist[0].who) || r.t.own;
+const isMyPend = r => !r.t.dep && S.me && lastBy(r) === S.me.name && (r.t.res === 'Volver a llamar' || (r.t.rev && !val(r, 'comment').trim()));
 const isAgenda = r => r.t.res === 'Volver a llamar' && r.t.next && r.t.next <= S.today;
 const isAdmin = () => S.me && S.me.role === 'admin';
 const resvFor = n => S.assigns.find(a => n >= a.from && n <= a.to);
@@ -1305,7 +1321,7 @@ async function loadAll(first) {
   const keepKey = S.active ? S.active.k : LS.get('pos', null), keepTop = $('#grid').scrollTop;
   try {
     const d = await call('api_load', S.token);
-    S.me = d.me; S.cfg = d.cfg; S.header = d.header; S.C = d.C; S.assigns = d.assigns; S.users = d.users;
+    S.me = d.me; S.drafts = LS.get('drafts:' + d.me.name, {}); S.cfg = d.cfg; S.header = d.header; S.C = d.C; S.assigns = d.assigns; S.users = d.users;
     S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false; S.brands = d.brands; S.orders = d.orders || []; S.sales = d.sales || []; S.scoped = !!d.scoped; S.total = d.total || d.rows.length; fillBrandLists();
     S.rows = d.rows.map(([k, r, v]) => ({ k, r, v, t: Object.assign(emptyT(), d.track[k] || {}), hay: null, _vi: null }));
     S.byKey = new Map(S.rows.map(r => [r.k, r]));
@@ -1438,6 +1454,15 @@ async function send(r, p) {
   return true;
 }
 /* el comentario nunca reemplaza al anterior: se agrega con fecha y usuario */
+/* borrador por cliente: se guarda en este equipo mientras escribes y no se escribe en Excel hasta
+   que pulses «Agregar comentario» o Enter */
+let draftT = null;
+function setDraft(k, v) {
+  if (v && v.trim()) S.drafts[k] = v; else delete S.drafts[k];
+  clearTimeout(draftT); const who = S.me ? S.me.name : ''; draftT = setTimeout(() => LS.set('drafts:' + who, S.drafts), 300);
+  const r = S.byKey.get(k); if (r) setRowClass(r);
+  const b = $('#pDraft'); if (b && S.active && S.active.k === k) b.hidden = !S.drafts[k];
+}
 function addComment(r, text) {
   text = String(text || '').trim();
   if (!text) return Promise.resolve(false);
@@ -1554,7 +1579,7 @@ function act(r, a, n) {
   else if (a === 'ovrm') { S.ov.num = $('#oNum').value; S.ov.lines.splice(+n, 1); renderPanel(true); }
   else if (a === 'ovsave') ovSave(r);
   else if (a === 'ovst') { const [ov, est] = n.split('|'); if (est === 'Anulada' && !confirm('¿Anular ' + ov + '? Deja de contar en las ventas.')) return; ovSetState(ov, est); }
-  else if (a === 'cmtadd') { const ta = $('#pCmt'); if (!ta || !ta.value.trim()) { if (ta) ta.focus(); return toast('Escribe el comentario primero.', true); } const v = ta.value; ta.value = ''; ta.blur(); addComment(r, v); }
+  else if (a === 'cmtadd') { const ta = $('#pCmt'); if (!ta || !ta.value.trim()) { if (ta) ta.focus(); return toast('Escribe el comentario primero.', true); } const v = ta.value; ta.value = ''; ta.blur(); setDraft(r.k, ''); addComment(r, v).then(ok => { if (!ok) { setDraft(r.k, v); if (r === S.active) renderPanel(true); } }); }
   else if (a === 'tipo') { send(r, { op: 'tipo', val: r.t.tipo === n ? '' : n }); }
   else if (a === 'brand') { const on = !(r.t.brands || []).includes(n); send(r, { op: 'brand', val: { b: n, on, rel: S.addRel } }).then(ok => ok && toast(on ? `${n}: ${REL[S.addRel].l.toLowerCase()}` : 'Marca quitada: ' + n)); }
   else if (a === 'brandrel') { const nx = REL_K[(REL_K.indexOf(relOf(r, n)) + 1) % REL_K.length]; send(r, { op: 'brand', val: { b: n, on: true, rel: nx } }).then(ok => ok && toast(`${n}: ${REL[nx].l.toLowerCase()}`)); }
@@ -1587,14 +1612,14 @@ function baseRows() {
     && brandMatch(r, cat, mq, rel));
 }
 function counts(rows) {
-  const c = { all: rows.length, none: 0, rev: 0, att: 0, buy: 0, noc: 0, agenda: 0, mine: 0, prio: 0 };
-  rows.forEach(r => { c[status(r)]++; if (r.t.buy) c.buy++; if (isNoc(r)) c.noc++; if (isAgenda(r)) c.agenda++; if (isMine(r)) c.mine++; if (tier(r) === 'A') c.prio++; });
+  const c = { all: rows.length, none: 0, rev: 0, att: 0, buy: 0, noc: 0, agenda: 0, mine: 0, mypend: 0 };
+  rows.forEach(r => { c[status(r)]++; if (r.t.buy) c.buy++; if (isNoc(r)) c.noc++; if (isAgenda(r)) c.agenda++; if (isMine(r)) c.mine++; if (isMyPend(r)) c.mypend++; });
   return c;
 }
 function match(r, st) {
   switch (st) {
     case 'all': return true; case 'buy': return r.t.buy; case 'noc': return isNoc(r); case 'agenda': return isAgenda(r);
-    case 'mine': return isMine(r); case 'prio': return tier(r) === 'A'; default: return status(r) === st;
+    case 'mine': return isMine(r); case 'mypend': return isMyPend(r); default: return status(r) === st;
   }
 }
 function applyFilter() {
@@ -1610,11 +1635,10 @@ function applyFilter() {
   renderNow(); updStrip();
 }
 function updStrip() {
-  const c = counts(S.view), n = S.view.length;
+  const n = S.view.length, k = {}; S.view.forEach(r => { const x = cat(r); k[x] = (k[x] || 0) + 1; });
   $('#sShow').textContent = fmtN(n) + (n === 1 ? ' cliente' : ' clientes');
-  $('#sAtt').textContent = fmtN(c.att); $('#sRev').textContent = fmtN(c.rev); $('#sNone').textContent = fmtN(c.none); $('#sBuy').textContent = fmtN(c.buy);
-  $('#sBar').innerHTML = n ? `<i class="seg-att" style="width:${c.att / n * 100}%"></i><i class="seg-rev" style="width:${c.rev / n * 100}%"></i>` : '';
-  $('#sBar').dataset.tip = `Atendidos ${fmtN(c.att)} (${pct(c.att, n)}%)\nRevisados ${fmtN(c.rev)} (${pct(c.rev, n)}%)\nPendientes ${fmtN(c.none)} (${pct(c.none, n)}%)`;
+  $('#sBar').innerHTML = n ? CATS.map(([x]) => k[x] ? `<i class="seg-${x}" style="width:${k[x] / n * 100}%"></i>` : '').join('') : '';
+  $('#sBar').dataset.tip = CATS.map(([x]) => k[x] ? `${CAT_TX[x]} ${fmtN(k[x])} (${pct(k[x], n)}%)` : '').filter(Boolean).join('\n');
   const mine = S.me ? S.assigns.filter(a => a.user === S.me.name) : [];
   $('#sResv').innerHTML = mine.length ? `<span class="resv">${icon('flag')} Tus filas: ${mine.map(a => a.from + '–' + a.to).join(', ')}</span>` : '';
   $('#sPos').innerHTML = (S.scoped ? `Tu cartera: <b>${fmtN(S.rows.length)}</b> de ${fmtN(S.total)} · ` : '') + (S.active ? `Ubicado en fila <b>${S.active.r}</b>` : '');
@@ -1630,11 +1654,11 @@ function buildCols() {
   const FIRST = ['id', 'legal', 'tax', 'phone', 'mail', 'state', 'city', 'exec'];
   const rank = c => { const i = FIRST.indexOf(c.k); return i < 0 ? 100 + c.j : i; };
   COLS = S.header.map((h, j) => ({ j, h, k: keyOf(j) })).filter(c => c.k !== 'comment' && !UI.hidden.includes(norm(c.h))).sort((a, b) => rank(a) - rank(b));
-  const w = [78, 176, 200, ...COLS.map(c => WIDTH[c.k] || 130), 300];
+  const w = [78, 200, ...COLS.map(c => WIDTH[c.k] || 130), 300];
   const g = $('#grid');
   g.style.setProperty('--cols', w.map(x => x + 'px').join(' '));
   g.style.setProperty('--w', w.reduce((a, b) => a + b, 0) + 'px');
-  $('#ghead').innerHTML = `<div class="c s0">Fila</div><div class="c s1">Contactar</div><div class="c">Gestión</div>` +
+  $('#ghead').innerHTML = `<div class="c s0">Fila</div><div class="c">Gestión</div>` +
     COLS.map(c => `<div class="c${c.k === 'credit' ? ' num' : ''}" title="${esc(c.h)}"><span class="t">${esc(c.h)}</span></div>`).join('') +
     `<div class="c sr">${esc(S.header[S.C.comment])}</div>`;
 }
@@ -1664,21 +1688,15 @@ function cellHTML(r, c) {
   if (c.k === 'credit') return `<div class="c num" title="${esc(v)}"><span class="t">${v ? Number(v).toLocaleString('es-PE') : ''}</span></div>`;
   return `<div class="c" title="${esc(v)}"><span class="t">${esc(v)}</span></div>`;
 }
-function rowClass(r) { const lk = lockedBy(r); return `row st-${status(r)}${r.t.buy ? ' buy' : ''}${lk ? ' locked' : ''}${r.t.dep ? ' dep' : ''}${r === S.active ? ' active' : ''}`; }
+function rowClass(r) { const lk = lockedBy(r); return `row st-${status(r)} cat-${cat(r)}${S.drafts[r.k] ? ' draft' : ''}${r.t.buy ? ' buy' : ''}${lk ? ' locked' : ''}${r.t.dep ? ' dep' : ''}${r === S.active ? ' active' : ''}`; }
 function rowHTML(r, i) {
-  const ps = S.C.phone != null ? phonesOf(r) : [], hasWa = ps.some(p => p.wa), hasMail = parseMails(val(r, 'mail')).length > 0, lk = lockedBy(r), dis = lk ? 'disabled' : '', tr = tier(r);
+  const ps = S.C.phone != null ? phonesOf(r) : [], hasWa = ps.some(p => p.wa), hasMail = parseMails(val(r, 'mail')).length > 0, lk = lockedBy(r), dis = lk ? 'disabled' : '';
   const who = lk ? `<span class="who" title="${esc(lk)}">${icon('lock')}${esc(lk.replace(/^.* (para|por) /, ''))}</span>` : (r.t.own && r.t.own !== S.me.name ? `<span class="who">${esc(r.t.own)}</span>` : '');
   return `<div class="${rowClass(r)}" style="top:${i * RH}px" data-i="${i}">`
-    + `<div class="c s0 fila"><span>${r.r}</span><span class="ico buyi" title="Compra con éxito">${icon('star')}</span><span class="ico lki" title="${esc(lk)}">${icon('lock')}</span><span class="tier ${tr}" title="Prioridad ${tr} · ${TIER_TX[tr]}">${tr}</span></div>`
-    + `<div class="c s1 acts">`
-    + `<button class="ib wa" data-act="wa" title="WhatsApp (W)" ${hasWa && !lk ? '' : 'disabled'}>${icon('wa')}</button>`
-    + `<button class="ib" data-act="mail" title="Correo (M)" ${hasMail && !lk ? '' : 'disabled'}>${icon('mail')}</button>`
-    + `<button class="ib" data-act="contact" title="Copiar contacto (C)">${icon('contact')}</button>`
-    + `<button class="ib${r.t.rev ? ' on-rev' : ''}" data-act="rev" title="Revisado (R)" ${dis}>${icon('eye')}</button>`
-    + `<button class="ib${r.t.buy ? ' on-buy' : ''}" data-act="buy" title="Compra con éxito (V)" ${dis}>${icon('cart')}</button>`
-    + `</div><div class="c">${resHTML(r.t)}${who}</div>`
+    + `<div class="c s0 fila"><span>${r.r}</span><span class="ico buyi" title="Compra con éxito">${icon('star')}</span><span class="ico lki" title="${esc(lk)}">${icon('lock')}</span><span class="ico dfi" title="Borrador sin guardar">${icon('pencil')}</span></div>`
+    + `<div class="c">${resHTML(r.t)}${who}</div>`
     + COLS.map(c => cellHTML(r, c)).join('')
-    + `<div class="c sr" title="${esc(val(r, 'comment'))}"><input class="cmt" data-i="${i}" value="" placeholder="${lk ? esc(lk) : esc(val(r, 'comment') || 'Agregar comentario… (Enter)')}" ${dis}></div></div>`;
+    + `<div class="c sr" title="${esc(val(r, 'comment'))}"><input class="cmt" data-i="${i}" value="${esc(S.drafts[r.k] || '')}" placeholder="${lk ? esc(lk) : esc(val(r, 'comment') || 'Agregar comentario… (Enter)')}" ${dis}></div></div>`;
 }
 let rq = 0;
 function render() { cancelAnimationFrame(rq); rq = requestAnimationFrame(renderNow); }
@@ -1707,7 +1725,12 @@ function setActive(i, scroll) {
   if (!S.view.length) return;
   i = Math.max(0, Math.min(S.view.length - 1, i));
   const prev = S.active; S.active = S.view[i];
-  if (prev && prev !== S.active) { if (S.cmtT[prev.k]) flushComment(prev); const e = rowEl(prev); if (e) e.classList.remove('active'); S.fixOpen = null; S.phDraft = ''; S.ov = null; }
+  if (prev && prev !== S.active) {
+    if (S.cmtT[prev.k]) flushComment(prev); const e = rowEl(prev); if (e) e.classList.remove('active');
+    if (S.phDraft) S.phMap[prev.k] = S.phDraft; else delete S.phMap[prev.k];
+    if (S.ov && S.ov.k === prev.k && (S.ov.num || S.ov.nota || S.ov.lines.length)) S.ovMap[prev.k] = S.ov; else delete S.ovMap[prev.k];
+    S.phDraft = S.phMap[S.active.k] || ''; S.fixOpen = S.phDraft ? S.active : null; S.ov = S.ovMap[S.active.k] || null;
+  }
   const e = rowEl(S.active); if (e) e.classList.add('active');
   if (scroll) ensureVisible(i);
   LS.set('pos', S.active.k);
@@ -1734,7 +1757,7 @@ function renderPanel(force) {
   const ae = document.activeElement;
   if (!force && ae && (ae.id === 'pCmt' || ae.id === 'pNewPhone' || ae.id === 'pBrand' || /^o(Num|Date|Quick|Brand|Nota)$/.test(ae.id) || (ae.classList && ae.classList.contains('oamt'))) && p.dataset.k === r.k) { updBadges(); return; }
   p.dataset.k = r.k;
-  const ps = phonesOf(r), ms = parseMails(val(r, 'mail')), lk = lockedBy(r), dis = lk ? 'disabled' : '', tr = tier(r), sc = score(r);
+  const ps = phonesOf(r), ms = parseMails(val(r, 'mail')), lk = lockedBy(r), dis = lk ? 'disabled' : '';
   const kv = S.header.map((h, j) => {
     const k = keyOf(j); if (['comment', 'legal', 'phone', 'mail'].includes(k)) return '';
     const v = r.v[j] == null ? '' : String(r.v[j]); if (!v) return '';
@@ -1748,11 +1771,8 @@ function renderPanel(force) {
       <div id="pFixHint">${fixHint()}</div>
       <div class="two"><button class="btn" data-act="phtry">${icon('wa')}Probar por WhatsApp</button><button class="btn primary" data-act="phsave">${icon('check')}Guardar número</button></div>
       <div class="hint" style="margin:0">El número original no se borra. El nuevo se guarda aparte y sale en el reporte «Teléfonos corregidos».</div></div>` : '';
-  p.innerHTML = `<div class="p-head" style="--tc:var(--t${tr})"><div class="rw"><span>Fila ${r.r} · ${esc(val(r, 'id'))}</span><span>${r.t.last ? 'Últ. cambio ' + esc(r.t.last) : ''}</span></div>
-    <h2>${esc(val(r, 'legal') || '(sin nombre)')}</h2><div class="badges" id="pBadges">${badgesHTML(r)}</div>
-    <div class="score"><div class="top"><span><span class="tier ${tr}" style="margin-right:6px">${tr}</span>Prioridad ${tr} · ${TIER_TX[tr]}</span><span style="font-family:var(--fm)">${sc.total}/10</span></div>
-      <div class="meter">${Array.from({ length: 10 }, (_, i) => `<i class="${i < sc.total ? 'on' : ''}"></i>`).join('')}</div>
-      <small>Compró hace ${sc.d} días · línea ${money(sc.cr)} · Clasif. ${esc(sc.cl || '—')}</small></div></div>
+  p.innerHTML = `<div class="p-head"><div class="rw"><span>Fila ${r.r} · ${esc(val(r, 'id'))}</span><span>${r.t.last ? 'Últ. cambio ' + esc(r.t.last) : ''}</span></div>
+    <h2>${esc(val(r, 'legal') || '(sin nombre)')}</h2><div class="badges" id="pBadges">${badgesHTML(r)}</div></div>
     ${lk ? `<div class="p-sec" style="padding-bottom:0;border:0"><div class="lockbar">${icon('lock')}<span style="flex:1">${esc(lk)}. Solo puedes ver y copiar sus datos.</span></div></div>` : ''}
     ${canUnlock ? `<div class="p-sec" style="padding-bottom:0;border:0"><div class="lockbar"><span style="flex:1">Gestionado por <b>${esc(r.t.own)}</b></span><button class="btn" data-act="unlock" style="height:28px">Liberar</button></div></div>` : ''}
     <div class="p-sec"><div class="p-actions">
@@ -1773,7 +1793,8 @@ function renderPanel(force) {
     ${bizHTML(r, lk, dis)}
     <div class="p-sec"><h3><span>${esc(S.header[S.C.comment])}</span></h3>
       ${val(r, 'comment') ? `<div class="curcmt">${val(r, 'comment').split(' | ').map(x => `<p>${esc(x)}</p>`).join('')}</div>` : ''}
-      <textarea id="pCmt" placeholder="${lk ? esc(lk) : 'Nuevo comentario… (Ctrl+Enter para agregar)'}" ${dis}></textarea>
+      <textarea id="pCmt" placeholder="${lk ? esc(lk) : 'Nuevo comentario… (Ctrl+Enter para agregar)'}" ${dis}>${esc(S.drafts[r.k] || '')}</textarea>
+      <div class="hint" id="pDraft" style="margin:4px 0 0;color:var(--accent);font-weight:600" ${S.drafts[r.k] ? '' : 'hidden'}>${icon('pencil')} Borrador sin guardar: se conserva aunque cambies de cliente. Pulsa «Agregar comentario» para guardarlo.</div>
       <div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="btn primary" data-act="cmtadd" ${dis}>${icon('msg')}Agregar comentario</button></div>
       <div class="hint">Cada comentario se agrega en «Comentario Créditos» con fecha y nombre, sin borrar los anteriores. Con comentario el cliente queda <b>atendido</b>.</div></div>
     <div class="p-sec"><h3><span>Contacto</span>${lk ? '' : `<button class="linkbtn" data-act="fixopen">${icon('pencil')}${r.t.fix ? 'Cambiar número' : 'Editar número'}</button>`}</h3>
@@ -2109,53 +2130,47 @@ $('#vBrands').addEventListener('click', async e => {
 });
 
 /* ---------- Mi día ---------- */
+/* Mi día: solo lo mío (la última gestión la hice yo). Volver a llamar por fecha (primero vencidos) y
+   revisados que quedaron sin comentario. Lo de los compañeros no se mezcla. */
 function myDay() {
-  const mine = S.rows.filter(r => !r.t.dep && (isAdmin() ? true : isMine(r)));
-  const calls = mine.filter(isAgenda).map(r => ({ r, why: r.t.next < S.today ? 'Llamada vencida · ' + ddmm(r.t.next) : 'Volver a llamar hoy', urgent: r.t.next < S.today }));
-  const top = mine.filter(r => status(r) === 'none' && !lockedBy(r) && ['A', 'B'].includes(tier(r))).sort((a, b) => score(b).total - score(a).total || a.r - b.r).slice(0, 12).map(r => ({ r, why: 'Prioridad ' + tier(r) + ' · ' + TIER_TX[tier(r)].toLowerCase() }));
-  return [...calls.sort((a, b) => (a.r.t.next || '').localeCompare(b.r.t.next || '')), ...top];
+  const mine = S.rows.filter(isMyPend);
+  const calls = mine.filter(r => r.t.res === 'Volver a llamar').sort((x, y) => (x.t.next || '9').localeCompare(y.t.next || '9') || x.r - y.r)
+    .map(r => ({ r, why: !r.t.next ? 'Volver a llamar · sin fecha' : r.t.next < S.today ? 'Vencida · era el ' + ddmm(r.t.next) : r.t.next === S.today ? 'Llamar hoy' : 'Programada · ' + ddmm(r.t.next), urgent: !!r.t.next && r.t.next <= S.today }));
+  const revs = mine.filter(r => r.t.res !== 'Volver a llamar').sort((x, y) => (y.t.last || '').localeCompare(x.t.last || ''))
+    .map(r => ({ r, why: 'Revisado el ' + ddmm((r.t.last || '').slice(0, 10)) + ' · falta comentario', urgent: false }));
+  return { calls, revs };
 }
-function doneToday() { const ids = new Set(); S.rows.forEach(r => r.t.hist.forEach(h => { if (h.d.startsWith(S.today) && (isAdmin() || h.who === S.me.name)) ids.add(r.k); })); return ids.size; }
-function updDayBadge() { if (!S.me) return; const n = myDay().filter(x => x.urgent).length; $('#ctDay').hidden = !n; $('#ctDay').textContent = n; }
+function doneToday() { const ids = new Set(); S.rows.forEach(r => r.t.hist.forEach(h => { if (h.d.startsWith(S.today) && h.who === S.me.name) ids.add(r.k); })); return ids.size; }
+function updDayBadge() { if (!S.me) return; const n = myDay().calls.filter(x => x.urgent).length; $('#ctDay').hidden = !n; $('#ctDay').textContent = n; }
 function renderDay() {
-  const list = myDay(), done = doneToday(), goal = isAdmin() ? S.cfg.goal * Math.max(1, S.users.length - 1) : S.cfg.goal;
-  const scope = S.rows.filter(r => !r.t.dep && (isAdmin() || isMine(r)));
-  const late = list.filter(x => x.urgent).length, aCold = scope.filter(r => tier(r) === 'A' && status(r) === 'none').length;
-  const wrong = scope.filter(r => r.t.res === 'Número errado').length, noBrands = scope.filter(r => r.t.own && !(r.t.brands || []).length).length, staleB = scope.filter(r => (r.t.brands || []).some(b => bAge(r, b) > STALE)).length;
-  const buysT = S.rows.filter(r => r.t.hist.some(h => h.d.startsWith(S.today) && /compra/i.test(h.txt) && (isAdmin() || h.who === S.me.name))).length;
+  const { calls, revs } = myDay(), done = doneToday(), goal = S.cfg.goal || 40;
+  const late = calls.filter(x => x.r.t.next && x.r.t.next < S.today).length, today = calls.filter(x => x.r.t.next === S.today).length;
   const R = 44, Cc = 2 * Math.PI * R, off = Cc * (1 - Math.min(1, done / goal));
   const h = new Date().getHours(), greet = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
   const dt = new Date().toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' });
+  const li = (x, i, c) => `<button class="li rise" style="--d:${i + 3}" data-open="${esc(x.r.k)}"><span class="co" style="--tc:var(${c})">${esc(initials(val(x.r, 'legal')))}</span><span class="g"><b>${esc(val(x.r, 'legal'))}</b><small class="${x.urgent ? 'u' : ''}">${esc(x.why)} · fila ${x.r.r}</small></span>${icon('right')}</button>`;
+  const col = (title, sub, list, c, empty, d) => `<div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+      <div class="d-head rise" style="--d:${d}"><h2 style="font-size:15px">${title} · ${fmtN(list.length)}</h2><span class="sub">${sub}</span></div>
+      ${list.length ? `<div class="dlist">${list.slice(0, 60).map((x, i) => li(x, i, c)).join('')}</div>${list.length > 60 ? `<div class="hint">${fmtN(list.length - 60)} más en la lista.</div>` : ''}` : `<div class="card d-empty">${empty}</div>`}
+    </div>`;
   $('#vDay').innerHTML = `<div class="day">
   <div class="hero rise">
-    <div><div class="eyb">${esc(dt)}</div><h2>${greet}, ${esc(S.me.name)}</h2><p>${isAdmin() ? 'Estás viendo el avance de todo el equipo.' : list.length ? `Tienes ${list.length} clientes priorizados para hoy.` : 'Todo al día por hoy.'}</p></div>
+    <div><div class="eyb">${esc(dt)}</div><h2>${greet}, ${esc(S.me.name)}</h2><p>${calls.length || revs.length ? `Tus pendientes: ${fmtN(calls.length)} para volver a llamar y ${fmtN(revs.length)} revisados sin comentario.` : 'No tienes pendientes. Todo al día.'}</p></div>
     <div class="ring"><svg viewBox="0 0 104 104"><circle class="bg" cx="52" cy="52" r="${R}"/><circle class="fg" id="ringFg" cx="52" cy="52" r="${R}" stroke-dasharray="${Cc}" stroke-dashoffset="${Cc}"/></svg>
-      <div class="lbl"><div><b data-count="${done}">0</b><small>de ${goal} gestiones</small></div></div></div>
+      <div class="lbl"><div><b data-count="${done}">0</b><small>de ${goal} gestiones hoy</small></div></div></div>
     <div class="hstats">
-      <div class="hstat"><b data-count="${list.length}">0</b><span>Para hoy</span></div>
       <div class="hstat"><b data-count="${late}">0</b><span>Llamadas vencidas</span></div>
-      <div class="hstat"><b data-count="${buysT}">0</b><span>Compras hoy</span></div>
-      <div class="hstat"><b data-count="${scope.filter(r => r.t.buy).length}">0</b><span>Compras en total</span></div>
+      <div class="hstat"><b data-count="${today}">0</b><span>Para llamar hoy</span></div>
+      <div class="hstat"><b data-count="${calls.length}">0</b><span>Volver a llamar</span></div>
+      <div class="hstat"><b data-count="${revs.length}">0</b><span>Revisados sin comentario</span></div>
     </div>
   </div>
   <div class="dgrid">
-    <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
-      <div class="d-head rise" style="--d:2"><h2 style="font-size:15px">Tu lista de hoy</h2><span class="sub">Primero lo agendado, después tus clientes A y B sin gestionar</span></div>
-      ${list.length ? `<div class="dlist">${list.map((x, i) => { const tr = tier(x.r); return `<button class="li rise" style="--d:${i + 3}" data-open="${esc(x.r.k)}"><span class="co" style="--tc:var(--t${tr})">${esc(initials(val(x.r, 'legal')))}<span class="tier ${tr}">${tr}</span></span><span class="g"><b>${esc(val(x.r, 'legal'))}</b><small class="${x.urgent ? 'u' : ''}">${esc(x.why)} · fila ${x.r.r}</small></span>${icon('right')}</button>`; }).join('')}</div>
-      <button class="btn primary rise" style="height:40px;justify-content:center;--d:${list.length + 3}" id="dStart">${icon('bolt')}Empezar recorrido</button>` : '<div class="card d-empty">No tienes pendientes para hoy.</div>'}
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
-      <div class="d-head rise" style="--d:2"><h2 style="font-size:15px">Alertas</h2></div>
-      <div class="alerts">
-        <div class="alert ${late ? 'crit' : 'ok'} rise" style="--d:3"><span class="ic">${icon(late ? 'alert' : 'check')}</span><div><b>${late}</b><span>${late === 1 ? 'Llamada vencida' : 'Llamadas vencidas'}</span></div></div>
-        <div class="alert ${aCold ? 'warn' : 'ok'} rise" style="--d:4"><span class="ic">${icon('star')}</span><div><b>${aCold}</b><span>Clientes A sin gestionar</span></div></div>
-        <div class="alert ${wrong ? 'warn' : 'ok'} rise" style="--d:5"><span class="ic">${icon('hash')}</span><div><b>${wrong}</b><span>Números errados por corregir</span></div></div>
-        <div class="alert ${noBrands ? 'warn' : 'ok'} rise" style="--d:6"><span class="ic">${icon('tag')}</span><div><b>${noBrands}</b><span>Gestionados sin marcas registradas</span></div></div>
-        <div class="alert ${openOrders().length ? (openOrders().some(o => ovLvl(o) === 2) ? 'crit' : 'warn') : 'ok'} rise" style="--d:6;cursor:pointer" id="dBell" role="button"><span class="ic">${icon('bell')}</span><div><b>${openOrders().length}</b><span>OV por cerrar (Despachando o incidencia)</span></div></div>
-        <div class="alert ${staleB ? 'warn' : 'ok'} rise" style="--d:7"><span class="ic">${icon('clock')}</span><div><b>${staleB}</b><span>Con marcas por confirmar (+90 días)</span></div></div>
-      </div>
-    </div>
-  </div></div>`;
+    ${col('Volver a llamar', 'Primero las vencidas y las de hoy', calls, '--violet', 'No tienes llamadas pendientes.', 2)}
+    ${col('Revisados sin comentario', 'Los revisaste pero falta escribir el comentario', revs, '--warn', 'No tienes revisados sin comentario.', 2)}
+  </div>
+  ${calls.length || revs.length ? `<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary rise" style="height:40px" id="dStart">${icon('bolt')}Empezar por el primero</button><button class="btn rise" style="height:40px" id="dList">${icon('list')}Ver mis pendientes en la lista</button></div>` : ''}
+  </div>`;
   countUp($('#vDay'));
   requestAnimationFrame(() => requestAnimationFrame(() => { const fg = $('#ringFg'); if (fg) fg.style.strokeDashoffset = off; }));
 }
@@ -2170,7 +2185,8 @@ function openClient(k) {
 $('#vDay').addEventListener('click', e => {
   const b = e.target.closest('[data-open]'); if (b) return openClient(b.dataset.open);
   if (e.target.closest('#dBell')) { e.stopPropagation(); $('#bellPop').hidden = false; renderBell(); return; }
-  if (e.target.closest('#dStart')) { const l = myDay(); if (l.length) openClient(l[0].r.k); }
+  if (e.target.closest('#dStart')) { const l = myDay(), f = l.calls[0] || l.revs[0]; if (f) openClient(f.r.k); }
+  if (e.target.closest('#dList')) { setTab('list'); S.st = 'mypend'; $$('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.st === 'mypend')); applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0, true); }
 });
 
 /* ---------- dashboard ---------- */
@@ -2339,11 +2355,11 @@ const REPORTS = {
   agenda: { t: 'Volver a llamar', d: 'Agenda de llamadas pendientes', ic: 'cal', c: 'var(--violet)' },
   buy: { t: 'Compras con éxito', d: 'Clientes que compraron, con monto', ic: 'star', c: 'var(--s1)' },
   tel: { t: 'Teléfonos corregidos', d: 'Para actualizar el sistema de la empresa', ic: 'pencil', c: 'var(--good)' },
-  pend: { t: 'Sin gestión', d: 'Clientes que nadie ha tocado, por prioridad', ic: 'eye', c: 'var(--pend)' },
+  pend: { t: 'Sin gestión', d: 'Clientes que nadie ha tocado todavía', ic: 'eye', c: 'var(--pend)' },
   promo: { t: 'Promoción por marca', d: 'Quién la distribuye o a quién ofrecerla', ic: 'tag', c: 'var(--s2)' },
   all: { t: 'Seguimiento completo', d: 'Toda la cartera con su gestión', ic: 'list', c: 'var(--accent)' }
 };
-const EXTRA = ['Fila', 'Prioridad', 'Tipo de negocio', 'Marcas habituales', 'Marcas a veces', 'Marcas de interés', 'Líneas', 'Marcas actualizadas', 'Gestionado por', 'Resultado', 'Intentos', 'Último contacto', 'Próximo contacto', 'Compra', 'Monto', 'Motivo', 'Teléfono corregido', 'Depurado'];
+const EXTRA = ['Fila', 'Tipo de negocio', 'Marcas habituales', 'Marcas a veces', 'Marcas de interés', 'Líneas', 'Marcas actualizadas', 'Gestionado por', 'Resultado', 'Intentos', 'Último contacto', 'Próximo contacto', 'Compra', 'Monto', 'Motivo', 'Teléfono corregido', 'Depurado'];
 function repRows(type, o) {
   const a = +o.from || -Infinity, b = +o.to || Infinity;
   return S.rows.filter(r => {
@@ -2370,7 +2386,7 @@ function repRows(type, o) {
 }
 /* las 18 columnas originales en su orden y, a la derecha, las de seguimiento */
 function repTable(rows) {
-  const body = rows.map(r => [...r.v.map(x => x == null ? '' : String(x)), r.r, tier(r), r.t.tipo, brandsBy(r, 'habitual').join(', '), brandsBy(r, 'ocasional').join(', '), brandsBy(r, 'interes').join(', '), [...new Set((r.t.brands || []).map(b => S.catOf[b]))].join(', '), lastBrandDate(r), r.t.own, r.t.res, r.t.int, r.t.lastc, r.t.next, r.t.buy ? 'SI' : '', r.t.monto, r.t.motivo, r.t.fix, r.t.dep]);
+  const body = rows.map(r => [...r.v.map(x => x == null ? '' : String(x)), r.r, r.t.tipo, brandsBy(r, 'habitual').join(', '), brandsBy(r, 'ocasional').join(', '), brandsBy(r, 'interes').join(', '), [...new Set((r.t.brands || []).map(b => S.catOf[b]))].join(', '), lastBrandDate(r), r.t.own, r.t.res, r.t.int, r.t.lastc, r.t.next, r.t.buy ? 'SI' : '', r.t.monto, r.t.motivo, r.t.fix, r.t.dep]);
   return [[...S.header, ...EXTRA], ...body];
 }
 function repOpts() {
@@ -2587,11 +2603,13 @@ $('#gbody').addEventListener('click', e => {
   if (b) { e.preventDefault(); if (!b.disabled) act(r, b.dataset.act, actArg(b)); }
   else if (!e.target.closest('.cmt')) $('#grid').focus({ preventScroll: true });
 });
+$('#gbody').addEventListener('input', e => { if (e.target.classList.contains('cmt')) { const r = S.view[+e.target.dataset.i]; if (r) setDraft(r.k, e.target.value); } });
 $('#gbody').addEventListener('focusin', e => { if (e.target.classList.contains('cmt')) { const i = +e.target.dataset.i; if (S.view[i] !== S.active) setActive(i); } });
 
 $('#panel').addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b || !S.active || b.disabled) return; e.preventDefault(); act(S.active, b.dataset.act, actArg(b)); });
 $('#panel').addEventListener('input', e => {
   if (e.target.id === 'pNewPhone') { S.phDraft = e.target.value; $('#pFixHint').innerHTML = fixHint(); }
+  if (e.target.id === 'pCmt' && S.active) setDraft(S.active.k, e.target.value);
 });
 $('#panel').addEventListener('keydown', e => { if (e.target.id === 'pCmt' && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); act(S.active, 'cmtadd'); } });
 $('#panel').addEventListener('keydown', e => { if (e.target.id === 'pBrand' && e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); act(S.active, 'brandadd'); } });
@@ -2631,7 +2649,7 @@ document.addEventListener('keydown', e => {
   if (anyModal() || !S.me || S.tab !== 'list' || !$('#login').hidden) return;
   if (typing) {
     if (t.classList.contains('cmt') && (k === 'Enter' || k === 'ArrowDown' || k === 'ArrowUp')) {
-      e.preventDefault(); const txt = t.value, r0 = S.active; t.value = ''; if (txt.trim()) addComment(r0, txt); setActive(S.active._vi + (k === 'ArrowUp' ? -1 : 1), true); focusComment();
+      e.preventDefault(); const txt = t.value, r0 = S.active; t.value = ''; if (txt.trim()) { setDraft(r0.k, ''); addComment(r0, txt).then(ok => { if (!ok) setDraft(r0.k, txt); }); } setActive(S.active._vi + (k === 'ArrowUp' ? -1 : 1), true); focusComment();
     }
     return;
   }
