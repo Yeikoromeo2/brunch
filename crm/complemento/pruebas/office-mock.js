@@ -101,7 +101,8 @@ const ui = {
     cb({ status: 'succeeded', value: {
       addEventHandler(t, h) { on[t].push(h); },
       messageChild(m) { if (w.__toChild) w.__toChild(m); else queue.push(m); },
-      close() { clearInterval(timer); w.close(); }
+      /* la prueba puede simular que Excel no alcanza a cerrar la ventana antes de recargar el panel */
+      close() { clearInterval(timer); if (!sessionStorage.getItem('__mockNoClose')) w.close(); }
     } });
     window.__dlgReady = () => { while (queue.length) w.__toChild(queue.shift()); };
   }

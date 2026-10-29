@@ -61,7 +61,7 @@ El panel de Excel tiene un ancho limitado. Con el botón **Ampliar** (arriba, en
 - El panel de Excel muestra «Abierto en otra ventana» y **debe quedar abierto**: es el que lee y guarda en el libro. Si se cierra el panel, la ventana deja de guardar.
 - Seleccionar una fila en la hoja abre ese cliente en la ventana.
 - Desde la ventana, elegir un cliente **no** mueve la selección de la hoja (eso traería Excel al frente y taparía la ventana, sobre todo con dos pantallas). En el panel lateral sí la mueve.
-- Si el panel de Excel se cierra, la ventana lo detecta (al hacer algo o en la siguiente sincronización) y muestra «Sin conexión con Excel». Lo que ya se guardó no se pierde; basta abrir otra vez el Gestor en Excel.
+- La ventana revisa cada 4 segundos que el panel de Excel siga respondiendo. Si deja de responder (Excel lo recargó o se cerró), **la ventana se cierra sola** en unos segundos; el panel recargado abre la nueva y los borradores se conservan. Lo que ya se guardó no se pierde.
 - Para volver, cierra la ventana o pulsa **Cerrar la ventana y volver aquí** en el panel.
 - Excel web a veces recarga el panel por su cuenta (abajo aparece «Cargando complementos»). Si pasa con la ventana abierta, la ventana vieja se cierra y **se reabre sola** al instante. Para que el navegador lo permita, autoriza una vez las ventanas emergentes de Excel:
   - **Edge:** Configuración → Cookies y permisos del sitio → **Elementos emergentes y redireccionamientos** → Permitir → Agregar `https://[*.]officeapps.live.com`, `https://[*.]office.com` y `https://[*.]sharepoint.com`.

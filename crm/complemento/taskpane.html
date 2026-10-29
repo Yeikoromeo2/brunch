@@ -283,6 +283,7 @@ kbd{font:10px var(--fm);padding:1px 5px;border:1px solid var(--line2);border-bot
 .login p{margin:0;color:var(--ink2)}
 .waopt{height:auto;min-height:64px;flex-direction:column;justify-content:center;gap:2px;padding:10px;white-space:normal;text-align:center}
 .waopt small{font-weight:400;font-size:12px;opacity:.8}
+.phw{display:inline-flex;align-items:center;gap:2px}
 .demo{font-size:12px;color:var(--ink2);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
 .demo b{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .demo button{border:1px solid var(--line2);background:var(--surface);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;text-align:left}
@@ -998,7 +999,7 @@ function call(fn, ...args) {
   return new Promise((ok, ko) => {
     google.script.run.withSuccessHandler(ok).withFailureHandler(e => {
       const msg = (e && e.message) || String(e);
-      if (window.GC_BRIDGE && /conexión con el panel/.test(msg)) { stopPoll(); showCover('#lostCover'); }
+      if (window.GC_BRIDGE && /conexión con el panel/.test(msg)) panelLost();
       if (/SESION/.test(msg)) sessionLost(msg.replace(/^.*SESION:\s*/, ''));
       ko(new Error(msg.replace(/^Error:\s*/, '').replace(/^.*SESION:\s*/, '')));
     })[fn](...args);
@@ -1470,6 +1471,9 @@ function act(r, a, n) {
     const t = [val(r, 'id'), val(r, 'legal'), val(r, 'state')].map(x => x.trim()).join(' // ');
     copyText(t).then(ok => toast(ok ? 'Copiado: ' + t : 'No se pudo copiar', !ok));
     if (!lk && !r.t.rev) send(r, { op: 'rev', val: true });
+  } else if (a === 'copyph') {
+    const p = phonesOf(r)[n]; if (!p) return;
+    copyText(p.d).then(ok => toast(ok ? 'Copiado: ' + p.d : 'No se pudo copiar', !ok));
   } else if (a === 'copy') {
     const t = val(r, n).trim(); if (!t) return;
     copyText(t).then(ok => toast(ok ? 'Copiado: ' + t : 'No se pudo copiar', !ok));
@@ -1587,7 +1591,7 @@ function cellHTML(r, c) {
   if (c.k === 'phone') {
     const ps = phonesOf(r);
     if (!ps.length) return `<div class="c"><span class="t">${esc(v)}</span></div>`;
-    return `<div class="c" title="${esc(r.t.fix ? 'Corregido: ' + r.t.fix + ' · Original: ' + v : v)}">` + ps.map((p, n) => p.wa ? `<a class="ph wa${p.fix ? ' fix' : ''}${p.old ? ' bad' : ''}" data-act="wa" data-n="${n}" title="WhatsApp +${p.wa}">${icon(p.fix ? 'check' : 'wa')}${esc(p.d)}</a>` : `<a class="ph tel${p.old ? ' bad' : ''}" data-act="tel" title="Llamar">${icon('phone')}${esc(p.d)}</a>`).join('') + `</div>`;
+    return `<div class="c" title="${esc(r.t.fix ? 'Corregido: ' + r.t.fix + ' · Original: ' + v : v)}">` + ps.map((p, n) => (p.wa ? `<a class="ph wa${p.fix ? ' fix' : ''}${p.old ? ' bad' : ''}" data-act="wa" data-n="${n}" title="WhatsApp +${p.wa}">${icon(p.fix ? 'check' : 'wa')}${esc(p.d)}</a>` : `<a class="ph tel${p.old ? ' bad' : ''}" data-act="tel" title="Llamar">${icon('phone')}${esc(p.d)}</a>`) + `<button class="ib sm" data-act="copyph" data-n="${n}" title="Copiar ${esc(p.d)}">${icon('copy')}</button>`).join('') + `</div>`;
   }
   if (c.k === 'mail') {
     const ms = parseMails(v);
@@ -1707,7 +1711,7 @@ function renderPanel(force) {
       <div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="btn primary" data-act="cmtadd" ${dis}>${icon('msg')}Agregar comentario</button></div>
       <div class="hint">Cada comentario se agrega en «Comentario Créditos» con fecha y nombre, sin borrar los anteriores. Con comentario el cliente queda <b>atendido</b>.</div></div>
     <div class="p-sec"><h3><span>Contacto</span>${lk ? '' : `<button class="linkbtn" data-act="fixopen">${icon('pencil')}${r.t.fix ? 'Cambiar número' : 'Editar número'}</button>`}</h3>
-      <div class="phones">${ps.map((x, n) => x.wa ? `<a class="ph wa${x.fix ? ' fix' : ''}${x.old ? ' bad' : ''}" data-act="wa" data-n="${n}">${icon(x.fix ? 'check' : 'wa')}${esc(x.d)}</a>` : `<a class="ph tel${x.old ? ' bad' : ''}" data-act="tel">${icon('phone')}${esc(x.d)}</a>`).join('') || '<span class="hint" style="margin:0">Sin teléfono registrado</span>'}</div>
+      <div class="phones">${ps.map((x, n) => `<span class="phw">${x.wa ? `<a class="ph wa${x.fix ? ' fix' : ''}${x.old ? ' bad' : ''}" data-act="wa" data-n="${n}">${icon(x.fix ? 'check' : 'wa')}${esc(x.d)}</a>` : `<a class="ph tel${x.old ? ' bad' : ''}" data-act="tel">${icon('phone')}${esc(x.d)}</a>`}<button class="ib sm" data-act="copyph" data-n="${n}" title="Copiar ${esc(x.d)}">${icon('copy')}</button></span>`).join('') || '<span class="hint" style="margin:0">Sin teléfono registrado</span>'}</div>
       ${ms.length ? `<div style="margin-top:8px;display:flex;flex-direction:column;gap:3px">${ms.map((m, n) => `<a class="ml" data-act="mail" data-n="${n}">${esc(m)}</a>`).join('')}</div>` : ''}
       ${r.t.res !== 'Número errado' ? fixBox : ''}</div>
     <div class="p-sec"><h3><span>Historial</span><span style="text-transform:none;letter-spacing:0;font-weight:500">${r.t.hist.length} movimiento${r.t.hist.length === 1 ? '' : 's'}</span></h3>
@@ -2685,6 +2689,14 @@ window.addEventListener('pagehide', () => { if (window.GC_HOST && GC_HOST.open) 
 $('#winReopen').onclick = () => { $('#winLost').hidden = true; $('#bWin').click(); };
 $('#winStay').onclick = () => { SS.set('win', ''); $('#winLost').hidden = true; };
 $('#lostClose').onclick = () => window.close();
+/* la ventana grande sin panel se cierra sola: el panel recargado abre la nueva (los borradores se conservan) */
+function panelLost() {
+  stopPoll(); flushAll();
+  try { LS.set('drafts:' + (S.me ? S.me.name : ''), S.drafts); } catch (e) {}
+  showCover('#lostCover');
+  setTimeout(() => { try { window.close(); } catch (e) {} }, 300);
+}
+if (window.GC_BRIDGE) GC_BRIDGE.onLost(panelLost);
 
 /* copia local de la última carga (IndexedDB de este navegador). Si Excel recarga el panel,
    la pantalla aparece al instante y se pone al día en segundo plano. Se borra al salir. */

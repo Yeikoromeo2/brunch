@@ -142,6 +142,10 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok(!(await page.$('#gbody .acts')) && !(await page.$('#gbody .tier')) && !(await page.$('#panel .score')), 'La lista no repite los botones de contacto y no se muestra la prioridad');
   ok(!(await page.$('#sAtt')) && (await page.$$('#sBar i')).length >= 3, 'La barrita usa los colores de cada estado, sin leyenda');
   ok(await page.$('#gbody .row.cat-att') && await page.$('#gbody .row.cat-noint') && await page.$('#gbody .row.cat-none'), 'Cada fila se pinta con el color de su estado');
+  /* 5c2. copiar el teléfono desde la lista y desde el panel */
+  await page.click('#gbody .row[data-i="2"] [data-act="copyph"]'); await page.waitForTimeout(200);
+  ok(/Copiado: 987650222/.test(await toast()), 'La columna de teléfonos tiene botón de copiar el número');
+  ok(!!(await page.$('#panel .phones [data-act="copyph"]')), 'El panel también tiene copiar en cada teléfono');
   /* 5d. lo que se escribe no se pierde al tocar otras opciones ni al cambiar de cliente */
   await page.click('#gbody .row[data-i="6"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(600);
   await page.fill('#pCmt', 'Borrador a medias');
@@ -245,15 +249,23 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await win.waitForTimeout(400);
   ok((await win.textContent('#panel h2')).includes('Comercial Rímac'), 'Seleccionar una fila en la hoja abre el cliente en la ventana');
   if (SHOTS) await win.screenshot({ path: path.join(SHOTS, '09-ventana.png') });
-  /* si el panel de Excel deja de responder, la ventana lo avisa en vez de quedarse guardando */
+  /* si el panel de Excel deja de responder, la ventana se da cuenta sola y se cierra (no queda «sin conexión») */
   await page.evaluate(() => { window.__fromChildOk = window.__fromChild; window.__fromChild = () => { throw new Error('panel cerrado'); }; });
-  /* la ventana puede detectarlo sola en su revisión automática; si no, al pulsar Recargar */
-  await win.evaluate(() => document.querySelector('#bReload').click());
-  await win.waitForSelector('#lostCover:not([hidden])', { timeout: 5000 }).catch(() => {});
-  ok(await win.isVisible('#lostCover'), 'Sin el panel de Excel la ventana muestra «Sin conexión con Excel»');
-  if (SHOTS) await win.screenshot({ path: path.join(SHOTS, '10-ventana-sin-panel.png') });
+  await win.waitForEvent('close', { timeout: 20000 }).catch(() => {});
+  ok(win.isClosed(), 'Sin el panel de Excel, la ventana grande lo detecta sola y se cierra');
   await page.evaluate(() => { window.__fromChild = window.__fromChildOk; });
-  /* si Excel recarga el panel con la ventana abierta, la ventana vieja se cierra y se reabre sola */
+  await page.waitForFunction(() => document.querySelector('#winCover').hidden && document.querySelector('#loading').hidden, null, { timeout: 8000 });
+  ok(true, 'Y el panel de Excel vuelve a funcionar solo');
+  [win] = await Promise.all([page.waitForEvent('popup'), page.click('#bWin')]);
+  await win.waitForFunction(() => { const m = document.querySelector('#meName'); return m && m.textContent === 'Ana'; });
+  /* si Excel recarga el panel y no alcanza a cerrar la ventana, la ventana vieja se cierra sola y la nueva se abre sola */
+  await page.evaluate(() => sessionStorage.setItem('__mockNoClose', '1'));
+  const stale = win;
+  [win] = await Promise.all([page.waitForEvent('popup', { timeout: 15000 }), page.reload()]);
+  await stale.waitForEvent('close', { timeout: 25000 }).catch(() => {});
+  ok(stale.isClosed() && !win.isClosed(), 'Si Excel recarga el panel sin cerrar la ventana vieja, esta se cierra sola y queda solo la nueva');
+  await page.evaluate(() => sessionStorage.removeItem('__mockNoClose'));
+  await win.waitForFunction(() => { const m = document.querySelector('#meName'); return m && m.textContent === 'Ana'; });
   const readsR = await page.evaluate(() => window.__book.raw.cartReads), oldWin = win;
   await page.evaluate(() => sessionStorage.setItem('__mockDelay', '300'));
   [win] = await Promise.all([page.waitForEvent('popup', { timeout: 15000 }), page.reload()]);

@@ -205,7 +205,7 @@ rep("const d = daysSince(val(r, 'last')), cr = +val(r, 'credit') || 0,",
 
 # ventana aparte: si se pierde el panel de Excel, se bloquea con un aviso claro
 rep("""      if (/SESION/.test(msg)) sessionLost(msg.replace(/^.*SESION:\\s*/, ''));""",
-    """      if (window.GC_BRIDGE && /conexión con el panel/.test(msg)) { stopPoll(); showCover('#lostCover'); }
+    """      if (window.GC_BRIDGE && /conexión con el panel/.test(msg)) panelLost();
       if (/SESION/.test(msg)) sessionLost(msg.replace(/^.*SESION:\\s*/, ''));""")
 
 # arranque rápido: copia de la última carga en el navegador, recarga en segundo plano
@@ -399,6 +399,14 @@ window.addEventListener('pagehide', () => { if (window.GC_HOST && GC_HOST.open) 
 $('#winReopen').onclick = () => { $('#winLost').hidden = true; $('#bWin').click(); };
 $('#winStay').onclick = () => { SS.set('win', ''); $('#winLost').hidden = true; };
 $('#lostClose').onclick = () => window.close();
+/* la ventana grande sin panel se cierra sola: el panel recargado abre la nueva (los borradores se conservan) */
+function panelLost() {
+  stopPoll(); flushAll();
+  try { LS.set('drafts:' + (S.me ? S.me.name : ''), S.drafts); } catch (e) {}
+  showCover('#lostCover');
+  setTimeout(() => { try { window.close(); } catch (e) {} }, 300);
+}
+if (window.GC_BRIDGE) GC_BRIDGE.onLost(panelLost);
 
 /* copia local de la última carga (IndexedDB de este navegador). Si Excel recarga el panel,
    la pantalla aparece al instante y se pone al día en segundo plano. Se borra al salir. */

@@ -36,6 +36,8 @@ if (window.GC_API) {
   let dlg = null, send = null, closed = null;
   const supported = () => { try { return !!(Office.context.ui && Office.context.ui.displayDialogAsync && Office.context.requirements.isSetSupported('DialogApi', '1.2')); } catch (e) { return false; } };
   function handle(m) {
+    /* latido de la ventana: se responde al instante, sin pasar por la fila de llamadas */
+    if (m.t === 'ping') { if (send) send({ t: 'pong', id: m.id }); return; }
     if (m.t !== 'call') return;
     const reply = (ok, r) => send && send({ t: 'res', id: m.id, ok, r });
     google.script.run.withSuccessHandler(r => reply(true, r)).withFailureHandler(e => reply(false, (e && e.message) || String(e)))[m.fn](...(m.args || []));
@@ -65,32 +67,52 @@ if (window.GC_API) {
   };
 } else {
   /* ---------- lado de la ventana aparte ---------- */
-  const pend = {}; let seq = 0, selCb = null, send = null;
+  const pend = {}; let seq = 0, selCb = null, send = null, lostCb = null, lost = false;
   const LOST = 'Se perdió la conexión con el panel de Excel. Lo que hagas aquí no se guarda: cierra esta ventana y vuelve a abrir el Gestor desde Excel.';
   const ready = new Promise(ok => {
     Office.onReady(() => {
       send = sender(t => Office.context.ui.messageParent(t));
       const recv = receiver(m => {
         if (m.t === 'sel') { if (selCb) selCb(); return; }
+        if (m.t === 'pong') { if (m.id === pingId) answered = true; return; }
         const p = pend[m.id]; if (!p) return; delete pend[m.id];
         if (m.ok) p.ok(m.r === undefined ? null : m.r); else p.ko(new Error(m.r));
       });
-      Office.context.ui.addHandlerAsync(Office.EventType.DialogParentMessageReceived, ev => recv(ev.message), () => ok());
+      Office.context.ui.addHandlerAsync(Office.EventType.DialogParentMessageReceived, ev => recv(ev.message), () => { ok(); heartbeat(); });
     });
   });
+  /* latido cada 4 s: si el panel deja de contestar 3 veces seguidas (Excel lo recargó o se cerró), la
+     ventana se da por desconectada enseguida en vez de esperar a que falle algo que se intente guardar.
+     Se cuentan latidos sin respuesta, no segundos, para no confundir una ventana en segundo plano. */
+  let pingId = 0, answered = true, misses = 0;
+  function setLost() {
+    if (lost) return; lost = true;
+    Object.keys(pend).forEach(id => { const p = pend[id]; delete pend[id]; p.ko(new Error(LOST)); });
+    if (lostCb) lostCb();
+  }
+  function heartbeat() {
+    setInterval(() => {
+      if (lost) return;
+      misses = answered ? 0 : misses + 1;
+      if (misses >= 3) return setLost();
+      answered = false; pingId = 'p' + Date.now();
+      try { send({ t: 'ping', id: pingId }); } catch (e) { setLost(); }
+    }, 4000);
+  }
   const runner = (ok, ko) => new Proxy({}, { get(_, fn) {
     if (fn === 'withSuccessHandler') return f => runner(f, ko);
     if (fn === 'withFailureHandler') return f => runner(ok, f);
     return (...args) => ready.then(() => {
+      if (lost) { ko && ko(new Error(LOST)); return; }
       const id = ++seq;
       /* si el panel de Excel se cerró, la llamada nunca tendría respuesta: se avisa en vez de esperar */
       const fail = () => { const p = pend[id]; if (!p) return; delete pend[id]; p.ko(new Error(LOST)); };
       const timer = setTimeout(fail, 60000);
       pend[id] = { ok: r => { clearTimeout(timer); ok && ok(r); }, ko: e => { clearTimeout(timer); ko && ko(e); } };
-      try { send({ t: 'call', id, fn, args }); } catch (e) { fail(); }
+      try { send({ t: 'call', id, fn, args }); } catch (e) { fail(); setLost(); }
     });
   } });
   window.google = { script: { get run() { return runner(); } } };
-  window.GC_BRIDGE = { onSelection(cb) { selCb = cb; } };
+  window.GC_BRIDGE = { onSelection(cb) { selCb = cb; }, onLost(cb) { lostCb = cb; if (lost) cb(); } };
 }
 })();
