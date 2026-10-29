@@ -1,0 +1,190 @@
+{
+  "version": 1,
+  "descripcion": "Catálogo de marcas que distribuye el mayorista, agrupadas por línea. Se guarda en la pestaña _Marcas; las marcas de cada cliente van en _ClienteMarcas (Customer ID, Marca, fecha, quién). Las de 'Por definir' deben reasignarse.",
+  "lineas": [
+    {
+      "linea": "Cómputo",
+      "marcas": [
+        "ASUS",
+        "Dell",
+        "HP",
+        "Lenovo",
+        "MSI",
+        "Huawei"
+      ]
+    },
+    {
+      "linea": "Gaming",
+      "marcas": [
+        "ROG",
+        "HyperX",
+        "Razer",
+        "Primus Gaming"
+      ]
+    },
+    {
+      "linea": "Componentes",
+      "marcas": [
+        "AMD",
+        "Intel",
+        "Gigabyte"
+      ]
+    },
+    {
+      "linea": "Almacenamiento y memoria",
+      "marcas": [
+        "A-Data",
+        "Kingston",
+        "PNY",
+        "SanDisk",
+        "Seagate",
+        "Western Digital",
+        "QNAP"
+      ]
+    },
+    {
+      "linea": "Servidores y centro de datos",
+      "marcas": [
+        "HPE",
+        "Dell EMC"
+      ]
+    },
+    {
+      "linea": "Redes y conectividad",
+      "marcas": [
+        "Ubiquiti",
+        "TP-Link",
+        "Meraki",
+        "Ruckus",
+        "Nexxt Solutions Home",
+        "Nexxt Solutions Infrastructure",
+        "Furukawa",
+        "Starlink",
+        "Riverbed"
+      ]
+    },
+    {
+      "linea": "Energía",
+      "marcas": [
+        "APC",
+        "Salicru",
+        "Forza"
+      ]
+    },
+    {
+      "linea": "Seguridad electrónica",
+      "marcas": [
+        "Hikvision",
+        "EZVIZ",
+        "Hanwha",
+        "Axis",
+        "VideoIQ",
+        "Honeywell",
+        "Firelite"
+      ]
+    },
+    {
+      "linea": "Hogar inteligente",
+      "marcas": [
+        "Ring",
+        "Eufy",
+        "Philips Hue",
+        "Wiz"
+      ]
+    },
+    {
+      "linea": "Punto de venta y código de barras",
+      "marcas": [
+        "Zebra",
+        "Newland",
+        "Unitech",
+        "Logic Controls",
+        "Elo",
+        "Custom"
+      ]
+    },
+    {
+      "linea": "Impresión",
+      "marcas": [
+        "Epson",
+        "Xerox"
+      ]
+    },
+    {
+      "linea": "Colaboración y videoconferencia",
+      "marcas": [
+        "Jabra",
+        "Poly",
+        "Logitech",
+        "Screenbeam",
+        "Promethean"
+      ]
+    },
+    {
+      "linea": "Audio profesional",
+      "marcas": [
+        "AKG",
+        "JBL Pro",
+        "Crown",
+        "Soundcraft"
+      ]
+    },
+    {
+      "linea": "Audio de consumo",
+      "marcas": [
+        "JBL",
+        "Harman Kardon",
+        "Soundcore"
+      ]
+    },
+    {
+      "linea": "Pantallas y monitores",
+      "marcas": [
+        "LG",
+        "Viewsonic",
+        "Philips",
+        "Haier"
+      ]
+    },
+    {
+      "linea": "Accesorios y periféricos",
+      "marcas": [
+        "Anker",
+        "Belkin",
+        "Gear4",
+        "Zagg",
+        "Klip Xtreme",
+        "Xtech",
+        "StarTech.com",
+        "Wacom"
+      ]
+    },
+    {
+      "linea": "Móviles y wearables",
+      "marcas": [
+        "Motorola",
+        "Realme",
+        "Oura"
+      ]
+    },
+    {
+      "linea": "Software y ciberseguridad",
+      "marcas": [
+        "Microsoft",
+        "Bitdefender",
+        "ESET",
+        "McAfee",
+        "BitTitan"
+      ]
+    },
+    {
+      "linea": "Por definir",
+      "marcas": [
+        "ELISE",
+        "Folksafe",
+        "Cyrus",
+        "Nebula"
+      ]
+    }
+  ]
+}

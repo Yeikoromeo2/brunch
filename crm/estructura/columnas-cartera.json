@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "hoja": "Hoja1",
+  "fila_encabezado": 1,
+  "descripcion": "Estructura fija de la cartera de clientes. Es la base de todo el sistema: no se agregan, quitan, renombran ni reordenan columnas. Cada fila es un cliente independiente.",
+  "clave_cliente": "Customer ID",
+  "columnas": [
+    { "col": "A", "nombre": "Organization",        "clave": "org",     "tipo": "texto",    "origen": "cartera", "nota": "Organización o unidad comercial." },
+    { "col": "B", "nombre": "KAM ID",              "clave": "kam",     "tipo": "texto",    "origen": "cartera", "nota": "Código del Key Account Manager." },
+    { "col": "C", "nombre": "Ejecutivo",           "clave": "exec",    "tipo": "texto",    "origen": "sistema", "obligatoria": true, "nota": "La llena el sistema con quien atiende al cliente." },
+    { "col": "D", "nombre": "Customer ID",         "clave": "id",      "tipo": "texto",    "origen": "cartera", "obligatoria": true, "nota": "Identifica al cliente. Se trata como texto para no perder ceros a la izquierda." },
+    { "col": "E", "nombre": "Legal Name",          "clave": "legal",   "tipo": "texto",    "origen": "cartera", "nota": "Razón social." },
+    { "col": "F", "nombre": "Tax Reg No",          "clave": "tax",     "tipo": "texto",    "origen": "cartera", "nota": "RUC. Se trata como texto." },
+    { "col": "G", "nombre": "Cust. Address1",      "clave": "addr",    "tipo": "texto",    "origen": "cartera", "nota": "Dirección." },
+    { "col": "H", "nombre": "State Name",          "clave": "state",   "tipo": "texto",    "origen": "cartera", "nota": "Departamento." },
+    { "col": "I", "nombre": "City Name",           "clave": "city",    "tipo": "texto",    "origen": "cartera", "nota": "Ciudad." },
+    { "col": "J", "nombre": "Cust. Telephone",     "clave": "phone",   "tipo": "texto",    "origen": "cartera", "nota": "Puede traer varios números separados por / , ; o espacios." },
+    { "col": "K", "nombre": "Cust. Mail Address",  "clave": "mail",    "tipo": "texto",    "origen": "cartera", "nota": "Puede traer varios correos." },
+    { "col": "L", "nombre": "Term ID",             "clave": "term",    "tipo": "texto",    "origen": "cartera", "nota": "Condición de pago." },
+    { "col": "M", "nombre": "Report Code",         "clave": "report",  "tipo": "texto",    "origen": "cartera", "nota": "Código de reporte." },
+    { "col": "N", "nombre": "Credit Limit",        "clave": "credit",  "tipo": "numero",   "origen": "cartera", "nota": "Línea de crédito. Señal para la prioridad A/B/C/D." },
+    { "col": "O", "nombre": "Creation Date",       "clave": "created", "tipo": "fecha",    "origen": "cartera", "nota": "Fecha de alta del cliente." },
+    { "col": "P", "nombre": "Last Purchase",       "clave": "last",    "tipo": "fecha",    "origen": "cartera", "nota": "Última compra. Señal para la prioridad A/B/C/D y alertas de clientes que dejaron de comprar." },
+    { "col": "Q", "nombre": "Clasif.",             "clave": "clasif",  "tipo": "texto",    "origen": "cartera", "nota": "Clasificación del cliente. Señal para la prioridad A/B/C/D." },
+    { "col": "R", "nombre": "Comentario Créditos", "clave": "comment", "tipo": "texto",    "origen": "sistema", "obligatoria": true, "nota": "Detalle de la atención. Con comentario, el cliente queda atendido." }
+  ]
+}

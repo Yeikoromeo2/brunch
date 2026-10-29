@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instalar Gestor de Cartera</title>
+<link rel="icon" href="assets/icon-32.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#f3f5f7;--surface:#fff;--ink:#101820;--ink2:#47525e;--muted:#7c8693;--line:#e3e7eb;--accent:#0b7f6c;--soft:#e4f3ef;--crit:#c93b3b}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1216;--surface:#151c21;--ink:#e8edf0;--ink2:#a9b4bd;--muted:#7c8893;--line:#26313a;--accent:#33c2a0;--soft:#12302a;--crit:#ef6b6b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "IBM Plex Sans",system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:40px 16px 60px}
+.logo{width:48px;height:48px;border-radius:12px}
+h1{font-size:28px;letter-spacing:-.02em;margin:14px 0 4px}
+.lead{color:var(--ink2);margin:0 0 28px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:16px}
+h2{font-size:17px;margin:0 0 10px;display:flex;gap:10px;align-items:center}
+h2 .n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:13px;flex:none}
+label{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:6px}
+input{width:100%;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font:14px "IBM Plex Mono",monospace;background:var(--bg);color:var(--ink)}
+input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+button{height:40px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:0 16px;font:600 14px "IBM Plex Sans",sans-serif;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+ol{margin:0;padding-left:20px;color:var(--ink2)}
+ol li{margin-bottom:6px}
+b{color:var(--ink)}
+.note{font-size:13px;color:var(--muted);margin:10px 0 0}
+.warn{font-size:13px;color:var(--crit);margin:10px 0 0}
+code{font:13px "IBM Plex Mono",monospace;background:var(--soft);padding:1px 6px;border-radius:5px;word-break:break-all}
+pre{max-height:220px;overflow:auto;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:12px;font:12px/1.5 "IBM Plex Mono",monospace;white-space:pre-wrap;word-break:break-all}
+</style>
+</head>
+<body>
+<main>
+  <img class="logo" src="assets/icon-64.png" alt="">
+  <h1>Instalar el Gestor de Cartera</h1>
+  <p class="lead">Complemento para Excel en la web que trabaja sobre el archivo de la cartera en OneDrive. No requiere TI ni instalar programas: cada persona lo carga una vez desde Excel.</p>
+
+  <section class="card">
+    <h2><span class="n">1</span>Descarga el manifiesto</h2>
+    <label for="base">Dirección donde está publicado el complemento</label>
+    <input id="base" spellcheck="false">
+    <div class="row">
+      <button class="primary" id="dl">Descargar manifest.xml</button>
+      <button id="see">Ver contenido</button>
+    </div>
+    <p class="note">Se detecta sola. Solo cámbiala si el complemento se mueve a otra dirección (debe empezar con <code>https://</code>).</p>
+    <p class="warn" id="warn" hidden></p>
+    <pre id="xml" hidden></pre>
+  </section>
+
+  <section class="card">
+    <h2><span class="n">2</span>Cárgalo en Excel para la web</h2>
+    <ol>
+      <li>Abre el archivo de la cartera desde OneDrive en <b>Excel para la web</b>.</li>
+      <li>Ve a <b>Inicio → Complementos</b> (en algunas versiones: <b>Insertar → Complementos → Obtener complementos</b>).</li>
+      <li>Elige <b>Mis complementos</b> y luego <b>Cargar mi complemento</b>.</li>
+      <li>Selecciona el <code>manifest.xml</code> que descargaste y pulsa <b>Cargar</b>.</li>
+      <li>Aparece el botón <b>Gestor de Cartera</b> en la pestaña Inicio. Púlsalo para abrir el panel.</li>
+    </ol>
+    <p class="note">Si no ves «Cargar mi complemento», tu organización lo tiene bloqueado y solo un administrador de Microsoft 365 puede habilitarlo.</p>
+  </section>
+
+  <section class="card">
+    <h2><span class="n">3</span>Primer uso</h2>
+    <ol>
+      <li>La primera persona que abre el panel en el archivo lo <b>configura</b> y queda como administrador.</li>
+      <li>El administrador crea a cada ejecutivo con un <b>PIN temporal</b>; al entrar, cada uno crea el suyo.</li>
+      <li>La hoja de la cartera no se modifica: el sistema solo agrega comentarios en «Comentario Créditos» y guarda lo demás en pestañas internas muy ocultas.</li>
+    </ol>
+  </section>
+</main>
+<script>
+(() => {
+'use strict';
+const ID = 'b19a446e-21bd-4b21-99ce-122f9fd6b3ef';
+const VERSION = '1.0.0.0';
+const $ = s => document.querySelector(s);
+const here = location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '');
+$('#base').value = here;
+const escX = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function base() { let b = $('#base').value.trim(); if (b && !b.endsWith('/')) b += '/'; return b; }
+function manifest(b) {
+  const u = p => escX(b + p);
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="TaskPaneApp">
+  <Id>${ID}</Id>
+  <Version>${VERSION}</Version>
+  <ProviderName>Gestor de Cartera</ProviderName>
+  <DefaultLocale>es-ES</DefaultLocale>
+  <DisplayName DefaultValue="Gestor de Cartera"/>
+  <Description DefaultValue="Seguimiento de la cartera de clientes, marcas y ventas por OV sobre el Excel en OneDrive."/>
+  <IconUrl DefaultValue="${u('assets/icon-32.png')}"/>
+  <HighResolutionIconUrl DefaultValue="${u('assets/icon-64.png')}"/>
+  <SupportUrl DefaultValue="${u('instalar.html')}"/>
+  <Hosts>
+    <Host Name="Workbook"/>
+  </Hosts>
+  <Requirements>
+    <Sets DefaultMinVersion="1.1">
+      <Set Name="ExcelApi" MinVersion="1.8"/>
+    </Sets>
+  </Requirements>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="${u('taskpane.html')}"/>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Workbook">
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="GC.GetStarted.Title"/>
+            <Description resid="GC.GetStarted.Description"/>
+            <LearnMoreUrl resid="GC.Help.Url"/>
+          </GetStarted>
+          <FunctionFile resid="GC.Commands.Url"/>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="GC.Group">
+                <Label resid="GC.Group.Label"/>
+                <Icon>
+                  <bt:Image size="16" resid="GC.Icon.16"/>
+                  <bt:Image size="32" resid="GC.Icon.32"/>
+                  <bt:Image size="80" resid="GC.Icon.80"/>
+                </Icon>
+                <Control xsi:type="Button" id="GC.Open">
+                  <Label resid="GC.Open.Label"/>
+                  <Supertip>
+                    <Title resid="GC.Open.Label"/>
+                    <Description resid="GC.Open.Tip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="GC.Icon.16"/>
+                    <bt:Image size="32" resid="GC.Icon.32"/>
+                    <bt:Image size="80" resid="GC.Icon.80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>GestorCartera</TaskpaneId>
+                    <SourceLocation resid="GC.Taskpane.Url"/>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="GC.Icon.16" DefaultValue="${u('assets/icon-16.png')}"/>
+        <bt:Image id="GC.Icon.32" DefaultValue="${u('assets/icon-32.png')}"/>
+        <bt:Image id="GC.Icon.80" DefaultValue="${u('assets/icon-80.png')}"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="GC.Commands.Url" DefaultValue="${u('commands.html')}"/>
+        <bt:Url id="GC.Taskpane.Url" DefaultValue="${u('taskpane.html')}"/>
+        <bt:Url id="GC.Help.Url" DefaultValue="${u('instalar.html')}"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="GC.GetStarted.Title" DefaultValue="Gestor de Cartera listo"/>
+        <bt:String id="GC.Group.Label" DefaultValue="Cartera"/>
+        <bt:String id="GC.Open.Label" DefaultValue="Gestor de Cartera"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="GC.GetStarted.Description" DefaultValue="Abre el panel desde Inicio → Gestor de Cartera."/>
+        <bt:String id="GC.Open.Tip" DefaultValue="Abre el panel de seguimiento de la cartera."/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>
+`;
+}
+function check() {
+  const b = base(), w = $('#warn');
+  w.hidden = /^https:\/\/[^\s]+\/$/.test(b);
+  w.textContent = 'La dirección debe empezar con https:// (Excel no acepta complementos sin conexión segura).';
+  return w.hidden;
+}
+$('#base').addEventListener('input', () => { check(); if (!$('#xml').hidden) $('#xml').textContent = manifest(base()); });
+$('#see').onclick = () => { $('#xml').hidden = !$('#xml').hidden; $('#xml').textContent = manifest(base()); };
+$('#dl').onclick = () => {
+  if (!check()) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([manifest(base())], { type: 'application/xml' }));
+  a.download = 'manifest.xml'; document.body.appendChild(a); a.click(); a.remove();
+};
+check();
+})();
+</script>
+</body>
+</html>
