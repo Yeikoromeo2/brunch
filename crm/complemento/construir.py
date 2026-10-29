@@ -76,6 +76,8 @@ rep("@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!
 
 # ---------- pantallas de acceso ----------
 rep_re(r'    <div class="demo"><b>Prototipo · usuarios de prueba</b>.*?</div>\n', "")
+rep('<button class="btn primary" id="lgBtn" type="submit" style="height:40px;justify-content:center">Entrar</button>',
+    '<button class="btn primary" id="lgBtn" type="submit" style="height:40px;justify-content:center">Entrar</button>\n    <button class="btn ghost" id="lgForgot" type="button" style="justify-content:center;font-size:12px">¿Olvidaste tu PIN? (administrador)</button>')
 rep('<p>Ingresa con tu nombre y tu PIN.</p>',
     '<p>Ingresa con tu nombre y tu PIN.</p><p class="ok-note" id="lgSheet"></p>')
 rep('<div class="cover" id="login">', '<div class="cover" id="login" hidden>')
@@ -154,6 +156,23 @@ COVERS = """
     <button class="btn ghost" id="winStay" type="button" style="justify-content:center">Seguir en este panel</button>
   </div>
 </div>
+
+<!-- RECUPERAR EL PIN DE UN ADMINISTRADOR CON UN CÓDIGO DE UN SOLO USO -->
+<div class="cover" id="recCover" hidden>
+  <form class="login" id="recForm" autocomplete="off">
+    <div class="logo"><svg><use href="#i-key"/></svg></div>
+    <div><h1>Recuperar PIN</h1><p>Solo para administradores. Usa el código de recuperación que te entregaron; sirve una sola vez en este libro.</p></div>
+    <label class="fl"><span>Tu nombre de usuario</span><input type="text" id="rcName" required></label>
+    <label class="fl"><span>Código de recuperación</span><input type="text" id="rcCode" placeholder="XXXX-XXXX-XXXX-XXXX" autocapitalize="characters" required></label>
+    <div class="two">
+      <label class="fl"><span>PIN nuevo</span><input type="password" id="rcPin" inputmode="numeric" required></label>
+      <label class="fl"><span>Repítelo</span><input type="password" id="rcPin2" inputmode="numeric" required></label>
+    </div>
+    <div class="err" id="rcErr"></div>
+    <button class="btn primary" id="rcBtn" type="submit" style="height:40px;justify-content:center">Cambiar PIN y entrar</button>
+    <button class="btn ghost" id="rcBack" type="button" style="justify-content:center">Volver al ingreso</button>
+  </form>
+</div>
 <div class="cover" id="loading">"""
 rep('<div class="cover" id="loading" hidden>', COVERS)
 rep('<div id="loadingTx">Cargando cartera…</div>', '<div id="loadingTx">Abriendo el libro…</div>')
@@ -225,13 +244,13 @@ rep("""    S.token = res.token; LS.set('lastName', res.name);
 rep("""function showLogin(msg) {
   $('#login').hidden = false; $('#loading').hidden = true;""",
     """function showCover(id) {
-  ['#login', '#setup', '#pinCover', '#probCover', '#winCover', '#lostCover', '#winLost'].forEach(s => $(s).hidden = s !== id);
+  ['#login', '#setup', '#pinCover', '#probCover', '#winCover', '#lostCover', '#winLost', '#recCover'].forEach(s => $(s).hidden = s !== id);
   $('#loading').hidden = true;
   const f = $(id).querySelector('input'); if (f) setTimeout(() => { const a = document.activeElement; if (!a || a === document.body) f.focus(); }, 50);
 }
 function showLogin(msg) {
   showCover('#login');""")
-rep("    $('#login').hidden = true;\n    $('#meName')", "    ['#login', '#setup', '#pinCover', '#probCover', '#winCover'].forEach(s => $(s).hidden = true);\n    $('#brandSheet').textContent = 'Excel · ' + d.sheet;\n    $('#meName')")
+rep("    $('#login').hidden = true;\n    $('#meName')", "    ['#login', '#setup', '#pinCover', '#probCover', '#winCover', '#recCover'].forEach(s => $(s).hidden = true);\n    $('#brandSheet').textContent = 'Excel · ' + d.sheet;\n    $('#meName')")
 
 # abrir enlaces: ventana real, o el navegador del sistema en Excel de escritorio
 rep("""  if (DEMO) return toast('En la versión real se abre ' + label + '. Se registró el intento.');
@@ -340,6 +359,22 @@ $('#pinForm').addEventListener('submit', async e => {
   $('#pnBtn').disabled = false;
 });
 $('#probRetry').onclick = () => boot();
+$('#lgForgot').onclick = () => { $('#rcName').value = $('#lgName').value; $('#rcErr').textContent = ''; showCover('#recCover'); };
+$('#rcBack').onclick = () => showLogin();
+$('#recForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const pin = $('#rcPin').value.trim();
+  if (pin !== $('#rcPin2').value.trim()) { $('#rcErr').textContent = 'Los PIN no coinciden.'; return; }
+  $('#rcErr').textContent = ''; $('#rcBtn').disabled = true;
+  try {
+    const res = await call('api_recover', $('#rcName').value, $('#rcCode').value, pin);
+    $('#rcCode').value = $('#rcPin').value = $('#rcPin2').value = '';
+    S.token = res.token; LS.set('lastName', res.name);
+    await loadAll(true);
+    toast('PIN cambiado. El código de recuperación ya no sirve en este libro.');
+  } catch (er) { $('#rcErr').textContent = er.message; }
+  $('#rcBtn').disabled = false;
+});
 
 /* ---------- ventana aparte: el panel queda de puente y guarda en el libro ---------- */
 if (window.GC_BRIDGE) $('#bWin').hidden = true;

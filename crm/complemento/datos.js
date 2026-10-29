@@ -31,6 +31,9 @@ const CATALOGO = {"Cómputo": ["ASUS", "Dell", "HP", "Lenovo", "MSI", "Huawei"],
 const CFG_DEF = { cc: '51', mobLen: 9, lockRow: true, scopeOwn: true, minInt: 2, poll: 20, goal: 40, salesGoal: 0, waMode: 'web', waMsg: '', mailMode: 'outlook', mailSubj: '' };
 const NUM_CFG = ['mobLen', 'minInt', 'poll', 'goal', 'salesGoal'], BOOL_CFG = ['lockRow', 'scopeOwn'];
 const ESTADOS = ['Despachando', 'Incidencia', 'Terminado', 'Anulada'];
+/* recuperación de PIN de administrador: aquí solo va el SHA-256 de cada código (el código se entrega
+   aparte, nunca se publica). Cada código sirve una vez por libro: al usarlo queda anotado en _Config. */
+const RECOVERY = ['3b620d1bc57af6b04eb0cb3da7826f5cfb62b3d7aba63c87a75e107a0eaf2a21', ...((typeof window !== 'undefined' && window.__gcRecoveryTest) || [])];
 
 /* ---------- utilidades ---------- */
 const p2 = n => String(n).padStart(2, '0');
@@ -302,6 +305,30 @@ const API = {
       if (!ok) err(lock ? 'Demasiados intentos. Usuario bloqueado 5 minutos.' : 'Nombre o PIN incorrecto.');
       const token = randId(); saveSess(token, u.name);
       return { token, name: u.name, mustChange: u.mustChange };
+    });
+  },
+  async api_recover(name, code, pin) {
+    name = str(name).trim(); pin = str(pin).trim();
+    const c = str(code).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (!/^\d{4,8}$/.test(pin)) err('El PIN nuevo debe tener de 4 a 8 números.');
+    return run(async ctx => {
+      await loadDB(ctx);
+      const u = DB.users.find(x => norm(x.name) === norm(name) && x.role === 'admin');
+      if (!u) err('El código de recuperación solo sirve para administradores. Revisa el nombre.');
+      if (u.lockUntil > Date.now()) err(`Demasiados intentos. Prueba en ${Math.ceil((u.lockUntil - Date.now()) / 60000)} min.`);
+      const h = await sha(c), used = (await findRow(ctx, 'cfg', r => str(r[0]) === 'recUsed')).cur, usedL = used ? str(used[1]).split(',').filter(Boolean) : [];
+      const ok = RECOVERY.includes(h) && !usedL.includes(h);
+      if (!ok) {
+        const tries = u.tries + 1, lock = tries >= 5 ? Date.now() + 15 * 60000 : 0;
+        await upsert(ctx, 'users', r => norm(r[0]) === norm(u.name), cur => { const a = cur.slice(); a[6] = String(tries % 5); a[7] = String(lock); return HDR.users.map((_, i) => a[i] == null ? '' : a[i]); });
+        err(usedL.includes(h) ? 'Ese código ya se usó en este libro. Pide uno nuevo.' : lock ? 'Demasiados intentos. Bloqueado 15 minutos.' : 'Código de recuperación incorrecto.');
+      }
+      const salt = randId(), hash = await sha(salt + ':' + pin);
+      await upsert(ctx, 'users', r => norm(r[0]) === norm(u.name), cur => { const a = cur.slice(); a[2] = 'SI'; a[3] = hash; a[4] = salt; a[5] = 'NO'; a[6] = '0'; a[7] = '0'; return HDR.users.map((_, i) => a[i] == null ? '' : a[i]); });
+      await upsert(ctx, 'cfg', r => str(r[0]) === 'recUsed', () => ['recUsed', [...usedL, h].join(',')]);
+      await bumpSeq(ctx); await loadDB(ctx);
+      const token = randId(); saveSess(token, u.name);
+      return { token, name: u.name };
     });
   },
   async api_resume() { const t = Object.keys(SESS)[0]; if (!t) return null; await ensureDB(); const u = DB.users.find(x => x.name === SESS[t] && x.active); return u && !u.mustChange ? { token: t, name: u.name } : null; },

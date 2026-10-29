@@ -46,6 +46,7 @@ Si «Cargar mi complemento» no aparece, la organización lo tiene bloqueado y s
 2. La primera persona que abre el panel ve **Configurar este libro**: escribe su nombre y un PIN y queda como **administrador**. En ese momento se crean las pestañas internas (`_Config`, `_Usuarios`, `_Seguimiento`, `_ClienteMarcas`, `_Marcas`, `_Ordenes`, `_Ventas`, `_Historial`, `_Telefonos`, `_Asignaciones`) como **muy ocultas**.
 3. El administrador abre **Usuarios** y crea a cada ejecutivo con un **PIN temporal**. Al entrar por primera vez, el sistema le pide crear su propio PIN.
 4. Cinco PIN incorrectos seguidos bloquean al usuario durante 5 minutos. Si alguien olvida su PIN, el administrador le asigna uno temporal nuevo.
+5. **Si un administrador olvida su PIN:** otro administrador le asigna uno temporal. Si no hay otro, en la pantalla de ingreso pulsa **¿Olvidaste tu PIN? (administrador)** y usa el **código de recuperación** que te entregaron (sirve una sola vez por libro; cinco intentos fallidos bloquean 15 minutos). En el código publicado solo está la versión cifrada del código, nunca el código. Conviene tener siempre **dos administradores**.
 
 ## Mi día y borradores
 

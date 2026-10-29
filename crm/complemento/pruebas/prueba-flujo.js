@@ -29,7 +29,8 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   page.on('pageerror', e => errors.push(e.message)); page.on('console', m => LOGS.push(m.text()));
   page.on('dialog', d => d.accept());
   /* trozos chicos para que el puente de la ventana pruebe el armado de mensajes grandes */
-  await context.addInitScript(seed => { window.__seed = seed; window.GC_CHUNK = 2000; }, SEED);
+  /* código de recuperación solo para la prueba (PRUEBA-PRUEBA-2345); el real nunca está en el repositorio */
+  await context.addInitScript(seed => { window.__seed = seed; window.GC_CHUNK = 2000; window.__gcRecoveryTest = ['fb455aa8291966a9e722399227c33ba659f454f4092eec78007caff8fef083a8']; }, SEED);
   await context.route('**/*', route => {
     const u = new URL(route.request().url());
     if (u.hostname === 'appsforoffice.microsoft.com') return route.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(path.join(__dirname, 'office-mock.js'), 'utf8') });
@@ -219,7 +220,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   let [win] = await Promise.all([page.waitForEvent('popup'), page.click('#bWin')]);
   win.on('pageerror', e => errors.push('ventana: ' + e.message)); win.on('dialog', d => d.accept());
   await win.setViewportSize({ width: 1500, height: 900 });
-  await win.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana');
+  await win.waitForFunction(() => { const m = document.querySelector('#meName'); return m && m.textContent === 'Ana'; });
   ok(await page.isVisible('#winCover'), 'El panel de Excel muestra «Abierto en otra ventana»');
   ok((await page.evaluate(() => window.__book.raw.cartReads)) === reads0, 'Al abrir la ventana grande no se vuelve a leer la cartera de Excel');
   ok(await win.isHidden('#bWin'), 'La ventana no ofrece abrir otra ventana');
@@ -246,7 +247,8 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   if (SHOTS) await win.screenshot({ path: path.join(SHOTS, '09-ventana.png') });
   /* si el panel de Excel deja de responder, la ventana lo avisa en vez de quedarse guardando */
   await page.evaluate(() => { window.__fromChildOk = window.__fromChild; window.__fromChild = () => { throw new Error('panel cerrado'); }; });
-  await win.click('#bReload');
+  /* la ventana puede detectarlo sola en su revisión automática; si no, al pulsar Recargar */
+  await win.evaluate(() => document.querySelector('#bReload').click());
   await win.waitForSelector('#lostCover:not([hidden])', { timeout: 5000 }).catch(() => {});
   ok(await win.isVisible('#lostCover'), 'Sin el panel de Excel la ventana muestra «Sin conexión con Excel»');
   if (SHOTS) await win.screenshot({ path: path.join(SHOTS, '10-ventana-sin-panel.png') });
@@ -256,10 +258,11 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.evaluate(() => sessionStorage.setItem('__mockDelay', '300'));
   [win] = await Promise.all([page.waitForEvent('popup', { timeout: 15000 }), page.reload()]);
   ok(oldWin.isClosed(), 'Si Excel recarga el panel, la ventana grande desconectada se cierra');
-  const winFast = await win.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana' ? document.querySelector('#syncTx').textContent : false, null, { timeout: 6000 }).then(h => h.jsonValue()).catch(() => '');
-  await win.waitForFunction(() => /Sincronizado/.test(document.querySelector('#syncTx').textContent), null, { timeout: 8000 }).catch(() => {});
+  const winFast = await win.waitForFunction(() => { const m = document.querySelector('#meName'); return m && m.textContent === 'Ana' ? document.querySelector('#syncTx').textContent : false; }, null, { timeout: 6000 }).then(h => h.jsonValue()).catch(() => '');
+  await win.waitForFunction(() => { const x = document.querySelector('#syncTx'); return x && /Sincronizado/.test(x.textContent); }, null, { timeout: 8000 }).catch(() => {});
   await page.evaluate(() => sessionStorage.removeItem('__mockDelay'));
-  ok(winFast === 'Actualizando…' && await page.isVisible('#winCover'), 'Y se reabre sola, al instante desde su copia, sin pedir nada');
+  const wc = await page.isVisible('#winCover');
+  ok(winFast === 'Actualizando…' && wc, 'Y se reabre sola, al instante desde su copia, sin pedir nada' + (winFast === 'Actualizando…' && wc ? '' : ` [estado ventana: «${winFast}», aviso en panel: ${wc}]`));
   ok((await page.evaluate(() => window.__book.raw.cartReads)) === readsR + 1, 'Solo se relee la cartera una vez (por la recarga del panel); la ventana no suma lecturas');
   /* si el navegador bloquea la reapertura, el panel ofrece el botón */
   await page.evaluate(() => sessionStorage.setItem('__mockNoPopup', '1'));
@@ -268,7 +271,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok(win.isClosed() && await page.isVisible('#winLost'), 'Si el navegador bloquea la reapertura, el panel ofrece «Volver a abrir la ventana grande»');
   await page.evaluate(() => sessionStorage.removeItem('__mockNoPopup'));
   [win] = await Promise.all([page.waitForEvent('popup'), page.click('#winReopen')]);
-  await win.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana');
+  await win.waitForFunction(() => { const m = document.querySelector('#meName'); return m && m.textContent === 'Ana'; });
   ok(await page.isVisible('#winCover'), 'Con un clic se vuelve a abrir y funciona');
   const reads2 = await page.evaluate(() => window.__book.raw.cartReads);
   await page.click('#winClose');
@@ -280,6 +283,26 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   /* 11. Harold entra con PIN temporal y ve solo su cartera */
   await page.click('#bOut');
   await page.waitForSelector('#login:not([hidden])'); await page.waitForTimeout(120);
+  /* 10c. un administrador que olvidó su PIN lo recupera con un código de un solo uso */
+  await page.click('#lgForgot'); await page.waitForTimeout(120);
+  await page.fill('#rcName', 'Harold'); await page.fill('#rcCode', 'PRUEBA-PRUEBA-2345'); await page.fill('#rcPin', '7777'); await page.fill('#rcPin2', '7777');
+  await page.click('#rcBtn'); await page.waitForTimeout(200);
+  ok(/solo sirve para administradores/.test(await page.textContent('#rcErr')), 'La recuperación no sirve para usuarios que no son administradores');
+  await page.fill('#rcName', 'Ana'); await page.fill('#rcCode', 'AAAA-BBBB-CCCC-DDDD'); await page.click('#rcBtn'); await page.waitForTimeout(200);
+  ok(/incorrecto/.test(await page.textContent('#rcErr')), 'Un código equivocado se rechaza');
+  await page.fill('#rcCode', 'prueba prueba 2345'); await page.click('#rcBtn');
+  await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana' && document.querySelector('#recCover').hidden);
+  ok(true, 'Con el código correcto el administrador cambia su PIN y entra');
+  await page.click('#bOut'); await page.waitForSelector('#login:not([hidden])'); await page.waitForTimeout(120);
+  await page.fill('#lgName', 'Ana'); await page.fill('#lgPin', '7777'); await page.click('#lgBtn');
+  await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana' && document.querySelector('#login').hidden);
+  ok(true, 'Y luego entra normal con su PIN nuevo');
+  await page.click('#bOut'); await page.waitForSelector('#login:not([hidden])'); await page.waitForTimeout(120);
+  await page.click('#lgForgot'); await page.waitForTimeout(120);
+  await page.fill('#rcName', 'Ana'); await page.fill('#rcCode', 'PRUEBA-PRUEBA-2345'); await page.fill('#rcPin', '8888'); await page.fill('#rcPin2', '8888');
+  await page.click('#rcBtn'); await page.waitForTimeout(200);
+  ok(/ya se usó/.test(await page.textContent('#rcErr')), 'El mismo código no sirve dos veces en el libro');
+  await page.click('#rcBack'); await page.waitForTimeout(120);
   await page.fill('#lgName', 'harold'); await page.fill('#lgPin', '0000'); await page.click('#lgBtn'); await page.waitForTimeout(150);
   ok(/incorrecto/.test(await page.textContent('#lgErr')), 'PIN incorrecto rechazado');
   await page.fill('#lgPin', '1111'); await page.click('#lgBtn');
@@ -327,7 +350,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   console.log(fails.length ? `\n${fails.length} prueba(s) fallaron` : '\nTodas las pruebas pasaron');
   process.exit(fails.length ? 1 : 0);
 })().catch(async e => {
-  console.error(e.message.split('\n').slice(0, 4).join(' | '));
+  console.error(e.message.split('\n').slice(0, 12).join(' | '));
   try { console.error('Estado:', await PAGE.evaluate(() => ({ toast: document.querySelector('#toast').textContent, covers: [...document.querySelectorAll('.cover')].filter(c => !c.hidden).map(c => c.id), pnErr: document.querySelector('#pnErr').textContent, lgErr: document.querySelector('#lgErr').textContent, me: document.querySelector('#meName').textContent, runs: window.__book.raw.runs, pnBtn: document.querySelector('#pnBtn').disabled, pin: document.querySelector('#pnPin').value, users: window.__book.dump('_Usuarios') }))); } catch (er) {}
   console.error(LOGS.slice(-8).join('\n'));
   process.exit(1);
