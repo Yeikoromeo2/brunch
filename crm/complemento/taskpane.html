@@ -298,6 +298,61 @@ kbd{font:10px var(--fm);padding:1px 5px;border:1px solid var(--line2);border-bot
 .rz{position:absolute;top:0;right:-3px;bottom:0;width:7px;cursor:col-resize;z-index:3}
 .rz:hover,body.resizing .rz{background:color-mix(in srgb,var(--accent) 35%,transparent)}
 body.resizing{cursor:col-resize;user-select:none}
+.psplit{width:7px;flex:none;cursor:col-resize;background:var(--surface2);border-left:1px solid var(--line);position:relative}
+.psplit::after{content:"";position:absolute;left:2px;top:50%;width:2px;height:34px;margin-top:-17px;border-radius:2px;background:var(--line2)}
+.psplit:hover,body.resizing .psplit{background:var(--accent-soft)}
+.psplit[hidden]{display:none}
+.okchk{display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding:1px 8px 1px 6px;border-radius:999px;background:color-mix(in srgb,var(--good) 16%,var(--surface));color:var(--good-ink);font-size:11px;font-weight:700;letter-spacing:0;text-transform:none;animation:okin .25s ease both, okout .4s ease 2.2s forwards}
+.okchk svg{width:12px;height:12px}
+@keyframes okin{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+@keyframes okout{to{opacity:0}}
+.ovigv{font-size:12px;color:var(--ink2);text-align:right;margin-top:-4px}
+.ovmore{font-size:12px;color:var(--ink2)}
+.ovmore summary{cursor:pointer;padding:4px 0}
+.ovmore[open]{display:flex;flex-direction:column;gap:8px}
+.curcmt p{display:flex;gap:6px;align-items:flex-start}
+.curcmt p > span{flex:1}
+.curcmt .ce{flex:none;opacity:.55}
+.curcmt p:hover .ce{opacity:1}
+.cmtedit{display:flex;flex-direction:column;gap:6px;width:100%}
+.cmtedit textarea{min-height:60px}
+.cmtedit div{display:flex;gap:6px;justify-content:flex-end}
+.uchips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--ink2)}
+.kpick{cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}
+.kpick:hover{border-color:var(--accent);transform:translateY(-1px)}
+.kpick.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.dsel{border-left:4px solid var(--accent)}
+.dsu{cursor:pointer}
+.rtab{width:100%;border-collapse:collapse;font-size:12.5px}
+.rtab th{text-align:left;font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;border-bottom:1px solid var(--line)}
+.rtab td{padding:7px 8px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.rtab td.n{text-align:right}
+.combo{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+.combo .pl{display:inline-flex;gap:4px;flex-wrap:wrap;flex:1}
+.combo .pl span{border:1px solid var(--line2);border-radius:999px;padding:1px 8px;font-weight:600;font-size:12px}
+.combo small{color:var(--muted);white-space:nowrap}
+.efbar{position:relative;z-index:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:9px 12px}
+.efbar .t{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
+.efbar .tr{height:8px;border-radius:4px;background:rgba(255,255,255,.2);overflow:hidden}
+.efbar .tr i{display:block;height:100%;background:#fff;border-radius:4px;transition:width .8s}
+.drank{position:relative;z-index:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:9px 12px;font-size:12px}
+.drank .rt{font-weight:700;margin-bottom:4px}
+.drank .drr{display:grid;grid-template-columns:18px 1fr auto;gap:6px;padding:3px 0;border-top:1px solid rgba(255,255,255,.12)}
+.drank .drr.you{font-weight:700}
+.motl{display:flex;flex-direction:column;gap:6px}
+.motl button{justify-content:flex-start;height:38px}
+.dupbar{margin:10px 18px 0;padding:8px 10px;border-radius:9px;background:color-mix(in srgb,var(--serious) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--serious) 35%,var(--line));font-size:12.5px;display:flex;flex-direction:column;gap:4px}
+.dupbar a{cursor:pointer;color:var(--ink);text-decoration:underline}
+.wtpl{margin-top:8px}
+.qlist{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.qi{display:grid;grid-template-columns:1fr auto;gap:4px 8px;border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:12.5px}
+.qi .m{grid-column:1/-1;color:var(--muted);font-size:12px}
+.qi .st{font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--surface3)}
+.qi .st.Ganada{background:color-mix(in srgb,var(--good) 16%,var(--surface));color:var(--good-ink)}
+.qi .st.Perdida{background:color-mix(in srgb,var(--crit) 12%,var(--surface));color:var(--crit)}
+.qi .ac{grid-column:1/-1;display:flex;gap:6px}
+.qi .ac .btn{height:28px}
+.qform{display:flex;flex-direction:column;gap:8px;margin-top:6px}
 .demo{font-size:12px;color:var(--ink2);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
 .demo b{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .demo button{border:1px solid var(--line2);background:var(--surface);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;text-align:left}
@@ -306,7 +361,17 @@ body.resizing{cursor:col-resize;user-select:none}
 .spin{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:sp .8s linear infinite;margin:0 auto 12px}
 
 /* Mi día */
-#vDay{overflow:auto;padding:20px;flex-direction:column;align-items:center}
+#vDay{overflow:hidden;padding:16px;flex-direction:column}
+.day2{flex:1;display:grid;grid-template-columns:300px minmax(0,1fr) minmax(0,1fr);gap:16px;min-height:0;width:100%}
+.hero.vert{grid-template-columns:1fr;align-content:start;gap:14px;overflow:auto}
+.hero.vert .hstats{grid-template-columns:1fr 1fr}
+.hero.vert .ring{justify-self:center}
+.hero.vert .hbtns{display:flex;flex-direction:column;gap:8px;position:relative;z-index:1}
+.hero.vert .hbtns .btn{justify-content:center;height:38px;background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.25);color:#fff}
+.hero.vert .hbtns .btn.primary{background:#fff;color:var(--hero-a);border-color:#fff}
+.dcol{display:flex;flex-direction:column;gap:10px;min-height:0;min-width:0}
+.dscroll{flex:1;overflow:auto;min-height:0;padding:2px 4px 2px 0;display:flex;flex-direction:column;gap:6px}
+@media (max-width:1000px){#vDay{overflow:auto}.day2{grid-template-columns:minmax(0,1fr)}.dscroll{overflow:visible;flex:none}}
 .day{width:100%;max-width:920px;display:flex;flex-direction:column;gap:16px}
 .hero{position:relative;overflow:hidden;border-radius:14px;padding:22px 24px;color:#fff;background:linear-gradient(135deg,var(--hero-a),var(--hero-b));box-shadow:var(--shadow-lg);display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}
 .hero::after{content:"";position:absolute;right:-60px;top:-90px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.16),transparent 65%);pointer-events:none}
@@ -855,6 +920,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
   <section class="view" id="vDay"></section>
   <section class="view on" id="vList">
     <div id="grid" tabindex="0"><div id="ghead"></div><div id="gbody"></div></div>
+    <div class="psplit" id="pSplit" title="Arrastra para cambiar el ancho del detalle"></div>
     <aside id="panel"><div class="p-empty">Selecciona una fila para ver el detalle.</div></aside>
   </section>
   <section class="view" id="vBrands"></section>
@@ -868,7 +934,15 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
   <h2 id="mResvT">Repartir cartera</h2>
   <div class="mb">
     <div class="hint" style="margin:0">Cada ejecutivo ve y trabaja solo los clientes que le asignes. Se guarda por Customer ID: aunque alguien ordene o filtre la hoja, cada cliente sigue con su ejecutivo. La columna «Ejecutivo» de la cartera no se modifica.</div>
-    <div class="seg2" id="rpMode"><button class="on" data-m="rows" type="button">Por filas</button><button data-m="alt" type="button">Alternado entre varios</button><button data-m="clear" type="button">Quitar asignación</button></div>
+    <div class="seg2" id="rpMode"><button class="on" data-m="rows" type="button">Por filas</button><button data-m="alt" type="button">Alternado entre varios</button><button data-m="clear" type="button">Quitar asignación</button><button data-m="stale" type="button">Reasignar sin gestión</button></div>
+    <div class="box" id="rpStale" hidden>
+      <div class="two">
+        <label class="fl"><span>Sin gestión hace (días)</span><input type="number" id="rpDays" min="1" value="15"></label>
+        <label class="fl"><span>Clientes de</span><select id="rpFromU"></select></label>
+      </div>
+      <div class="fl"><span>Pasarlos, en turno, a</span><div class="rpus" id="rpToUs"></div></div>
+      <div class="hint" style="margin:0">Solo cuentan los clientes asignados hace más de esos días que nadie gestionó desde entonces. Nunca se pasan al mismo ejecutivo que los tenía.</div>
+    </div>
     <div class="box" id="rpRows">
       <label class="fl"><span>Filas (como al imprimir)</span><input type="text" id="rpSpec" placeholder="Ej.: 2-500, 650, 700-900"></label>
       <label class="fl" id="rpUserWrap"><span>Para</span><select id="rpUser"></select></label>
@@ -911,11 +985,13 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
         <div class="two">
           <label class="fl"><span>Intentos para reporte «No contestaron»</span><input type="number" id="cMin" min="1" max="20"></label>
           <label class="fl"><span>Meta diaria de gestiones</span><input type="number" id="cGoal" min="1" max="500"></label>
-          <label class="fl"><span>Meta mensual de venta por ejecutivo (S/ sin IGV)</span><input type="number" id="cSGoal" min="0" step="1000"></label>
+          <label class="fl"><span>Meta diaria de clientes efectivos</span><input type="number" id="cGoalEf" min="0" max="500"></label>
+          <label class="fl"><span>Meta mensual de venta por ejecutivo (US$ sin IGV)</span><input type="number" id="cSGoal" min="0" step="1000"></label>
         </div>
         <label class="fl"><span>Sincronizar cada (seg.)</span><input type="number" id="cPoll" min="10" max="300"></label>
         <label class="fl"><span>WhatsApp sugerido al equipo (cada persona elige el suyo)</span><select id="cWa"><option value="web">WhatsApp Web (no requiere instalar)</option><option value="wame">Automático (wa.me)</option><option value="app">Aplicación de escritorio</option></select></label>
         <label class="fl"><span>Mensaje inicial de WhatsApp</span><textarea id="cMsg" placeholder="Hola {legal}, le saluda {ejecutivo}…"></textarea></label>
+        <label class="fl"><span>Plantillas de WhatsApp (una por línea: Nombre | mensaje)</span><textarea id="cTpl" placeholder="Promo JBL | Hola {legal}, esta semana tenemos JBL con precio especial…&#10;Reactivar | Hola {legal}, hace tiempo no te vemos…"></textarea></label>
         <label class="fl"><span>Abrir correo con</span><select id="cMail"><option value="outlook">Outlook web (Office 365)</option><option value="gmail">Gmail web</option><option value="mailto">Programa predeterminado</option></select></label>
         <label class="fl"><span>Asunto del correo</span><input type="text" id="cSubj" placeholder="Atención cliente {id} – {legal}"></label>
         <div class="hint" style="margin:0">Variables: {legal} {id} {state} {city} {ejecutivo} {marca}</div>
@@ -965,6 +1041,13 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
     </div>
     <label class="ck"><input type="checkbox" id="waRemember" checked> Recordar en este equipo (se cambia en Ajustes)</label>
   </div>
+  <div class="mf"><button class="btn ghost" data-close>Cancelar</button></div>
+</div></div>
+
+<!-- Motivo obligatorio de «No interesado» y «Número errado» -->
+<div class="modal-bg" id="mMot"><div class="modal" role="dialog" aria-labelledby="mMotT">
+  <h2 id="mMotT">¿Por qué?</h2>
+  <div class="mb"><div class="hint" style="margin:0" id="motTx"></div><div class="motl" id="motList"></div></div>
   <div class="mf"><button class="btn ghost" data-close>Cancelar</button></div>
 </div></div>
 
@@ -1036,7 +1119,7 @@ function call(fn, ...args) {
 }
 
 /* ---------- estado ---------- */
-const S = { stf: { per: '30', exec: '', tipo: '', cat: '', state: '' }, asg: {}, drafts: {}, phMap: {}, ovMap: {}, token: '', me: null, cfg: {}, header: [], C: {}, rows: [], byKey: new Map(), view: [], active: null, st: 'all', tab: 'list',
+const S = { quotes: [], qf: null, dups: { tax: new Map(), tel: new Map() }, stf: { per: '30', exec: '', tipo: '', cat: '', state: '' }, asg: {}, drafts: {}, phMap: {}, ovMap: {}, token: '', me: null, cfg: {}, header: [], C: {}, rows: [], byKey: new Map(), view: [], active: null, st: 'all', tab: 'list',
   assigns: [], users: [], seq: 0, lastRow: 0, today: '', pending: 0, cmtT: {}, needReload: false, activity: null, activityAt: 0, rep: { type: 'noc' }, sheets: [], fixOpen: null, phDraft: '', brands: [], catOf: {}, cats: [], catOpen: false, addRel: 'habitual', scoped: false, total: 0, bf: { q: '', cat: '', marca: '', rel: '', exec: '', tipo: '', empty: false, mode: 'cli' }, orders: [], sales: [], ov: null, dashMode: 'gest', sf: { per: 'mes', marca: '', cat: '', exec: '', tipo: '' } };
 
 /* ---------- utilidades ---------- */
@@ -1044,7 +1127,9 @@ const norm = s => String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const icon = id => `<svg><use href="#i-${id}"/></svg>`;
 const fmtN = n => (n || 0).toLocaleString('es-PE');
-const money = n => 'S/ ' + Math.round(Number(String(n == null ? '' : n).replace(/[^\d.-]/g, '')) || 0).toLocaleString('es-PE');
+/* las ventas se registran en dólares y siempre sin IGV; el IGV (18 %) se calcula aparte */
+const IGV = 0.18;
+const money = n => 'US$ ' + (Number(String(n == null ? '' : n).replace(/[^\d.-]/g, '')) || 0).toLocaleString('es-PE', { maximumFractionDigits: 2 });
 const pct = (a, b) => b ? Math.round(a / b * 1000) / 10 : 0;
 const p2 = n => String(n).padStart(2, '0');
 const nowStr = () => { const d = new Date(); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}`; };
@@ -1259,9 +1344,9 @@ async function loadAll(first, quiet, pre) {
     if (d.same) { S.needReload = false; setSync('', 'Sincronizado'); startPoll(); $('#loading').hidden = true; return; }
     if (!pre) CACHE.set({ name: d.me.name, token: S.token, d });
     S.me = d.me; S.drafts = LS.get('drafts:' + d.me.name, {}); S.cfg = d.cfg; S.header = d.header; S.C = d.C; S.assigns = d.assigns; S.users = d.users;
-    S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false; S.brands = d.brands; S.orders = d.orders || []; S.sales = d.sales || []; S.asg = d.asg || {}; S.scoped = !!d.scoped; S.total = d.total || d.rows.length; fillBrandLists();
+    S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false; S.brands = d.brands; S.orders = d.orders || []; S.sales = d.sales || []; S.asg = d.asg || {}; S.quotes = d.quotes || []; S.scoped = !!d.scoped; S.total = d.total || d.rows.length; fillBrandLists();
     S.rows = d.rows.map(([k, r, v]) => ({ k, r, v, t: Object.assign(emptyT(), d.track[k] || {}), hay: null, _vi: null }));
-    S.byKey = new Map(S.rows.map(r => [r.k, r]));
+    S.byKey = new Map(S.rows.map(r => [r.k, r])); buildDups();
     ['#login', '#setup', '#pinCover', '#probCover', '#winCover', '#recCover'].forEach(s => $(s).hidden = true);
     $('#brandSheet').textContent = 'Excel · ' + d.sheet;
     $('#meName').textContent = S.me.name; $('#meRole').textContent = isAdmin() ? 'Administrador' : 'Ejecutivo';
@@ -1354,10 +1439,11 @@ function applyLocal(r, p) {
   const t = r.t;
   switch (p.op) {
     case 'comment': { const prev = val(r, 'comment').trim(), n = nowStr(), line = `${n.slice(8, 10)}/${n.slice(5, 7)} ${S.me.name}: ${p.val}`; r.v[S.C.comment] = prev ? line + ' | ' + prev : line; break; }
+    case 'editcmt': { const parts = val(r, 'comment').split(' | '), m = String(p.val.old).match(/^(\d{2}\/\d{2} [^:]+: )/); parts[p.val.i] = (m ? m[1] : '') + p.val.txt; r.v[S.C.comment] = parts.join(' | '); break; }
     case 'rev': t.rev = !!p.val; break;
     case 'buy': t.buy = !!p.val; if (p.val) t.rev = true; break;
     case 'result': t.res = p.val || ''; if (p.val) t.rev = true; t.next = p.val === 'Volver a llamar' ? (p.date || t.next || tomorrow()) : '';
-      if (p.val !== 'No interesado') t.motivo = '';
+      t.motivo = ['No interesado', 'Número errado'].includes(p.val) ? (p.motivo || '') : '';
       if (p.val === 'No contesta' && (!t.lastc || Date.now() - new Date(t.lastc.replace(' ', 'T')).getTime() > 15 * 60000)) { t.int++; t.lastc = nowStr(); } break;
     case 'next': t.next = p.val || ''; break;
     case 'motivo': t.motivo = p.val || ''; break;
@@ -1379,7 +1465,7 @@ async function send(r, p) {
   applyLocal(r, p); refreshRow(r, true); if (r === S.active) renderPanel(true); updStripSoon();
   S.pending++; setSync('saving');
   try {
-    const res = await call('api_action', S.token, { k: r.k, op: p.op, val: p.val, date: p.date });
+    const res = await call('api_action', S.token, { k: r.k, op: p.op, val: p.val, date: p.date, motivo: p.motivo });
     if (!res.ok) toast(res.error, true);
     applyState(res.state);
   } catch (e) {
@@ -1388,7 +1474,7 @@ async function send(r, p) {
   }
   S.pending--;
   if (!S.pending) setSync('', 'Guardado');
-  updStripSoon(); updDayBadge();
+  updStripSoon(); updDayBadge(); updBell(true);
   return true;
 }
 /* el comentario nunca reemplaza al anterior: se agrega con fecha y usuario */
@@ -1401,11 +1487,15 @@ function setDraft(k, v) {
   const r = S.byKey.get(k); if (r) setRowClass(r);
   const b = $('#pDraft'); if (b && S.active && S.active.k === k) b.hidden = !S.drafts[k];
 }
+/* «28/10 Luis: texto»: cada uno edita los suyos; el administrador, cualquiera */
+const cmtAuthor = x => { const m = String(x).match(/^\d{2}\/\d{2} ([^:]+): /); return m ? m[1].trim() : ''; };
+const cmtBody = x => String(x).replace(/^\d{2}\/\d{2} [^:]+: /, '');
+const canEditCmt = x => isAdmin() || cmtAuthor(x) === S.me.name;
 function addComment(r, text) {
   text = String(text || '').trim();
   if (!text) return Promise.resolve(false);
   if (lockedBy(r)) { toast(lockedBy(r), true); return Promise.resolve(false); }
-  return send(r, { op: 'comment', val: text }).then(ok => { if (ok) toast('Comentario agregado. Los anteriores se conservan.'); return ok; });
+  return send(r, { op: 'comment', val: text }).then(ok => { if (ok) flashOk('cmt', r); return ok; });
 }
 function queueComment(r, text, from) {
   if (lockedBy(r)) return;
@@ -1486,7 +1576,7 @@ function act(r, a, n) {
     const all = phonesOf(r);
     const p = n != null ? all[n] : all.find(x => x.wa);
     if (!p || !p.wa) return toast('Este cliente no tiene un celular válido', true);
-    const msg = tpl(S.cfg.waMsg, r).trim(), t = msg ? encodeURIComponent(msg) : '';
+    const tp = tplList().find(x => x.n === UI.waTplSel), msg = tpl(tp ? tp.t : S.cfg.waMsg, r).trim(), t = msg ? encodeURIComponent(msg) : '';
     openWa(p.wa, t, 'WhatsApp con +' + p.wa, () => send(r, { op: 'contact', val: 'WhatsApp ' + p.wa }));
   } else if (a === 'mail') {
     if (lk) return toast(lk, true);
@@ -1513,17 +1603,29 @@ function act(r, a, n) {
   else if (a === 'buy') { if (lk) return toast(lk, true); if (!S.ov || S.ov.k !== r.k) act(r, 'ovopen'); toast(r.t.buy ? 'Para sumar otra compra registra su OV.' : 'Registra la OV con sus marcas y montos sin IGV para marcar la compra.'); }
   else if (a === 'res') {
     const v = n || '';
+    if (v === 'No interesado' || v === 'Número errado') return askMotivo(r, v);
     send(r, { op: 'result', val: v, date: v === 'Volver a llamar' ? (r.t.next || tomorrow()) : '' });
     if (v === 'Número errado') { S.fixOpen = r; S.phDraft = ''; }
     if (v === 'Contestó' && !r.t.tipo && !(r.t.brands || []).length) toast('Marca el tipo de negocio o al menos una marca para que cuente como cliente efectivo.');
   } else if (a === 'unlock') { if (confirm('¿Liberar este cliente para que otra persona lo pueda gestionar?')) send(r, { op: 'unlock' }); }
   else if (a === 'brandfocus') { const i = $('#pBrand'); if (i) { i.focus(); i.scrollIntoView({ block: 'center' }); } }
-  else if (a === 'ovopen') { if (lk) return toast(lk, true); S.ov = S.ov && S.ov.k === r.k ? null : { k: r.k, num: '', date: S.today, nota: '', lines: brandsBy(r, 'habitual').length === 1 ? [{ b: brandsBy(r, 'habitual')[0], m: '' }] : [] }; renderPanel(true); const i = $('#oNum'); if (i) i.focus(); }
+  else if (a === 'ovopen') { if (lk) return toast(lk, true); S.ov = S.ov && S.ov.k === r.k ? null : { k: r.k, num: '', date: S.today, nota: '', lines: brandsBy(r, 'habitual').length === 1 ? [{ b: brandsBy(r, 'habitual')[0], m: '' }] : [] }; renderPanel(true); const i = $('#oQuick'); if (i) i.focus(); }
   else if (a === 'ovpick') { const ex = S.ov.lines.findIndex(l => l.b === n); if (ex >= 0 && !S.ov.lines[ex].m) S.ov.lines.splice(ex, 1); else ovLineAdd(n); S.ov.num = $('#oNum').value; renderPanel(true); const i = $(`.oamt[data-i="${S.ov.lines.findIndex(l => l.b === n)}"]`); if (i) i.focus(); }
   else if (a === 'ovrm') { S.ov.num = $('#oNum').value; S.ov.lines.splice(+n, 1); renderPanel(true); }
   else if (a === 'ovsave') ovSave(r);
   else if (a === 'ovst') { const [ov, est] = n.split('|'); if (est === 'Anulada' && !confirm('¿Anular ' + ov + '? Deja de contar en las ventas.')) return; ovSetState(ov, est); }
   else if (a === 'cmtadd') { const ta = $('#pCmt'); if (!ta || !ta.value.trim()) { if (ta) ta.focus(); return toast('Escribe el comentario primero.', true); } const v = ta.value; ta.value = ''; ta.blur(); setDraft(r.k, ''); addComment(r, v).then(ok => { if (!ok) { setDraft(r.k, v); if (r === S.active) renderPanel(true); } }); }
+  else if (a === 'cmted') { S.cEdit = { k: r.k, i: n }; renderPanel(true); const t = $('#pCmtEd'); if (t) { t.focus(); t.setSelectionRange(t.value.length, t.value.length); } }
+  else if (a === 'cmtedx') { S.cEdit = null; renderPanel(true); }
+  else if (a === 'cmtedok') {
+    const t = $('#pCmtEd'), e = S.cEdit; if (!t || !e) return;
+    const parts = val(r, 'comment').split(' | '), old = parts[e.i], txt = t.value.trim();
+    if (!txt) return toast('El comentario no puede quedar vacío.', true);
+    S.cEdit = null;
+    send(r, { op: 'editcmt', val: { i: e.i, old, txt } }).then(ok => { if (ok) flashOk('cmt', r); });
+  }
+  else if (a === 'qopen' || a === 'qpick' || a === 'qrm' || a === 'qsave' || a === 'qst') return quoteAct(r, a, n);
+  else if (a === 'dupopen') { openClient(n); }
   else if (a === 'tipo') { send(r, { op: 'tipo', val: r.t.tipo === n ? '' : n }); }
   else if (a === 'brand') { const on = !(r.t.brands || []).includes(n); send(r, { op: 'brand', val: { b: n, on, rel: S.addRel } }).then(ok => ok && toast(on ? `${n}: ${REL[S.addRel].l.toLowerCase()}` : 'Marca quitada: ' + n)); }
   else if (a === 'brandrel') { const nx = REL_K[(REL_K.indexOf(relOf(r, n)) + 1) % REL_K.length]; send(r, { op: 'brand', val: { b: n, on: true, rel: nx } }).then(ok => ok && toast(`${n}: ${REL[nx].l.toLowerCase()}`)); }
@@ -1613,8 +1715,11 @@ function buildCols() {
     (S.showCmt ? `<div class="c sr">${esc(S.header[S.C.comment])}</div>` : '');
 }
 function applyWidths() {
-  const w = [NARROW ? 70 : 78, ...(S.showGest ? [colW('_gest', NARROW ? 124 : 200)] : []), ...COLS.map(c => colW(c.k, NARROW && c.k === 'legal' ? 210 : WIDTH[c.k] || 130)), ...(S.showCmt ? [colW('_cmt', 300)] : [])];
+  let w = [NARROW ? 70 : 78, ...(S.showGest ? [colW('_gest', NARROW ? 124 : 200)] : []), ...COLS.map(c => colW(c.k, NARROW && c.k === 'legal' ? 210 : WIDTH[c.k] || 130)), ...(S.showCmt ? [colW('_cmt', 300)] : [])];
   const g = $('#grid');
+  /* si sobran espacios, las columnas se estiran en proporción para llenar el ancho de la lista */
+  const room = g.clientWidth - 2, sum = w.reduce((a, b) => a + b, 0);
+  if (room > sum && w.length > 1) { const k = (room - w[0]) / (sum - w[0]); w = w.map((x, i) => i ? Math.floor(x * k) : x); }
   g.style.setProperty('--cols', w.map(x => x + 'px').join(' '));
   g.style.setProperty('--w', w.reduce((a, b) => a + b, 0) + 'px');
 }
@@ -1729,7 +1834,7 @@ function renderPanel(force) {
   const kv = S.header.map((h, j) => {
     const k = keyOf(j); if (['comment', 'legal', 'phone', 'mail'].includes(k)) return '';
     const v = r.v[j] == null ? '' : String(r.v[j]); if (!v) return '';
-    return `<dt>${esc(h)}</dt><dd>${esc(k === 'credit' ? money(v) : v)}${k === 'id' || k === 'tax' ? `<button class="ib sm" data-act="copy" data-f="${k}" title="Copiar">${icon('copy')}</button>` : ''}</dd>`;
+    return `<dt>${esc(h)}</dt><dd>${esc(k === 'credit' ? (Number(String(v).replace(/[^\d.-]/g, '')) || 0).toLocaleString('es-PE') : v)}${k === 'id' || k === 'tax' ? `<button class="ib sm" data-act="copy" data-f="${k}" title="Copiar">${icon('copy')}</button>` : ''}</dd>`;
   }).join('');
   const canUnlock = isAdmin() && r.t.own && r.t.own !== S.me.name;
   const showFix = !lk && (r.t.res === 'Número errado' || S.fixOpen === r);
@@ -1743,6 +1848,7 @@ function renderPanel(force) {
     <h2>${esc(val(r, 'legal') || '(sin nombre)')}</h2><div class="badges" id="pBadges">${badgesHTML(r)}</div></div>
     ${lk ? `<div class="p-sec" style="padding-bottom:0;border:0"><div class="lockbar">${icon('lock')}<span style="flex:1">${esc(lk)}. Solo puedes ver y copiar sus datos.</span></div></div>` : ''}
     ${canUnlock ? `<div class="p-sec" style="padding-bottom:0;border:0"><div class="lockbar"><span style="flex:1">Gestionado por <b>${esc(r.t.own)}</b></span><button class="btn" data-act="unlock" style="height:28px">Liberar</button></div></div>` : ''}
+    ${dupHTML(r)}
     <div class="p-sec"><div class="p-actions">
       <button class="btn wa" data-act="wa" ${ps.some(x => x.wa) && !lk ? '' : 'disabled'}>${icon('wa')}WhatsApp</button>
       <button class="btn" data-act="mail" ${ms.length && !lk ? '' : 'disabled'}>${icon('mail')}Correo</button>
@@ -1750,17 +1856,22 @@ function renderPanel(force) {
       <button class="btn tog${r.t.rev ? ' on-rev' : ''}" data-act="rev" ${dis}>${icon('eye')}${r.t.rev ? 'Revisado' : 'Marcar revisado'}</button>
       <button class="btn tog${r.t.buy ? ' on-buy' : ''}" data-act="buy" ${dis}>${icon('cart')}${r.t.buy ? 'Compró' : 'Marcar compra'}</button>
     </div>
+    ${tplList().length && !lk ? `<label class="fl wtpl"><span>Mensaje de WhatsApp</span><select class="selin" id="pTpl"><option value="">Mensaje inicial del equipo</option>${tplList().map(x => `<option ${UI.waTplSel === x.n ? 'selected' : ''}>${esc(x.n)}</option>`).join('')}</select></label>` : ''}
     ${r.t.buy ? `<div class="hint">Total comprado: <b>${money(r.t.monto)}</b> sin IGV en ${ordersOf(r.k).filter(o => o.est !== 'Anulada').length} OV. El monto sale de las OV registradas.</div>` : ''}</div>
     <div class="p-sec"><h3><span>Resultado del contacto</span></h3><div class="rchips">
       ${RES_LIST.map(x => `<button class="rchip${r.t.res === x ? ' on' : ''}" style="--rc:${RES[x].c}" data-act="res" data-n="${esc(x)}" ${dis}><i style="background:${RES[x].c}"></i>${esc(x)}<kbd>${RES[x].k}</kbd></button>`).join('')}
     </div>
     ${r.t.res === 'Volver a llamar' ? `<div class="sub" style="flex-direction:row;align-items:center;gap:8px">${icon('cal')}<span style="white-space:nowrap">Volver a llamar el</span><input type="date" class="datein" id="pNext" value="${esc(r.t.next)}" ${dis}></div>` : ''}
     ${r.t.res === 'No interesado' ? `<div class="sub"><label class="fl"><span>¿Por qué no le interesa?</span><select class="selin" id="pMotivo" ${dis}><option value="">Elige un motivo…</option>${MOTIVOS.map(m => `<option ${r.t.motivo === m ? 'selected' : ''}>${esc(m)}</option>`).join('')}</select></label></div>` : ''}
+    ${r.t.res === 'Número errado' && r.t.motivo ? `<div class="hint" style="margin:6px 0 0">Motivo: <b>${esc(r.t.motivo)}</b></div>` : ''}
     ${r.t.res === 'Número errado' ? fixBox : ''}</div>
+    ${quoteHTML(r, lk)}
     ${ovHTML(r, lk, dis)}
     ${bizHTML(r, lk, dis)}
-    <div class="p-sec"><h3><span>${esc(S.header[S.C.comment])}</span></h3>
-      ${val(r, 'comment') ? `<div class="curcmt">${val(r, 'comment').split(' | ').map(x => `<p>${esc(x)}</p>`).join('')}</div>` : ''}
+    <div class="p-sec"><h3><span>${esc(S.header[S.C.comment])}${okChk('cmt', r)}</span></h3>
+      ${val(r, 'comment') ? `<div class="curcmt">${val(r, 'comment').split(' | ').map((x, i) => S.cEdit && S.cEdit.k === r.k && S.cEdit.i === i
+        ? `<p><span class="cmtedit"><textarea class="txtin" id="pCmtEd">${esc(cmtBody(x))}</textarea><div><button class="btn ghost" data-act="cmtedx">Cancelar</button><button class="btn primary" data-act="cmtedok">${icon('check')}Guardar</button></div></span></p>`
+        : `<p><span>${esc(x)}</span>${!lk && canEditCmt(x) ? `<button class="ib sm ce" data-act="cmted" data-n="${i}" title="Editar este comentario">${icon('pencil')}</button>` : ''}</p>`).join('')}</div>` : ''}
       <textarea id="pCmt" placeholder="${lk ? esc(lk) : 'Nuevo comentario… (Ctrl+Enter para agregar)'}" ${dis}>${esc(S.drafts[r.k] || '')}</textarea>
       <div class="hint" id="pDraft" style="margin:4px 0 0;color:var(--accent);font-weight:600" ${S.drafts[r.k] ? '' : 'hidden'}>${icon('pencil')} Borrador sin guardar: se conserva aunque cambies de cliente. Pulsa «Agregar comentario» para guardarlo.</div>
       <div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="btn primary" data-act="cmtadd" ${dis}>${icon('msg')}Agregar comentario</button></div>
@@ -1800,21 +1911,28 @@ const openOrders = () => S.orders.filter(o => OPEN(o) && S.byKey.has(o.k)).sort(
 function ovHTML(r, lk, dis) {
   const os = ordersOf(r.k), f = S.ov && S.ov.k === r.k ? S.ov : null, quick = [...brandsBy(r, 'habitual'), ...brandsBy(r, 'ocasional'), ...brandsBy(r, 'interes')];
   const tot = f ? f.lines.reduce((a, l) => a + (+l.m || 0), 0) : 0;
-  return `<div class="p-sec"><h3><span>Ventas (OV) · sin IGV</span>${lk ? '' : `<button class="linkbtn" data-act="ovopen">${icon(f ? 'x' : 'plus')}${f ? 'Cancelar' : 'Registrar venta'}</button>`}</h3>
+  return `<div class="p-sec"><h3><span>Ventas (OV) · US$ sin IGV${okChk('ov', r)}</span>${lk ? '' : `<button class="linkbtn" data-act="ovopen">${icon(f ? 'x' : 'plus')}${f ? 'Cancelar' : 'Registrar venta'}</button>`}</h3>
     ${f ? `<div class="ovform">
-      <div class="two"><label class="fl"><span>N° de OV *</span><input class="txtin" id="oNum" placeholder="Ej.: OV-12345" value="${esc(f.num)}" autocomplete="off"></label><label class="fl"><span>Fecha</span><input type="date" class="datein" id="oDate" value="${esc(f.date)}"></label></div>
       ${quick.length ? `<div class="bsel">${quick.map(b => `<button class="bchip${f.lines.some(l => l.b === b) ? ' on' : ''}" data-act="ovpick" data-n="${esc(b)}">${icon('plus')}${esc(b)}</button>`).join('')}</div>` : ''}
-      <input class="txtin" id="oQuick" placeholder="Rápido: JBL 1200, Lenovo 5400 y Enter">
-      ${f.lines.map((l, i) => `<div class="ovline"><b>${esc(l.b)}</b><input class="txtin oamt" data-i="${i}" inputmode="decimal" placeholder="Monto sin IGV" value="${l.m || ''}"><button class="ib" data-act="ovrm" data-n="${i}" title="Quitar">×</button></div>`).join('')}
+      <input class="txtin" id="oQuick" placeholder="Marca y monto en US$ sin IGV: JBL 1200, Lenovo 5400 y Enter">
+      ${f.lines.map((l, i) => `<div class="ovline"><b>${esc(l.b)}</b><input class="txtin oamt" data-i="${i}" inputmode="decimal" placeholder="US$ sin IGV" value="${l.m || ''}"><button class="ib" data-act="ovrm" data-n="${i}" title="Quitar">×</button></div>`).join('')}
       <div class="badd" style="margin:0"><input class="txtin" id="oBrand" list="dlBrands" placeholder="Otra marca… escribe y Enter"></div>
-      <input class="txtin" id="oNota" placeholder="Nota (opcional): recojo, dirección de entrega…" value="${esc(f.nota)}">
-      <div class="ovtot"><span>Total sin IGV · ${f.lines.length} marca${f.lines.length === 1 ? '' : 's'}</span><b id="oTot">${money(tot)}</b></div>
-      <button class="btn primary" data-act="ovsave" style="justify-content:center;height:38px">${icon('check')}Guardar OV · queda en Despachando</button></div>` : ''}
+      <div class="ovtot"><span>Sin IGV · ${f.lines.length} marca${f.lines.length === 1 ? '' : 's'}</span><b id="oTot">${money(tot)}</b></div>
+      <div class="ovigv" id="oIgv">${igvTx(tot)}</div>
+      <details class="ovmore"><summary>Más datos (opcional): N° de OV, fecha y nota</summary>
+        <div class="two"><label class="fl"><span>N° de OV</span><input class="txtin" id="oNum" placeholder="Vacío = se genera solo" value="${esc(f.num)}" autocomplete="off"></label><label class="fl"><span>Fecha</span><input type="date" class="datein" id="oDate" value="${esc(f.date)}"></label></div>
+        <input class="txtin" id="oNota" placeholder="Nota: recojo, dirección de entrega…" value="${esc(f.nota)}">
+      </details>
+      <button class="btn primary" data-act="ovsave" style="justify-content:center;height:38px">${icon('check')}Guardar venta</button></div>` : ''}
     ${os.length ? `<div class="ovlist" style="margin-top:${f ? 10 : 0}px">${os.slice(0, 6).map(o => `<div class="ovi"><b>${esc(o.ov)}</b><span class="est ${o.est}"><i></i>${o.est}</span>
       <span class="m">${ddmm(o.d)}/${o.d.slice(2, 4)} · ${money(o.tot)} · ${linesOf(o.ov).map(x => esc(x.b)).join(', ')}${OPEN(o) ? ` · hace ${ovAge(o)} día${ovAge(o) === 1 ? '' : 's'}` : o.fin ? ` · cerrada ${ddmm(o.fin)} por ${esc(o.finBy)}` : ''}${o.nota ? ' · ' + esc(o.nota) : ''}</span>
       ${lk ? '' : `<span class="acts2">${OPEN(o) ? `<button class="btn primary" data-act="ovst" data-n="${esc(o.ov)}|Terminado">${icon('check')}Terminado</button>${o.est !== 'Incidencia' ? `<button class="btn" data-act="ovst" data-n="${esc(o.ov)}|Incidencia">${icon('alert')}Incidencia</button>` : `<button class="btn" data-act="ovst" data-n="${esc(o.ov)}|Despachando">Volver a Despachando</button>`}` : isAdmin() ? `<button class="btn" data-act="ovst" data-n="${esc(o.ov)}|Despachando">Reabrir</button>` : ''}${isAdmin() && o.est !== 'Anulada' ? `<button class="btn" data-act="ovst" data-n="${esc(o.ov)}|Anulada">Anular</button>` : ''}</span>`}</div>`).join('')}
       ${os.length > 6 ? `<div class="hint" style="margin:0">${os.length - 6} OV anteriores más.</div>` : ''}</div>` : f ? '' : '<div class="hint" style="margin:0">Sin ventas registradas.</div>'}</div>`;
 }
+const igvTx = t => `IGV 18 %: ${money(t * IGV)} · Total con IGV: ${money(t * (1 + IGV))}`;
+/* ✓ Guardado: aparece unos segundos junto al título de la sección recién guardada */
+const okChk = (sec, r) => S.flash && S.flash.sec === sec && S.flash.k === r.k && Date.now() - S.flash.t < 2600 ? `<span class="okchk">${icon('check')}Guardado</span>` : '';
+function flashOk(sec, r) { S.flash = { sec, k: r.k, t: Date.now() }; if (r === S.active) renderPanel(true); clearTimeout(S.flashT); S.flashT = setTimeout(() => { S.flash = null; const e = $('#panel .okchk'); if (e) e.remove(); }, 2700); }
 function ovLineAdd(b, m) { const f = S.ov; if (!f) return; const x = f.lines.find(l => l.b === b); if (x) { if (m) x.m = m; } else f.lines.push({ b, m: m || '' }); }
 function parseQuick(txt) {
   const out = [], bad = [];
@@ -1828,17 +1946,29 @@ function parseQuick(txt) {
 }
 async function ovSave(r) {
   const f = S.ov; if (!f) return;
-  const num = ($('#oNum') ? $('#oNum').value : f.num).trim(); f.num = num;
-  if (!num) { $('#oNum') && $('#oNum').focus(); return toast('El número de OV es obligatorio.', true); }
-  const lines = f.lines.filter(l => +l.m > 0);
-  if (!lines.length) return toast('Agrega al menos una marca con su monto sin IGV.', true);
+  const num = ($('#oNum') ? $('#oNum').value : f.num).trim(), nota = $('#oNota') ? $('#oNota').value : f.nota, d = ($('#oDate') ? $('#oDate').value : f.date) || S.today;
+  Object.assign(f, { num, nota, date: d });
+  const lines = f.lines.filter(l => +l.m > 0).map(l => ({ b: l.b, m: +l.m }));
+  if (!lines.length) return toast('Agrega al menos una marca con su monto en US$ sin IGV.', true);
   if (f.lines.some(l => !(+l.m > 0))) return toast('Hay marcas sin monto: complétalas o quítalas.', true);
+  const tmp = { ov: num.toUpperCase() || 'Guardando…', k: r.k, d, tot: lines.reduce((a, l) => a + l.m, 0), est: 'Despachando', by: S.me.name, fin: '', finBy: '', nota };
+  const tl = lines.map(l => ({ ov: tmp.ov, k: r.k, d, b: l.b, m: l.m, by: S.me.name }));
+  const before = JSON.stringify(r.t);
+  S.orders.push(tmp); S.sales.push(...tl); S.ov = null; delete S.ovMap[r.k];
+  lines.forEach(l => { if (!r.t.brands.includes(l.b)) r.t.brands.push(l.b); r.t.bmeta = Object.assign({}, r.t.bmeta, { [l.b]: { rel: 'habitual', by: S.me.name, d: S.today } }); });
+  r.t.buy = true; r.t.monto = String((+r.t.monto || 0) + tmp.tot); r.hay = null;
+  refreshRow(r); flashOk('ov', r); updBell();
+  S.pending++; setSync('saving');
   try {
-    const res = await call('api_addOrder', S.token, { k: r.k, ov: num, d: f.date, nota: ($('#oNota') ? $('#oNota').value : f.nota), lines });
-    S.orders.push(res.order); S.sales.push(...res.lines); S.ov = null;
-    applyState(res.state); renderPanel(true); updBell(); updDayBadge();
-    toast(`${res.order.ov} registrada · ${money(res.order.tot)} sin IGV · queda en Despachando hasta marcar Terminado.`);
-  } catch (e) { toast(e.message, true); }
+    const res = await call('api_addOrder', S.token, { k: r.k, ov: num, d, nota, lines });
+    S.orders = S.orders.filter(o => o !== tmp).concat(res.order); S.sales = S.sales.filter(x => !tl.includes(x)).concat(res.lines);
+    if (res.quote) { const q = S.quotes.find(x => x.id === res.quote.id); if (q) Object.assign(q, res.quote); }
+    applyState(res.state); updBell(); updDayBadge();
+  } catch (e) {
+    S.orders = S.orders.filter(o => o !== tmp); S.sales = S.sales.filter(x => !tl.includes(x)); r.t = Object.assign(emptyT(), JSON.parse(before));
+    S.ov = f; S.flash = null; refreshRow(r); if (r === S.active) renderPanel(true); toast(e.message, true);
+  }
+  S.pending--; if (!S.pending) setSync('', 'Guardado');
 }
 async function ovSetState(ov, est) {
   const o = S.orders.find(x => x.ov === ov); if (!o) return;
@@ -1850,13 +1980,14 @@ async function ovSetState(ov, est) {
   } catch (e) { toast(e.message, true); }
 }
 function updBell(rerender) {
-  const l = openOrders(), ct = $('#bellCt'); ct.hidden = !l.length; ct.textContent = l.length;
-  ct.style.background = l.some(o => ovLvl(o) === 2) ? 'var(--crit)' : 'var(--warn)';
+  const l = openOrders(), due = S.me ? myDay().calls.filter(x => x.urgent).length : 0, ct = $('#bellCt'); ct.hidden = !(l.length + due); ct.textContent = l.length + due;
+  ct.style.background = due || l.some(o => ovLvl(o) === 2) ? 'var(--crit)' : 'var(--warn)';
   if (rerender && !$('#bellPop').hidden) renderBell();
 }
 function renderBell() {
-  const l = openOrders();
-  $('#bellPop').innerHTML = `<div class="hd"><b>OV por cerrar · ${l.length}</b><span class="sub" style="font-size:11px;color:var(--muted)">Se quitan solo al marcar Terminado</span></div>
+  const l = openOrders(), due = myDay().calls.filter(x => x.urgent);
+  $('#bellPop').innerHTML = (due.length ? `<div class="hd"><b>Llamadas para hoy · ${due.length}</b><span class="sub" style="font-size:11px;color:var(--muted)">Clientes que pidieron que los llames</span></div>
+  ${due.slice(0, 12).map(x => `<div class="nt"><span class="lv l${x.r.t.next < S.today ? 2 : 1}"></span><div><div class="tt"><b>${esc(val(x.r, 'legal'))}</b><span class="est">${x.r.t.next < S.today ? 'Vencida · ' + ddmm(x.r.t.next) : 'Hoy'}</span></div><div class="ac"><button class="btn primary" data-bopen="${esc(x.r.k)}">${icon('phone')}Abrir cliente</button></div></div></div>`).join('')}` : '') + `<div class="hd"><b>OV por cerrar · ${l.length}</b><span class="sub" style="font-size:11px;color:var(--muted)">Se quitan solo al marcar Terminado</span></div>
   ${l.length ? l.map(o => { const r = S.byKey.get(o.k), lv = ovLvl(o); return `<div class="nt"><span class="lv l${lv}"></span><div><div class="tt"><b>${esc(o.ov)}</b><span class="est ${o.est}"><i></i>${o.est} · ${ovAge(o)} d</span></div>
     <div class="ds">${esc(r ? val(r, 'legal') : o.k)} · ${money(o.tot)} · ${linesOf(o.ov).map(x => esc(x.b)).join(', ')}${isAdmin() ? ' · ' + esc(o.by) : ''}${o.nota ? '<br>' + esc(o.nota) : ''}</div>
     <div class="ac"><button class="btn primary" data-bst="${esc(o.ov)}|Terminado">${icon('check')}Terminado</button>${o.est !== 'Incidencia' ? `<button class="btn" data-bst="${esc(o.ov)}|Incidencia">${icon('alert')}Incidencia</button>` : ''}<button class="btn ghost" data-bopen="${esc(o.k)}">Ver cliente</button></div></div></div>`; }).join('')
@@ -1874,7 +2005,7 @@ document.addEventListener('click', () => { $('#bellPop').hidden = true; });
 const MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 const ym = d => d.slice(0, 7), addM = (ymS, n) => { const [y, m] = ymS.split('-').map(Number), d = new Date(y, m - 1 + n, 1); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}`; };
 const shiftY = (d, n) => (+d.slice(0, 4) + n) + d.slice(4);
-const kS = n => n >= 1e6 ? 'S/ ' + (n / 1e6).toFixed(1) + ' M' : n >= 1e3 ? 'S/ ' + (n / 1e3).toFixed(n >= 1e5 ? 0 : 1) + ' mil' : 'S/ ' + Math.round(n);
+const kS = n => n >= 1e6 ? 'US$ ' + (n / 1e6).toFixed(1) + ' M' : n >= 1e3 ? 'US$ ' + (n / 1e3).toFixed(n >= 1e5 ? 0 : 1) + ' mil' : 'US$ ' + Math.round(n);
 function perRange(per) {
   const T = S.today, y = T.slice(0, 4), first = T.slice(0, 8) + '01';
   const lastDay = ymS => { const [a, b] = ymS.split('-').map(Number); return `${ymS}-${p2(new Date(a, b, 0).getDate())}`; };
@@ -1937,7 +2068,7 @@ function renderSales(keep) {
   const hmax = Math.max(1, ...Object.values(hm));
   // escala de clientes y estatus por última compra
   const perCli = {}; cur.forEach(x => perCli[x.k] = (perCli[x.k] || 0) + x.m);
-  const TR = [['Hasta S/ 5 mil', 0, 5000], ['S/ 5 a 20 mil', 5000, 20000], ['Más de S/ 20 mil', 20000, 1e12]].map(([l, a, b]) => { const ks = Object.entries(perCli).filter(([, v]) => v > a && v <= b); return { l, n: ks.length, v: ks.reduce((s, [, v]) => s + v, 0) }; });
+  const TR = [['Hasta US$ 5 mil', 0, 5000], ['US$ 5 a 20 mil', 5000, 20000], ['Más de US$ 20 mil', 20000, 1e12]].map(([l, a, b]) => { const ks = Object.entries(perCli).filter(([, v]) => v > a && v <= b); return { l, n: ks.length, v: ks.reduce((s, [, v]) => s + v, 0) }; });
   const lastBuy = {}; all.forEach(x => { if (!lastBuy[x.k] || x.d > lastBuy[x.k]) lastBuy[x.k] = x.d; });
   const stt = { act: 0, risk: 0, ina: 0 }; Object.values(lastBuy).forEach(dd => { const a = daysSince(dd); stt[a <= 90 ? 'act' : a <= 180 ? 'risk' : 'ina']++; });
   const sttT = stt.act + stt.risk + stt.ina || 1;
@@ -1956,7 +2087,7 @@ function renderSales(keep) {
     <button class="btn ghost" id="sClear">Limpiar</button>
   </div>
   <div class="kpis">
-    <div class="kpi hero2 rise"><div class="l">Venta sin IGV</div><div class="v" data-count="${Math.round(total)}" data-pre="S/ ">S/ 0</div><div class="s" style="color:#fff">${prev ? deltaHTML(total, sumM(prev), R.prevL).replace(/var\(--muted\)/, 'rgba(255,255,255,.8)') : ''}</div></div>
+    <div class="kpi hero2 rise"><div class="l">Venta sin IGV</div><div class="v" data-count="${Math.round(total)}" data-pre="US$ ">US$ 0</div><div class="s" style="color:#fff">${prev ? deltaHTML(total, sumM(prev), R.prevL).replace(/var\(--muted\)/, 'rgba(255,255,255,.8)') : ''}</div></div>
     <div class="kpi rise" style="--d:1"><div class="l">${icon('cal')}Mismo período año anterior</div><div class="v">${kS(sumM(ly))}</div><div class="s">${deltaHTML(total, sumM(ly), 'año anterior')}</div></div>
     <div class="kpi rise" style="--d:2"><div class="l">${icon('file')}OV</div><div class="v" data-count="${ovs}">0</div><div class="s">Ticket promedio ${kS(ticket)}</div></div>
     <div class="kpi rise" style="--d:3"><div class="l">${icon('users')}Clientes que compraron</div><div class="v" data-count="${nB}">0</div><div class="s">${pct(nB, S.rows.length)}% de ${isAdmin() ? 'la cartera' : 'tu cartera'}</div></div>
@@ -1992,10 +2123,47 @@ function renderSales(keep) {
       <div class="stk3" data-tip="Activos (≤90 días): ${stt.act}\nEn riesgo (91–180): ${stt.risk}\nInactivos (+180): ${stt.ina}"><i style="flex:${stt.act};background:var(--good)"></i><i style="flex:${stt.risk};background:var(--warn)"></i><i style="flex:${stt.ina};background:var(--crit)"></i></div>
       <div class="legend" style="margin:8px 0 0"><span><span class="sw" style="background:var(--good)"></span>Activos ${stt.act} · ${pct(stt.act, sttT)}%</span><span><span class="sw" style="background:var(--warn)"></span>En riesgo ${stt.risk} · ${pct(stt.risk, sttT)}%</span><span><span class="sw" style="background:var(--crit)"></span>Inactivos ${stt.ina} · ${pct(stt.ina, sttT)}%</span></div></div>
   </div>
+  ${salesInsights(cur)}
   ${isAdmin() ? `<div class="card rise" style="--d:9"><h3>Venta por ejecutivo</h3><div class="sub">Share de venta del período · clic para filtrar</div>
     ${byE.length ? shareHd.replace('Marca', 'Ejecutivo') + byE.map((o, i) => shareRow(o, Math.max(1, byE[0].v), i, `data-sexec="${esc(o.k)}"`)).join('') : '<div class="d-empty">Sin ventas.</div>'}</div>` : ''}`;
   if (keep) d.querySelectorAll('.rise').forEach(x => x.classList.remove('rise'));
   countUp(d);
+}
+/* detalle de un recuadro: cuántos de esos clientes tiene cada usuario (quien los gestionó por última vez) */
+const DK = { att: ['Atendidos', r => status(r) === 'att', 'att'], rev: ['Revisados', r => status(r) === 'rev', 'rev'], none: ['Pendientes', r => status(r) === 'none', 'none'], buy: ['Compras con éxito', r => r.t.buy, 'buy'],
+  recov: ['Recuperados', null, null], noc: ['No contestan', isNoc, 'noc'], agenda: ['Llamar hoy', isAgenda, 'agenda'] };
+function dashDetail(rows, recov) {
+  const [lab, fn0, chip] = DK[S.dSel], fn = fn0 || (r => recov.includes(r)), list = rows.filter(fn);
+  const by = {}; list.forEach(r => { const u = S.dSel === 'none' ? (S.asg[r.k] || val(r, 'exec').trim() || '(sin asignar)') : (lastBy(r) || '(sin usuario)'); by[u] = (by[u] || 0) + 1; });
+  const arr = Object.entries(by).sort((a, b) => b[1] - a[1]), mx = Math.max(1, ...arr.map(x => x[1]));
+  return `<div class="card rise dsel"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div style="flex:1"><h3>${esc(lab)} por usuario · ${fmtN(list.length)}</h3><div class="sub">${S.dSel === 'none' ? 'Según a quién está asignado el cliente' : 'Según quién lo gestionó por última vez'}</div></div>
+    ${chip ? `<button class="btn" data-dlist="${chip}">${icon('list')}Ver estos clientes en la lista</button>` : ''}<button class="btn ghost" data-dclose>${icon('x')}Cerrar</button></div>
+    ${arr.length ? arr.map(([u, v], i) => `<div class="dsu" data-du="${esc(u)}">${hbar(`<span class="sw" style="background:${userColor(u)}"></span>${esc(u)}`, v, mx, 'var(--s1)', `${fmtN(v)} · ${pct(v, list.length)}%`, `${u}: ${fmtN(v)} (clic: ver solo ${u})`, i)}</div>`).join('') : '<div class="d-empty">No hay clientes en este grupo.</div>'}</div>`;
+}
+/* qué marcas se repiten, cuáles se compran juntas y a cuáles conviene pedir promoción */
+function salesInsights(cur) {
+  if (!cur.length) return '';
+  const B = {}; cur.forEach(x => { const o = B[x.b] || (B[x.b] = { b: x.b, ovs: new Set(), cli: {}, m: 0 }); o.ovs.add(x.ov); o.cli[x.k] = (o.cli[x.k] || new Set()).add(x.ov); o.m += x.m; });
+  const rec = Object.values(B).map(o => ({ b: o.b, ov: o.ovs.size, cl: Object.keys(o.cli).length, rep: Object.values(o.cli).filter(z => z.size >= 2).length, m: o.m })).sort((a, b) => b.ov - a.ov || b.m - a.m);
+  const byOv = {}; cur.forEach(x => { (byOv[x.ov] = byOv[x.ov] || { k: x.k, b: new Set() }).b.add(x.b); });
+  const P = {}; Object.values(byOv).forEach(o => { const l = [...o.b].sort(); for (let i = 0; i < l.length; i++) for (let j = i + 1; j < l.length; j++) { const k = l[i] + '|' + l[j]; const z = P[k] || (P[k] = { n: 0, cl: new Set() }); z.n++; z.cl.add(o.k); } });
+  const pairs = Object.entries(P).sort((a, b) => b[1].n - a[1].n).slice(0, 8);
+  /* demanda por marca: compradores que repiten + clientes que dicen que les interesa (sin comprarla en el período) */
+  const buyers = b => new Set(cur.filter(x => x.b === b).map(x => x.k));
+  const intr = {}; S.rows.forEach(r => Object.entries(r.t.bmeta || {}).forEach(([b, m]) => { if (m.rel === 'interes') (intr[b] = intr[b] || new Set()).add(r.k); }));
+  const cand = [...new Set([...Object.keys(B), ...Object.keys(intr)])].map(b => { const bs = B[b] ? buyers(b) : new Set(), it = [...(intr[b] || [])].filter(k => !bs.has(k)).length, r0 = rec.find(x => x.b === b) || { rep: 0, cl: 0, m: 0 };
+    return { b, rep: r0.rep, cl: r0.cl, it, m: r0.m, score: r0.rep * 3 + r0.cl + it * 2 }; }).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 8);
+  return `<div class="grid2">
+    <div class="card rise" style="--d:8"><h3>Marcas más recurrentes</h3><div class="sub">En cuántas OV aparece cada marca y cuántos clientes la vuelven a comprar</div>
+      <table class="rtab"><thead><tr><th>Marca</th><th class="n">OV</th><th class="n">Clientes</th><th class="n">Recompran</th><th class="n">Venta</th></tr></thead><tbody>
+      ${rec.slice(0, 10).map(o => `<tr data-tip="${esc(o.b)}: ${o.ov} OV · ${o.cl} clientes · ${o.rep} la compraron 2+ veces · ${money(o.m)}"><td><b>${esc(o.b)}</b></td><td class="n">${fmtN(o.ov)}</td><td class="n">${fmtN(o.cl)}</td><td class="n">${fmtN(o.rep)}</td><td class="n">${kS(o.m)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="card rise" style="--d:9"><h3>Combos frecuentes</h3><div class="sub">Marcas que se compran juntas en la misma OV: base para armar combos</div>
+      ${pairs.length ? pairs.map(([k, z]) => `<div class="combo"><span class="pl">${k.split('|').map(b => `<span>${esc(b)}</span>`).join('+')}</span><small>${fmtN(z.n)} OV · ${fmtN(z.cl.size)} clientes</small></div>`).join('') : '<div class="d-empty">Aún no hay OV con dos o más marcas en el período.</div>'}</div>
+    <div class="card rise" style="--d:10"><h3>A qué marcas pedir promoción</h3><div class="sub">Demanda en tu cartera: clientes que la recompran y clientes interesados que aún no la compran</div>
+      ${cand.length ? `<table class="rtab"><thead><tr><th>Marca</th><th class="n">Recompran</th><th class="n">Compran</th><th class="n">Interesados</th><th class="n">Venta</th></tr></thead><tbody>
+      ${cand.map(o => `<tr><td><b>${esc(o.b)}</b></td><td class="n">${fmtN(o.rep)}</td><td class="n">${fmtN(o.cl)}</td><td class="n">${fmtN(o.it)}</td><td class="n">${kS(o.m)}</td></tr>`).join('')}</tbody></table>
+      <div class="hint" style="margin:8px 0 0">Con recompra alta, pide al proveedor precio por volumen; con muchos interesados, una promoción de lanzamiento. La lista de clientes sale en Reportes → Promoción por marca.</div>` : '<div class="d-empty">Sin datos suficientes.</div>'}</div>
+  </div>`;
 }
 const dashModes = () => `<div class="modes" id="dMode"><button data-dm="gest" class="${S.dashMode === 'gest' ? 'on' : ''}">${icon('chart')}Gestión</button><button data-dm="ventas" class="${S.dashMode === 'ventas' ? 'on' : ''}">${icon('cart')}Ventas</button></div>`;
 let sfT;
@@ -2116,31 +2284,32 @@ function renderDay() {
   const R = 44, Cc = 2 * Math.PI * R, off = Cc * (1 - Math.min(1, done / goal));
   const h = new Date().getHours(), greet = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
   const dt = new Date().toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' });
-  const li = (x, i, c) => `<button class="li rise" style="--d:${i + 3}" data-open="${esc(x.r.k)}"><span class="co" style="--tc:var(${c})">${esc(initials(val(x.r, 'legal')))}</span><span class="g"><b>${esc(val(x.r, 'legal'))}</b><small class="${x.urgent ? 'u' : ''}">${esc(x.why)} · fila ${x.r.r}</small></span>${icon('right')}</button>`;
-  const col = (title, sub, list, c, empty, d) => `<div style="display:flex;flex-direction:column;gap:10px;min-width:0">
-      <div class="d-head rise" style="--d:${d}"><h2 style="font-size:15px">${title} · ${fmtN(list.length)}</h2><span class="sub">${sub}</span></div>
-      ${list.length ? `<div class="dlist">${list.slice(0, 60).map((x, i) => li(x, i, c)).join('')}</div>${list.length > 60 ? `<div class="hint">${fmtN(list.length - 60)} más en la lista.</div>` : ''}` : `<div class="card d-empty">${empty}</div>`}
-    </div>`;
-  $('#vDay').innerHTML = `<div class="day">
-  <div class="hero rise">
+  const li = (x, i, c) => `<button class="li${i < 20 ? ' rise' : ''}" style="--d:${Math.min(i, 20) + 3}" data-open="${esc(x.r.k)}"><span class="co" style="--tc:var(${c})">${esc(initials(val(x.r, 'legal')))}</span><span class="g"><b>${esc(val(x.r, 'legal'))}</b><small class="${x.urgent ? 'u' : ''}">${esc(x.why)} · fila ${x.r.r}</small></span>${icon('right')}</button>`;
+  const col = (title, sub, list, c, empty) => `<section class="dcol">
+      <div class="d-head"><h2 style="font-size:15px">${title} · ${fmtN(list.length)}</h2><span class="sub">${sub}</span></div>
+      <div class="dscroll">${list.length ? list.slice(0, 500).map((x, i) => li(x, i, c)).join('') + (list.length > 500 ? `<div class="hint">${fmtN(list.length - 500)} más en la lista.</div>` : '') : `<div class="card d-empty">${empty}</div>`}</div>
+    </section>`;
+  $('#vDay').innerHTML = `<div class="day2">
+  <aside class="hero vert rise">
     <div><div class="eyb">${esc(dt)}</div><h2>${greet}, ${esc(S.me.name)}</h2><p>${calls.length || revs.length ? `Tus pendientes: ${fmtN(calls.length)} para volver a llamar y ${fmtN(revs.length)} revisados sin comentario.` : 'No tienes pendientes. Todo al día.'}</p></div>
     <div class="ring"><svg viewBox="0 0 104 104"><circle class="bg" cx="52" cy="52" r="${R}"/><circle class="fg" id="ringFg" cx="52" cy="52" r="${R}" stroke-dasharray="${Cc}" stroke-dashoffset="${Cc}"/></svg>
       <div class="lbl"><div><b data-count="${done}">0</b><small>de ${goal} gestiones hoy</small></div></div></div>
+    <div class="efbar" data-tip="Clientes efectivos hoy: «Contestó» con tipo de negocio o marca"><div class="t"><span>Efectivos hoy</span><b>${fmtN(efToday())} de ${fmtN(S.cfg.goalEf != null ? S.cfg.goalEf : 10)}</b></div><div class="tr"><i style="width:${Math.min(100, efToday() / Math.max(1, S.cfg.goalEf != null ? S.cfg.goalEf : 10) * 100)}%"></i></div></div>
     <div class="hstats">
       <div class="hstat"><b data-count="${late}">0</b><span>Llamadas vencidas</span></div>
       <div class="hstat"><b data-count="${today}">0</b><span>Para llamar hoy</span></div>
       <div class="hstat"><b data-count="${calls.length}">0</b><span>Volver a llamar</span></div>
       <div class="hstat"><b data-count="${revs.length}">0</b><span>Revisados sin comentario</span></div>
     </div>
-  </div>
-  <div class="dgrid">
-    ${col('Volver a llamar', 'Primero las vencidas y las de hoy', calls, '--violet', 'No tienes llamadas pendientes.', 2)}
-    ${col('Revisados sin comentario', 'Los revisaste pero falta escribir el comentario', revs, '--warn', 'No tienes revisados sin comentario.', 2)}
-  </div>
-  ${calls.length || revs.length ? `<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary rise" style="height:40px" id="dStart">${icon('bolt')}Empezar por el primero</button><button class="btn rise" style="height:40px" id="dList">${icon('list')}Ver mis pendientes en la lista</button></div>` : ''}
+    <div class="drank" id="dRank"><div class="rt">Ranking de hoy</div><small>Cargando…</small></div>
+    ${calls.length || revs.length ? `<div class="hbtns"><button class="btn primary" id="dStart">${icon('bolt')}Empezar por el primero</button><button class="btn" id="dList">${icon('list')}Ver mis pendientes en la lista</button></div>` : ''}
+  </aside>
+  ${col('Volver a llamar', 'Primero las vencidas y las de hoy', calls, '--violet', 'No tienes llamadas pendientes.')}
+  ${col('Revisados sin comentario', 'Los revisaste pero falta escribir el comentario', revs, '--warn', 'No tienes revisados sin comentario.')}
   </div>`;
   countUp($('#vDay'));
   requestAnimationFrame(() => requestAnimationFrame(() => { const fg = $('#ringFg'); if (fg) fg.style.strokeDashoffset = off; }));
+  loadRank();
 }
 function openClient(k) {
   const r = S.byKey.get(k); if (!r) return;
@@ -2191,7 +2360,8 @@ function renderDash(skipFetch) {
   if (S.dashMode === 'ventas') return renderSales();
   if (!skipFetch) { S.activityAt = 0; loadActivity(); }
   const scope = LS.get('dashScope', 'all');
-  const rows = (scope === 'view' ? S.view : S.rows).filter(r => !r.t.dep);
+  /* con un usuario elegido, todo se calcula sobre los clientes con los que ese usuario interactuó */
+  const dU = S.dUser || '', rows = (scope === 'view' ? S.view : S.rows).filter(r => !r.t.dep && (!dU || r.t.own === dU || r.t.hist.some(h => h.who === dU)));
   const c = counts(rows), total = c.all, touched = c.att + c.rev;
   const contacted = rows.filter(r => ['Contestó', 'Volver a llamar', 'No interesado'].includes(r.t.res) || r.t.buy).length;
   const todayN = rows.filter(r => r.t.last.startsWith(S.today)).length;
@@ -2232,18 +2402,20 @@ function renderDash(skipFetch) {
   const cc = {}; rows.forEach(r => new Set((r.t.brands || []).map(b => S.catOf[b])).forEach(c => cc[c] = (cc[c] || 0) + 1));
   const topC = Object.entries(cc).sort((a, b) => b[1] - a[1]).slice(0, 8), cmax = Math.max(1, ...topC.map(x => x[1]));
   d.innerHTML = `
-  <div class="d-head"><div><h2>Avance de la gestión</h2><div class="sub">Actualizado en vivo con el trabajo de todo el equipo${deps ? ` · ${fmtN(deps)} depurados excluidos` : ''}</div></div><div class="spacer"></div>${dashModes()}
+  <div class="d-head"><div><h2>Avance de la gestión</h2><div class="sub">${dU ? `Clientes con los que interactuó <b>${esc(dU)}</b>` : 'Actualizado en vivo con el trabajo de todo el equipo'}${deps ? ` · ${fmtN(deps)} depurados excluidos` : ''}</div></div><div class="spacer"></div>${dashModes()}
     <div class="tabs" id="dScope"><button data-s="all" class="${scope === 'all' ? 'on' : ''}" style="${scope === 'all' ? 'background:var(--surface);box-shadow:var(--shadow)' : ''}">Toda la cartera</button><button data-s="view" class="${scope === 'view' ? 'on' : ''}" style="${scope === 'view' ? 'background:var(--surface);box-shadow:var(--shadow)' : ''}">Filtro actual</button></div></div>
+  <div class="uchips" id="dUsers"><span>Usuario:</span>${['', ...S.users].map(u => `<button class="chip${dU === u ? ' on' : ''}" data-du="${esc(u)}">${u ? `<span class="sw" style="background:${userColor(u)}"></span>${esc(u)}` : 'Todo el equipo'}</button>`).join('')}</div>
   <div class="kpis">
     <div class="kpi hero2 rise"><div class="l">Avance de la cartera</div><div class="v" data-count="${pct(touched, total).toFixed(1)}" data-suf="%">0%</div><div class="s">${fmtN(touched)} de ${fmtN(total)} clientes gestionados</div></div>
-    <div class="kpi rise" style="--d:1"><div class="l"><span class="sw att"></span>Atendidos</div><div class="v" data-count="${c.att}">0</div><div class="s">${pct(c.att, total)}% con comentario</div></div>
-    <div class="kpi rise" style="--d:2"><div class="l"><span class="sw rev"></span>Revisados</div><div class="v" data-count="${c.rev}">0</div><div class="s">${pct(c.rev, total)}% sin comentario</div></div>
-    <div class="kpi rise" style="--d:3"><div class="l"><span class="sw none"></span>Pendientes</div><div class="v" data-count="${c.none}">0</div><div class="s">${pct(c.none, total)}% sin interacción</div></div>
-    <div class="kpi rise" style="--d:4"><div class="l"><span class="sw buy"></span>Compras con éxito</div><div class="v" data-count="${c.buy}">0</div><div class="s">${money(totalM)} · éxito ${pct(c.buy, touched)}%</div></div>
-    <div class="kpi rise" style="--d:5"><div class="l"><span class="sw" style="background:var(--s3)"></span>Recuperados</div><div class="v" data-count="${recov.length}">0</div><div class="s">No compraban hace +90 días</div></div>
-    <div class="kpi rise" style="--d:6"><div class="l"><span class="sw noc"></span>No contestan</div><div class="v" data-count="${c.noc}">0</div><div class="s">${fmtN(rows.filter(r => isNoc(r) && r.t.int >= S.cfg.minInt).length)} con ${S.cfg.minInt}+ intentos</div></div>
-    <div class="kpi rise" style="--d:7"><div class="l"><span class="sw agenda"></span>Llamar hoy</div><div class="v" data-count="${c.agenda}">0</div><div class="s">Gestionados hoy: ${fmtN(todayN)}</div></div>
+    <div class="kpi rise kpick${S.dSel === 'att' ? ' sel' : ''}" data-dk="att" title="Clic: ver por usuario" style="--d:1"><div class="l"><span class="sw att"></span>Atendidos</div><div class="v" data-count="${c.att}">0</div><div class="s">${pct(c.att, total)}% con comentario</div></div>
+    <div class="kpi rise kpick${S.dSel === 'rev' ? ' sel' : ''}" data-dk="rev" title="Clic: ver por usuario" style="--d:2"><div class="l"><span class="sw rev"></span>Revisados</div><div class="v" data-count="${c.rev}">0</div><div class="s">${pct(c.rev, total)}% sin comentario</div></div>
+    <div class="kpi rise kpick${S.dSel === 'none' ? ' sel' : ''}" data-dk="none" title="Clic: ver por usuario" style="--d:3"><div class="l"><span class="sw none"></span>Pendientes</div><div class="v" data-count="${c.none}">0</div><div class="s">${pct(c.none, total)}% sin interacción</div></div>
+    <div class="kpi rise kpick${S.dSel === 'buy' ? ' sel' : ''}" data-dk="buy" title="Clic: ver por usuario" style="--d:4"><div class="l"><span class="sw buy"></span>Compras con éxito</div><div class="v" data-count="${c.buy}">0</div><div class="s">${money(totalM)} · éxito ${pct(c.buy, touched)}%</div></div>
+    <div class="kpi rise kpick${S.dSel === 'recov' ? ' sel' : ''}" data-dk="recov" title="Clic: ver por usuario" style="--d:5"><div class="l"><span class="sw" style="background:var(--s3)"></span>Recuperados</div><div class="v" data-count="${recov.length}">0</div><div class="s">No compraban hace +90 días</div></div>
+    <div class="kpi rise kpick${S.dSel === 'noc' ? ' sel' : ''}" data-dk="noc" title="Clic: ver por usuario" style="--d:6"><div class="l"><span class="sw noc"></span>No contestan</div><div class="v" data-count="${c.noc}">0</div><div class="s">${fmtN(rows.filter(r => isNoc(r) && r.t.int >= S.cfg.minInt).length)} con ${S.cfg.minInt}+ intentos</div></div>
+    <div class="kpi rise kpick${S.dSel === 'agenda' ? ' sel' : ''}" data-dk="agenda" title="Clic: ver por usuario" style="--d:7"><div class="l"><span class="sw agenda"></span>Llamar hoy</div><div class="v" data-count="${c.agenda}">0</div><div class="s">Gestionados hoy: ${fmtN(todayN)}</div></div>
   </div>
+  ${S.dSel ? dashDetail(rows, recov) : ''}
   <div class="grid3">
     <div class="card rise" style="--d:2"><h3>Estado de la cartera</h3><div class="sub">Proporción de clientes por estado</div>
       <div class="donut-wrap">${donut([{ l: 'Atendidos', v: c.att, c: 'var(--good)' }, { l: 'Revisados', v: c.rev, c: 'var(--warn)' }, { l: 'Pendientes', v: c.none, c: 'var(--pend)' }], total, pct(touched, total) + '%', 'gestionado')}
@@ -2311,6 +2483,10 @@ $('#dash').addEventListener('click', e => {
   const sc = e.target.closest('[data-scat]'); if (sc) { S.sf.cat = S.sf.cat === sc.dataset.scat ? '' : sc.dataset.scat; return renderSales(true); }
   const se = e.target.closest('[data-sexec]'); if (se) { S.sf.exec = S.sf.exec === se.dataset.sexec ? '' : se.dataset.sexec; return renderSales(true); }
   const b = e.target.closest('#dScope button'); if (b) { LS.set('dashScope', b.dataset.s); renderDash(true); return; }
+  const du = e.target.closest('[data-du]'); if (du) { S.dUser = du.dataset.du === '(sin usuario)' || du.dataset.du === '(sin asignar)' ? S.dUser : du.dataset.du; renderDash(true); return; }
+  const kk = e.target.closest('[data-dk]'); if (kk) { S.dSel = S.dSel === kk.dataset.dk ? '' : kk.dataset.dk; renderDash(true); return; }
+  if (e.target.closest('[data-dclose]')) { S.dSel = ''; renderDash(true); return; }
+  const dl = e.target.closest('[data-dlist]'); if (dl) { setTab('list'); S.st = dl.dataset.dlist; $$('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.st === S.st)); applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0, true); return; }
   const fb = e.target.closest('[data-brand],[data-cat],[data-tipo]');
   if (fb) { $('#q').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; $('#fMarca').value = fb.dataset.brand || ''; $('#fCat').value = fb.dataset.cat || ''; $('#fTipo').value = fb.dataset.tipo || ''; S.st = 'all'; $$('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.st === 'all')); setTab('list'); applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0, true); return; }
   const t = e.target.closest('.tile');
@@ -2324,6 +2500,7 @@ const REPORTS = {
   buy: { t: 'Compras con éxito', d: 'Clientes que compraron, con monto', ic: 'star', c: 'var(--s1)' },
   tel: { t: 'Teléfonos corregidos', d: 'Para actualizar el sistema de la empresa', ic: 'pencil', c: 'var(--good)' },
   pend: { t: 'Sin gestión', d: 'Clientes que nadie ha tocado todavía', ic: 'eye', c: 'var(--pend)' },
+  dup: { t: 'Posibles duplicados', d: 'Mismo RUC o teléfono en varios clientes', ic: 'copy', c: 'var(--serious)' },
   promo: { t: 'Promoción por marca', d: 'Quién la distribuye o a quién ofrecerla', ic: 'tag', c: 'var(--s2)' },
   all: { t: 'Seguimiento completo', d: 'Toda la cartera con su gestión', ic: 'list', c: 'var(--accent)' }
 };
@@ -2348,9 +2525,10 @@ function repRows(type, o) {
       case 'buy': return r.t.buy;
       case 'tel': return !!r.t.fix;
       case 'pend': return status(r) === 'none' && !r.t.res;
+      case 'dup': return dupsOf(r).length > 0;
       default: return true;
     }
-  }).sort((x, y) => type === 'agenda' ? (x.t.next || '').localeCompare(y.t.next || '') : type === 'pend' ? score(y).total - score(x).total || x.r - y.r : x.r - y.r);
+  }).sort((x, y) => type === 'agenda' ? (x.t.next || '').localeCompare(y.t.next || '') : type === 'dup' ? val(x, 'tax').localeCompare(val(y, 'tax')) || x.r - y.r : type === 'pend' ? score(y).total - score(x).total || x.r - y.r : x.r - y.r);
 }
 /* las 18 columnas originales en su orden y, a la derecha, las de seguimiento */
 function repTable(rows) {
@@ -2498,6 +2676,7 @@ function renderStats(keep) {
     ${kpi('Clientes efectivos', ef.length, `${pct(ef.length, g)}% de los gestionados`, true)}
     ${kpi('Con tipo de negocio', withT, `${pct(withT, g)}% de los gestionados`)}
     ${kpi('Con marcas', withB, `${pct(withB, g)}% de los gestionados`)}
+    ${(() => { const bs = new Set(base.map(r => r.k)), qs = S.quotes.filter(q => bs.has(q.k) && (!since || q.d >= since)), won = qs.filter(q => q.est === 'Ganada').length; return kpi('Cotizaciones', qs.length, `${fmtN(won)} ganadas · ${pct(won, qs.length)}% pasó a venta`); })()}
   </div>
   <div class="grid2">
     <div class="card rise"><h3>Embudo de gestión</h3><div class="sub">De la cartera a la compra</div><div class="funnel">
@@ -2531,6 +2710,94 @@ $('#vStats').addEventListener('change', e => {
 });
 $('#vStats').addEventListener('click', e => { if (e.target.closest('#stClear')) { S.stf = { per: '30', exec: '', tipo: '', cat: '', state: '' }; renderStats(true); } });
 
+/* ---------- metas y ranking del día ---------- */
+/* efectivos de hoy de la persona: marcó «Contestó» hoy y el cliente tiene tipo de negocio o marca */
+const efToday = () => S.rows.filter(r => isEfectivo(r) && r.t.hist.some(h => h.who === S.me.name && h.txt === 'Resultado: Contestó' && h.d.startsWith(S.today))).length;
+function loadRank() {
+  call('api_activity', S.token).then(A => {
+    S.activity = A; const el = $('#dRank'); if (!el || !A) return;
+    const people = [...new Set([...Object.keys(A.m || {}), ...Object.keys(A.e || {}), ...S.users])];
+    const L = people.map(u => ({ u, g: ((A.m || {})[u] || {})[S.today] || 0, e: ((A.e || {})[u] || {})[S.today] || 0 })).filter(x => x.g || x.e || x.u === S.me.name).sort((a, b) => b.e - a.e || b.g - a.g);
+    el.innerHTML = `<div class="rt">Ranking de hoy</div>` + (L.length ? L.map((x, i) => `<div class="drr${x.u === S.me.name ? ' you' : ''}"><span>${i + 1}</span><span>${esc(x.u)}</span><span>${fmtN(x.e)} efect. · ${fmtN(x.g)} gest.</span></div>`).join('') : '<small>Aún sin gestiones hoy.</small>');
+  }).catch(() => { const el = $('#dRank'); if (el) el.hidden = true; });
+}
+
+/* ---------- motivo obligatorio ---------- */
+const MOT_ERR = ['No existe o fuera de servicio', 'Es de otra persona o empresa', 'Siempre apagado', 'Fijo sin respuesta', 'Otro'];
+let motPend = null;
+function askMotivo(r, v) {
+  motPend = { r, v };
+  $('#mMotT').textContent = v === 'No interesado' ? '¿Por qué no le interesa?' : '¿Por qué el número está errado?';
+  $('#motTx').textContent = 'Elige el motivo para guardar «' + v + '». Sirve para saber por qué se pierde cada cliente.';
+  $('#motList').innerHTML = (v === 'No interesado' ? MOTIVOS : MOT_ERR).map(m => `<button class="btn" type="button" data-mot="${esc(m)}">${esc(m)}</button>`).join('');
+  openModal('#mMot'); setTimeout(() => { const b = $('#motList button'); if (b) b.focus(); }, 50);
+}
+$('#motList').addEventListener('click', e => {
+  const b = e.target.closest('[data-mot]'); if (!b || !motPend) return;
+  const { r, v } = motPend; motPend = null; closeModal('#mMot');
+  send(r, { op: 'result', val: v, motivo: b.dataset.mot });
+  if (v === 'Número errado') { S.fixOpen = r; S.phDraft = ''; }
+});
+
+/* ---------- cotizaciones ---------- */
+const quotesOf = k => S.quotes.filter(q => q.k === k).sort((a, b) => b.d.localeCompare(a.d) || b.id.localeCompare(a.id));
+function quoteHTML(r, lk) {
+  const qs = quotesOf(r.k), f = S.qf && S.qf.k === r.k ? S.qf : null, mine = r.t.brands || [];
+  return `<div class="p-sec"><h3><span>Cotizaciones${okChk('cot', r)}</span>${lk ? '' : `<button class="linkbtn" data-act="qopen">${icon(f ? 'x' : 'plus')}${f ? 'Cancelar' : 'Registrar cotización'}</button>`}</h3>
+    ${f ? `<div class="qform">
+      ${mine.length ? `<div class="bsel">${mine.map(b => `<button class="bchip${f.b.includes(b) ? ' on' : ''}" data-act="qpick" data-n="${esc(b)}">${esc(b)}</button>`).join('')}</div>` : ''}
+      <div class="badd" style="margin:0"><input class="txtin" id="qBrand" list="dlBrands" placeholder="Marcas cotizadas… escribe y Enter"></div>
+      ${f.b.length ? `<div class="hint" style="margin:0">Marcas: <b>${f.b.map(esc).join(', ')}</b></div>` : ''}
+      <input class="txtin" id="qAmt" inputmode="decimal" placeholder="Monto US$ sin IGV (opcional)" value="${esc(f.m)}">
+      <button class="btn primary" data-act="qsave" style="justify-content:center">${icon('check')}Guardar cotización</button></div>` : ''}
+    ${qs.length ? `<div class="qlist">${qs.slice(0, 5).map(q => `<div class="qi"><b>${esc(q.b)}</b><span class="st ${q.est}">${q.est}</span>
+      <span class="m">${ddmm(q.d)} · ${q.m ? money(q.m) + ' sin IGV · ' : ''}${esc(q.by)}${q.fin ? ' · cerrada ' + ddmm(q.fin) : ''}</span>
+      ${!lk && q.est === 'Enviada' ? `<span class="ac"><button class="btn" data-act="qst" data-n="${esc(q.id)}|Ganada">${icon('check')}Ganada</button><button class="btn" data-act="qst" data-n="${esc(q.id)}|Perdida">Perdida</button></span>` : ''}</div>`).join('')}</div>`
+      : f ? '' : '<div class="hint" style="margin:0">Sin cotizaciones. Al registrar una venta, la cotización abierta pasa sola a «Ganada».</div>'}</div>`;
+}
+async function quoteAct(r, a, n) {
+  if (lockedBy(r)) return toast(lockedBy(r), true);
+  if (a === 'qopen') { S.qf = S.qf && S.qf.k === r.k ? null : { k: r.k, b: [], m: '' }; renderPanel(true); const i = $('#qBrand'); if (i) i.focus(); return; }
+  if (a === 'qpick') { const f = S.qf; f.m = ($('#qAmt') || {}).value || f.m; f.b = f.b.includes(n) ? f.b.filter(x => x !== n) : [...f.b, n]; renderPanel(true); return; }
+  if (a === 'qst') {
+    const [id, est] = n.split('|');
+    try { const res = await call('api_setQuote', S.token, id, est); const q = S.quotes.find(x => x.id === id); if (q) Object.assign(q, res.quote); applyState(res.state); flashOk('cot', r); } catch (e) { toast(e.message, true); }
+    return;
+  }
+  if (a === 'qsave') {
+    const f = S.qf; if (!f) return; f.m = ($('#qAmt') || {}).value || '';
+    if (!f.b.length) return toast('Elige al menos una marca para la cotización.', true);
+    try { const res = await call('api_addQuote', S.token, { k: r.k, brands: f.b, m: f.m }); S.quotes.push(res.quote); S.qf = null; applyState(res.state); flashOk('cot', r); }
+    catch (e) { toast(e.message, true); }
+  }
+}
+$('#panel').addEventListener('keydown', e => {
+  if (e.target.id !== 'qBrand' || e.key !== 'Enter' || !S.qf) return;
+  e.preventDefault(); e.stopPropagation();
+  const b = findBrand(e.target.value); if (!b) return toast('Elige una marca del catálogo.', true);
+  S.qf.m = ($('#qAmt') || {}).value || S.qf.m; if (!S.qf.b.includes(b.m)) S.qf.b.push(b.m); renderPanel(true); const i = $('#qBrand'); if (i) i.focus();
+}, true);
+
+/* ---------- plantillas de WhatsApp: «Nombre | mensaje», una por línea ---------- */
+const tplList = () => String(S.cfg.waTpl || '').split('\n').map(l => l.split('|')).filter(x => x.length >= 2 && x[0].trim() && x.slice(1).join('|').trim()).map(x => ({ n: x[0].trim(), t: x.slice(1).join('|').trim() }));
+
+/* ---------- posibles duplicados: mismo RUC o mismo teléfono ---------- */
+function buildDups() {
+  const tax = new Map(), tel = new Map(), add = (m, k, r) => { if (!k) return; const l = m.get(k); if (l) l.push(r); else m.set(k, [r]); };
+  S.rows.forEach(r => { const t = val(r, 'tax').replace(/\D/g, ''); if (t.length >= 8) add(tax, t, r); new Set([...parsePhones(val(r, 'phone')).map(p => p.d), ...(r.t.fix ? [r.t.fix.replace(/\D/g, '')] : [])].filter(d => d.length >= 7)).forEach(d => add(tel, d, r)); });
+  S.dups = { tax, tel };
+}
+function dupsOf(r) {
+  const out = new Map(), t = val(r, 'tax').replace(/\D/g, '');
+  (S.dups.tax.get(t) || []).forEach(x => { if (x !== r) out.set(x.k, { r: x, why: 'mismo RUC' }); });
+  parsePhones(val(r, 'phone')).forEach(p => (S.dups.tel.get(p.d) || []).forEach(x => { if (x !== r && !out.has(x.k)) out.set(x.k, { r: x, why: 'mismo teléfono' }); }));
+  return [...out.values()];
+}
+function dupHTML(r) {
+  const l = dupsOf(r); if (!l.length) return '';
+  return `<div class="dupbar"><b>${icon('alert')} Posible duplicado</b>${l.slice(0, 4).map(x => `<span>Fila ${x.r.r} · <a data-act="dupopen" data-n="${esc(x.r.k)}">${esc(val(x.r, 'legal') || x.r.k)}</a> (${x.why})</span>`).join('')}${l.length > 4 ? `<span>y ${l.length - 4} más (Reportes → Posibles duplicados)</span>` : ''}</div>`;
+}
+
 /* ---------- reparto de cartera (administrador) ---------- */
 let rpMode = 'rows';
 function parseRowsUI(spec) {
@@ -2552,13 +2819,15 @@ const execList = () => S.users.filter(u => u !== S.me.name);
 function openResv() {
   $('#rpUser').innerHTML = [...execList(), S.me.name].map(u => `<option>${esc(u)}</option>`).join('');
   $('#rpUsers').innerHTML = execList().map(u => `<label><input type="checkbox" value="${esc(u)}" checked> ${esc(u)}</label>`).join('');
+  $('#rpToUs').innerHTML = execList().map(u => `<label><input type="checkbox" value="${esc(u)}" checked> ${esc(u)}</label>`).join('');
+  $('#rpFromU').innerHTML = '<option value="">Todos los ejecutivos</option>' + execList().map(u => `<option>${esc(u)}</option>`).join('');
   $('#rpSpec').value = $('#fFrom').value && $('#fTo').value ? $('#fFrom').value + '-' + $('#fTo').value : '';
   setRpMode(rpMode); renderResvList(); openModal('#mResv'); setTimeout(() => $(rpMode === 'alt' ? '#rpFrom' : '#rpSpec').focus(), 50);
 }
 function setRpMode(m) {
   rpMode = m; $$('#rpMode button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
-  $('#rpRows').hidden = m === 'alt'; $('#rpAlt').hidden = m !== 'alt'; $('#rpUserWrap').hidden = m === 'clear';
-  $('#bDoResv span').textContent = m === 'clear' ? 'Quitar asignación' : 'Guardar reparto'; updResv();
+  $('#rpRows').hidden = m === 'alt' || m === 'stale'; $('#rpAlt').hidden = m !== 'alt'; $('#rpStale').hidden = m !== 'stale'; $('#rpUserWrap').hidden = m === 'clear';
+  $('#bDoResv span').textContent = m === 'clear' ? 'Quitar asignación' : m === 'stale' ? 'Reasignar' : 'Guardar reparto'; updResv();
 }
 function renderResvList() {
   const by = {}; S.rows.forEach(r => { const u = S.asg[r.k]; if (u) (by[u] = by[u] || []).push(r.r); });
@@ -2569,6 +2838,12 @@ function renderResvList() {
 function updResv() {
   const byRow = new Map(S.rows.map(r => [r.r, r])), last = S.rows.reduce((m, r) => Math.max(m, r.r), 2);
   try {
+    if (rpMode === 'stale') {
+      const days = Math.max(1, +$('#rpDays').value || 15), lim = addDays(S.today, -days), from = $('#rpFromU').value, to = $$('#rpToUs input:checked').map(x => x.value);
+      const c = S.rows.filter(r => S.asg[r.k] && (!from || S.asg[r.k] === from) && (!r.t.last || r.t.last.slice(0, 10) <= lim)).length;
+      $('#rpPrev').innerHTML = to.length ? `Hasta <b>${fmtN(c)}</b> clientes sin gestión hace ${days}+ días pasarán en turno a ${to.map(esc).join(', ')}.` : 'Marca a quién pasarlos.';
+      return;
+    }
     if (rpMode === 'alt') {
       const us = $$('#rpUsers input:checked').map(x => x.value), from = +$('#rpFrom').value || 2, to = +$('#rpTo').value || last, block = Math.max(1, +$('#rpBlock').value || 1);
       if (!us.length) { $('#rpPrev').textContent = 'Marca al menos un ejecutivo.'; return; }
@@ -2585,17 +2860,17 @@ function updResv() {
   } catch (e) { $('#rpPrev').textContent = e.message; }
 }
 $('#rpMode').addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (b) setRpMode(b.dataset.m); });
-['#rpSpec', '#rpUser', '#rpFrom', '#rpTo', '#rpBlock'].forEach(x => $(x).addEventListener('input', updResv));
-$('#rpUsers').addEventListener('change', updResv);
+['#rpSpec', '#rpUser', '#rpFrom', '#rpTo', '#rpBlock', '#rpDays', '#rpFromU'].forEach(x => $(x).addEventListener('input', updResv));
+['#rpUsers', '#rpToUs', '#rpFromU'].forEach(x => $(x).addEventListener('change', updResv));
 $('#bDoResv').onclick = async () => {
-  const p = rpMode === 'alt' ? { mode: 'alt', users: $$('#rpUsers input:checked').map(x => x.value), from: $('#rpFrom').value, to: $('#rpTo').value, block: $('#rpBlock').value }
+  const p = rpMode === 'stale' ? { mode: 'stale', days: $('#rpDays').value, from: $('#rpFromU').value, users: $$('#rpToUs input:checked').map(x => x.value) } : rpMode === 'alt' ? { mode: 'alt', users: $$('#rpUsers input:checked').map(x => x.value), from: $('#rpFrom').value, to: $('#rpTo').value, block: $('#rpBlock').value }
     : { mode: rpMode, spec: $('#rpSpec').value, user: $('#rpUser').value };
   if (rpMode === 'clear' && !confirm('¿Quitar la asignación de esas filas? Esos clientes quedarán sin ejecutivo.')) return;
   $('#bDoResv').disabled = true;
   try {
     const res = await call('api_assign', S.token, p);
     S.asg = res.asg; renderResvList(); updResv(); render(); updStrip();
-    toast(`${fmtN(res.count)} clientes ${rpMode === 'clear' ? 'liberados' : 'asignados'}. Cada ejecutivo lo verá al actualizar.`);
+    toast(`${fmtN(res.count)} clientes ${rpMode === 'clear' ? 'liberados' : rpMode === 'stale' ? 'reasignados' : 'asignados'}. Cada ejecutivo lo verá al actualizar.`);
   } catch (er) { toast(er.message, true); }
   $('#bDoResv').disabled = false;
 };
@@ -2608,7 +2883,7 @@ function openCfg() {
   $('#cAdmin').hidden = !isAdmin();
   $('#cWaMe').value = UI.wa || 'ask'; $('#cSync').value = UI.sync === 'auto' ? 'auto' : 'manual';
   const c = S.cfg;
-  $('#cCC').value = c.cc; $('#cLen').value = c.mobLen; $('#cLock').checked = c.lockRow; $('#cScope').checked = c.scopeOwn !== false; $('#cMin').value = c.minInt; $('#cPoll').value = c.poll; $('#cGoal').value = c.goal; $('#cSGoal').value = c.salesGoal || 0;
+  $('#cCC').value = c.cc; $('#cLen').value = c.mobLen; $('#cLock').checked = c.lockRow; $('#cScope').checked = c.scopeOwn !== false; $('#cMin').value = c.minInt; $('#cPoll').value = c.poll; $('#cGoal').value = c.goal; $('#cGoalEf').value = c.goalEf != null ? c.goalEf : 10; $('#cTpl').value = c.waTpl || ''; $('#cSGoal').value = c.salesGoal || 0;
   $('#cWa').value = c.waMode; $('#cMsg').value = c.waMsg; $('#cMail').value = c.mailMode; $('#cSubj').value = c.mailSubj;
   $('#cBrandInfo').textContent = `${S.brands.length} marcas en ${S.cats.length} líneas. Para cambiar la línea de una marca, pídeselo al administrador del libro.`;
   $('#cBrandCat').innerHTML = S.cats.map(x => `<option>${esc(x)}</option>`).join('');
@@ -2624,7 +2899,7 @@ $('#bCfgOk').onclick = async () => {
   if (isAdmin()) {
     $('#bCfgOk').disabled = true;
     try {
-      S.cfg = await call('api_saveCfg', S.token, { cc: $('#cCC').value, mobLen: $('#cLen').value, lockRow: $('#cLock').checked, scopeOwn: $('#cScope').checked, minInt: $('#cMin').value, poll: $('#cPoll').value, goal: $('#cGoal').value, salesGoal: $('#cSGoal').value, waMode: $('#cWa').value, waMsg: $('#cMsg').value, mailMode: $('#cMail').value, mailSubj: $('#cSubj').value });
+      S.cfg = await call('api_saveCfg', S.token, { cc: $('#cCC').value, mobLen: $('#cLen').value, lockRow: $('#cLock').checked, scopeOwn: $('#cScope').checked, minInt: $('#cMin').value, poll: $('#cPoll').value, goal: $('#cGoal').value, goalEf: $('#cGoalEf').value, waTpl: $('#cTpl').value, salesGoal: $('#cSGoal').value, waMode: $('#cWa').value, waMsg: $('#cMsg').value, mailMode: $('#cMail').value, mailSubj: $('#cSubj').value });
       startPoll(); renderNow(); renderPanel(); toast('Configuración guardada para todo el equipo. La visibilidad se aplica al volver a entrar.');
     } catch (e) { toast(e.message, true); }
     $('#bCfgOk').disabled = false;
@@ -2684,10 +2959,23 @@ function setTab(t) {
   $('#vDay').classList.toggle('on', t === 'day'); $('#vBrands').classList.toggle('on', t === 'brands'); $('#vList').classList.toggle('on', t === 'list'); $('#dash').classList.toggle('on', t === 'dash'); $('#rep').classList.toggle('on', t === 'rep'); $('#vStats').classList.toggle('on', t === 'stats');
   $('#toolbar').hidden = t !== 'list'; $('#strip').hidden = t !== 'list';
   updDayBadge();
-  if (t === 'day') renderDay(); else if (t === 'brands') renderBrands(); else if (t === 'dash') renderDash(); else if (t === 'stats') renderStats(); else if (t === 'rep') renderRep(false); else { renderNow(); renderPanel(true); }
+  if (t === 'day') renderDay(); else if (t === 'brands') renderBrands(); else if (t === 'dash') renderDash(); else if (t === 'stats') renderStats(); else if (t === 'rep') renderRep(false); else { if (S.header.length) applyWidths(); renderNow(); renderPanel(true); }
 }
 $$('#mainTabs button').forEach(b => b.onclick = () => setTab(b.dataset.tab));
-function applyPanel() { const small = innerWidth <= 1000; $('#panel').classList.toggle('hide', !small && !UI.panel); $('#panel').classList.toggle('hide-m', small && !UI.panelM); }
+function applyPanel() {
+  const small = innerWidth <= 1000;
+  $('#panel').classList.toggle('hide', !small && !UI.panel); $('#panel').classList.toggle('hide-m', small && !UI.panelM);
+  $('#panel').style.width = small ? '' : (UI.panelW || 380) + 'px'; $('#pSplit').hidden = small || !UI.panel;
+  if (S.me && COLS.length) { applyWidths(); render(); }
+}
+/* ancho del panel de detalle: se arrastra la barra entre la lista y el detalle (se recuerda) */
+$('#pSplit').addEventListener('mousedown', e => {
+  e.preventDefault();
+  const x0 = e.clientX, w0 = $('#panel').getBoundingClientRect().width; document.body.classList.add('resizing');
+  const mv = ev => { UI.panelW = Math.max(300, Math.min(Math.round(innerWidth * 0.6), Math.round(w0 - (ev.clientX - x0)))); $('#panel').style.width = UI.panelW + 'px'; applyWidths(); };
+  const up = () => { document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); document.body.classList.remove('resizing'); saveUI(); render(); };
+  document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
+});
 $('#bPanel').onclick = () => { if (innerWidth <= 1000) UI.panelM = !UI.panelM; else UI.panel = !UI.panel; saveUI(); applyPanel(); };
 $('#bResv').onclick = openResv; $('#bCfg').onclick = openCfg; $('#bUsers').onclick = openUsers; $('#bKeys').onclick = () => openModal('#mKeys');
 $('#bReload').onclick = () => { flushAll(); loadAll(false); };
@@ -2705,7 +2993,7 @@ $('#bClear').onclick = () => { $('#q').value = ''; $('#fFrom').value = ''; $('#f
 $('#chips').addEventListener('click', e => { const c = e.target.closest('.chip'); if (!c) return; S.st = c.dataset.st; $$('#chips .chip').forEach(x => x.classList.toggle('on', x === c)); applyFilter(); $('#grid').scrollTop = 0; if (S.view.length) setActive(0); });
 $('#grid').addEventListener('scroll', render, { passive: true });
 window.addEventListener('resize', () => { if (S.me && (innerWidth <= 760) !== NARROW) buildCols(); render(); applyPanel(); moveInd(); });
-function actArg(b) { return b.dataset.act === 'copy' ? b.dataset.f : (['res', 'tipo', 'brand', 'brandrel', 'brandrm', 'addrel', 'ovpick', 'ovrm', 'ovst'].includes(b.dataset.act) ? b.dataset.n : (b.dataset.n != null ? +b.dataset.n : null)); }
+function actArg(b) { return b.dataset.act === 'copy' ? b.dataset.f : (['res', 'tipo', 'brand', 'brandrel', 'brandrm', 'addrel', 'ovpick', 'ovst', 'qpick', 'qst', 'dupopen'].includes(b.dataset.act) ? b.dataset.n : (b.dataset.n != null ? +b.dataset.n : null)); }
 $('#gbody').addEventListener('click', e => {
   const rowE = e.target.closest('.row'); if (!rowE) return;
   const i = +rowE.dataset.i, r = S.view[i];
@@ -2735,7 +3023,7 @@ $('#panel').addEventListener('input', e => {
   if (e.target.id === 'oNum') S.ov.num = e.target.value;
   if (e.target.id === 'oDate') S.ov.date = e.target.value;
   if (e.target.id === 'oNota') S.ov.nota = e.target.value;
-  if (e.target.classList.contains('oamt')) { S.ov.lines[+e.target.dataset.i].m = e.target.value.replace(/[^\d.]/g, ''); const t = $('#oTot'); if (t) t.textContent = money(S.ov.lines.reduce((a, l) => a + (+l.m || 0), 0)); }
+  if (e.target.classList.contains('oamt')) { S.ov.lines[+e.target.dataset.i].m = e.target.value.replace(/[^\d.]/g, ''); const t = $('#oTot'); const tt = S.ov.lines.reduce((a, l) => a + (+l.m || 0), 0); if (t) t.textContent = money(tt); const g = $('#oIgv'); if (g) g.textContent = igvTx(tt); }
 });
 $('#panel').addEventListener('keydown', e => {
   if (!S.ov || e.key !== 'Enter') return;
@@ -2747,6 +3035,7 @@ $('#panel').addEventListener('keydown', e => {
 $('#panel').addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('bcat')) S.catOpen = e.target.open; }, true);
 $('#panel').addEventListener('change', e => {
   if (!S.active) return;
+  if (e.target.id === 'pTpl') { UI.waTplSel = e.target.value; saveUI(); }
   if (e.target.id === 'pNext') send(S.active, { op: 'next', val: e.target.value });
   if (e.target.id === 'pMotivo') send(S.active, { op: 'motivo', val: e.target.value });
   if (e.target.id === 'pMonto') send(S.active, { op: 'monto', val: e.target.value });

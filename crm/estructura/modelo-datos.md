@@ -54,7 +54,7 @@ La línea de la marca no se repite aquí: se obtiene de `_Marcas`, así un cambi
 | Fecha terminado / Terminado por | Cuándo y quién cerró el proceso |
 | Nota | Observaciones de entrega o recojo |
 
-Mientras una OV no esté en `Terminado` (o `Anulada`), aparece en las notificaciones.
+Montos en **US$ sin IGV**. Si no se escribe el N° de OV, se genera `OC-<CustomerID>-<aammddhhmm>`. Mientras una OV no esté en `Terminado` (o `Anulada`), aparece en las notificaciones.
 
 ### `_Ventas`: una fila por marca dentro de cada OV
 OV · Customer ID · Fecha OV · Marca · Monto sin IGV · Ejecutivo. La línea de la marca se toma de `_Marcas`.
@@ -65,6 +65,9 @@ Customer ID · Fecha y hora · Usuario · Acción (resultado, comentario, marca,
 ### `_Reparto`: cartera asignada por el administrador
 Customer ID · Ejecutivo · Asignado por · Fecha. Una fila por cliente. Con reparto, cada ejecutivo ve solo sus clientes.
 
+### `_Cotizaciones`: una fila por cotización
+ID · Customer ID · Fecha · Marcas · Monto US$ sin IGV · Ejecutivo · Estado (`Enviada` · `Ganada` · `Perdida`) · Fecha cierre · Cerrado por. Al registrar una venta, la cotización abierta más reciente del cliente pasa a `Ganada`.
+
 ### `_Telefonos`: números corregidos
 Customer ID · Teléfono original · Teléfono corregido · Corregido por · Fecha. La columna `Cust. Telephone` de la cartera conserva el original.
 
@@ -74,7 +77,7 @@ Customer ID · Teléfono original · Teléfono corregido · Corregido por · Fec
 - `_Config`: ajustes del equipo (meta diaria, meta mensual de venta, intentos para purga, visibilidad, WhatsApp…) y el contador `seq`, que sube con cada cambio para que los demás paneles sepan que deben recargar.
 
 ## Pestaña visible `Seguimiento` (reporte del administrador)
-La crea o actualiza el administrador desde Reportes, nunca sola. Una fila por fecha y ejecutivo: Clientes gestionados · **Clientes efectivos** (marcados «Contestó» ese día que tienen tipo de negocio o al menos una marca) · Contestó sin tipo ni marca · No contesta · Volver a llamar · Número errado · No interesado · Revisados · Comentarios · Intentos de contacto · Números corregidos · Marcas registradas · Tipos de negocio registrados · OV registradas · Venta sin IGV · % efectividad. Debajo, los totales del período por ejecutivo. Se rehace completa cada vez desde `_Historial` y `_Ordenes`.
+La crea o actualiza el administrador desde Reportes, nunca sola. Una fila por fecha y ejecutivo: Clientes gestionados · **Clientes efectivos** (marcados «Contestó» ese día que tienen tipo de negocio o al menos una marca) · Contestó sin tipo ni marca · No contesta · Volver a llamar · Número errado · No interesado · Revisados · Comentarios · Intentos de contacto · Números corregidos · Marcas registradas · Tipos de negocio registrados · Cotizaciones · OV registradas · Venta sin IGV (US$) · % efectividad. Debajo, los totales del período por ejecutivo y el **resumen por semana** (lunes a domingo) con la diferencia de efectivos y de venta frente a la semana anterior. Se rehace completa cada vez desde `_Historial` y `_Ordenes`.
 
 ## Quién ve qué
 

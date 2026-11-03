@@ -7,7 +7,7 @@ Este repositorio contiene el firmware brunch y, en `crm/`, el sistema de gestió
 La cartera de clientes es la base de todo el CRM. Su estructura está definida en `crm/estructura/columnas-cartera.json`, con la plantilla original en `crm/estructura/plantilla-cartera.xlsx`.
 
 - Las 18 columnas de `Hoja1` (de `Organization` a `Comentario Créditos`) nunca se agregan, quitan, renombran ni reordenan.
-- **La hoja de la cartera no se modifica.** Lo único que el sistema escribe en `Hoja1` es la columna `Comentario Créditos`, siempre agregando (`dd/mm Usuario: texto`) sin borrar lo anterior. No escribe en `Ejecutivo`, no pinta filas ni cambia formatos.
+- **La hoja de la cartera no se modifica.** Lo único que el sistema escribe en `Hoja1` es la columna `Comentario Créditos`, siempre agregando (`dd/mm Usuario: texto`) sin borrar lo anterior. Cada persona puede **editar el texto de sus propios comentarios** (el administrador, cualquiera): se conservan fecha y autor, los demás comentarios no se tocan y el texto anterior queda en `_Historial`. No escribe en `Ejecutivo`, no pinta filas ni cambia formatos.
 - **Opción B (decidida):** como el usuario no tiene acceso a Entra ID para registrar una app de Microsoft Graph, todo dato adicional (seguimiento, historial, asignaciones, marcas, ventas, órdenes, teléfonos) se guarda en **pestañas internas «muy ocultas»** (`VeryHidden`) del mismo archivo, enlazadas por `Customer ID`. No aparecen en «Mostrar hojas». Si más adelante TI registra la app, esos datos se migran a un archivo paralelo sin cambiar su estructura.
 - Cada fila es un cliente independiente. Se identifica por `Customer ID`, nunca por el número de fila, porque la hoja puede ordenarse o filtrarse.
 - `Customer ID`, `Tax Reg No` y los teléfonos se tratan como texto.
@@ -17,8 +17,10 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 
 ## Ventas y órdenes (OV)
 
-- Toda venta se registra con su **número de OV** (obligatorio y único) y una línea por marca con su monto.
-- Los montos siempre son **sin IGV**.
+- Toda venta se registra con una línea por marca y su monto, enlazada al cliente por su Customer ID. El **número de OV es opcional y único**: si no se escribe, se genera `OC-<CustomerID>-<aammddhhmm>`.
+- Los montos siempre son **en dólares (US$) y sin IGV**; el IGV (18 %) se muestra calculado, nunca se guarda en el monto.
+- La marca de cada línea se reconoce sin importar mayúsculas ni acentos y queda registrada como «habitual» del cliente.
+- **Cotizaciones** (`_Cotizaciones`): marcas y monto opcional en US$; al registrar una venta del cliente, su cotización abierta más reciente pasa sola a «Ganada».
 - Al registrar una OV su estado pasa automáticamente a **Despachando**. La alerta sigue activa hasta que alguien la marque como **Terminado**; no se puede desactivar.
 - Estados: `Despachando` → `Terminado`, con `Incidencia` para problemas de entrega. Solo el administrador puede **reabrir** una OV cerrada o **anularla**; las anuladas no cuentan en las ventas.
 - El monto comprado de cada cliente es la suma de sus OV no anuladas; no se escribe a mano.
@@ -28,6 +30,7 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 
 - Tipo de negocio de cada cliente: **Reseller tienda virtual**, **Reseller tienda física**, **Oficina (B2B)** o **Híbrido** (combina lo anterior). Se sugiere por palabras clave del comentario y se confirma en el panel; se guarda en `_Seguimiento`. Los tipos anteriores (Tienda/Oficina/Híbrido) se dejaron sin tipo una sola vez (`tiposV2` en `_Config`).
 - Los resultados de contacto solo los marca la persona con un clic: copiar el contacto o abrir WhatsApp no marcan «Revisado» ni ningún resultado.
+- «No interesado» y «Número errado» no se guardan sin **motivo**.
 - **Cliente efectivo:** marcado «Contestó» y con tipo de negocio o al menos una marca. Es la cifra que cuentan el reporte `Seguimiento` y las Estadísticas.
 - El catálogo de marcas está en `crm/estructura/marcas.json` (pestaña `_Marcas`). Las marcas que distribuye cada cliente van en `_ClienteMarcas`, nunca como columnas de la cartera.
 - Cada marca de un cliente lleva su relación (`habitual`, `ocasional`, `interes`), quién la registró y la fecha. Pasados 90 días se marca «por confirmar».
@@ -35,6 +38,7 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 ## Visibilidad
 
 - **Reparto de cartera:** el administrador asigna clientes a cada ejecutivo por filas (rangos como al imprimir, `2-500, 650`) o alternados entre varios. Se guarda por Customer ID en `_Reparto`. En cuanto hay reparto, cada ejecutivo ve y trabaja **solo** lo que le asignaron.
+- El administrador puede **reasignar** clientes asignados sin gestión hace N días a otros ejecutivos, en turno.
 - Mientras no haya reparto, el ejecutivo ve su cartera según la columna `Ejecutivo` (con su «Nombre en cartera»), sus filas reservadas o los clientes que gestionó. El administrador ve todo.
 - El modelo completo de pestañas auxiliares está en `crm/estructura/modelo-datos.md`.
 

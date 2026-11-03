@@ -15,6 +15,7 @@ const NAMES = ['Ferretería San Martín SAC', 'Distribuidora El Sol EIRL', 'Inve
 /* como en una cartera real: mayúsculas, espacios de más y el nombre completo en vez del usuario */
 const execs = ['Harold', ' HAROLD ', 'harold', 'Luis', 'Luis', '', '', '', 'HAROLD QUISPE', '', 'Luis', ''];
 const cartera = [COLS, ...NAMES.map((n, i) => ['PE01', 'K21' + (i % 4), execs[i], String(100101 + i), n, '20600' + (100101 + i), 'Av. Ejemplo ' + (100 + i), 'Lima', 'Lima', 987650000 + i * 111, `compras${i}@ejemplo.pe`, '30D', 'R1' + (i % 5), 5000 + i * 7000, 43500 + i * 30, 45900 + i * 20, ['A', 'B', 'C'][i % 3], i === 2 ? 'Tiene tienda en galería Wilson' : ''])];
+cartera[12][5] = cartera[11][5];
 const SEED = [{ name: 'Hoja1', rows: cartera }, { name: 'Resumen', rows: [['Notas'], ['hoja ajena al sistema']] }];
 
 const fails = [];
@@ -52,7 +53,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.click('#suBtn');
   await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana');
   const vis = await page.evaluate(() => window.__book.raw.sheets.map(s => s.name + ':' + s.visibility));
-  ok(vis.filter(x => x.startsWith('_')).length === 11 && vis.filter(x => x.startsWith('_')).every(x => x.endsWith(':VeryHidden')), '11 pestañas internas creadas como VeryHidden');
+  ok(vis.filter(x => x.startsWith('_')).length === 12 && vis.filter(x => x.startsWith('_')).every(x => x.endsWith(':VeryHidden')), '12 pestañas internas creadas como VeryHidden');
   ok(vis.includes('Hoja1:Visible') && vis.includes('Resumen:Visible'), 'Hoja1 y hojas ajenas siguen visibles');
   ok((await aux('_Marcas')).length === 90, 'Catálogo de 89 marcas en _Marcas');
   const u0 = await aux('_Usuarios');
@@ -171,6 +172,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
 
   /* 6. venta con OV */
   await page.click('[data-act="ovopen"]');
+  await page.click('.ovmore summary');
   await page.fill('#oNum', 'ov-5001');
   await page.fill('#oQuick', 'HP 1500, Lenovo 2300'); await page.press('#oQuick', 'Enter');
   await page.click('[data-act="ovsave"]'); await page.waitForTimeout(250);
@@ -179,12 +181,42 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok(ven.filter(r => r[0] === 'OV-5001').length === 2, 'Una línea por marca en _Ventas');
   ok(!(await page.$('#bellCt[hidden]')), 'La campana avisa de la OV abierta');
   await page.click('[data-act="ovopen"]');
+  await page.click('.ovmore summary');
   await page.fill('#oNum', 'OV-5001'); await page.fill('#oQuick', 'HP 100'); await page.press('#oQuick', 'Enter');
   await page.click('[data-act="ovsave"]'); await page.waitForTimeout(200);
   ok(/ya está registrada/.test(await toast()), 'OV duplicada rechazada');
   await page.click('[data-act="ovopen"]');
   await page.click('[data-act="ovst"][data-n="OV-5001|Terminado"]'); await page.waitForTimeout(200);
   ok((await aux('_Ordenes')).some(r => r[0] === 'OV-5001' && r[4] === 'Terminado' && r[7] === 'Ana'), 'OV marcada como Terminado por quien la cerró');
+
+  /* 6b. cotización → venta rápida en US$ sin N° de OV (marca en minúsculas) → la cotización queda ganada */
+  await page.click('[data-act="qopen"]'); await page.fill('#qBrand', 'jbl'); await page.press('#qBrand', 'Enter'); await page.fill('#qAmt', '900');
+  await page.click('[data-act="qsave"]'); await page.waitForTimeout(400);
+  ok((await aux('_Cotizaciones')).some(r => r[1] === '100103' && r[3] === 'JBL' && r[6] === 'Enviada'), 'Cotización registrada con su marca (Enviada)');
+  await page.click('[data-act="ovopen"]');
+  await page.fill('#oQuick', 'jbl 800'); await page.press('#oQuick', 'Enter'); await page.waitForTimeout(100);
+  ok(/IGV 18 %: US\$ 144 · Total con IGV: US\$ 944/.test(await page.textContent('#oIgv')), 'La venta se registra en US$ sin IGV y el IGV se calcula solo');
+  const t0 = Date.now(); await page.click('[data-act="ovsave"]');
+  await page.waitForSelector('#panel .okchk', { timeout: 2000 }); const dt = Date.now() - t0;
+  ok(dt < 1500, `Al guardar aparece al instante el ✓ «Guardado» (${dt} ms), sin mensaje`);
+  await page.waitForTimeout(500);
+  const ords = await aux('_Ordenes'), auto = ords.find(r => /^OC-100103-\d{10}$/.test(r[0]));
+  ok(auto && auto[3] === '800' && (await aux('_Ventas')).some(r => r[0] === auto[0] && r[3] === 'JBL'), 'Sin N° de OV se genera uno con el Customer ID; «jbl» se reconoce como JBL');
+  ok((await aux('_Cotizaciones')).some(r => r[1] === '100103' && r[6] === 'Ganada'), 'Al registrar la venta, la cotización abierta queda «Ganada»');
+  /* editar un comentario propio */
+  await page.click('[data-act="cmted"][data-n="0"]'); await page.fill('#pCmtEd', 'Pidió precios de HP y Lenovo');
+  await page.click('[data-act="cmtedok"]'); await page.waitForTimeout(400);
+  ok(/^\d\d\/\d\d Ana: Pidió precios de HP y Lenovo \| Tiene tienda en galería Wilson$/.test((await aux('Hoja1'))[3][17]), 'Se edita el propio comentario sin tocar los demás');
+  ok((await aux('_Historial')).some(r => r[0] === '100103' && /^Editó un comentario: «Pidió precios de HP» → «Pidió precios de HP y Lenovo»/.test(r[3])), 'El texto anterior queda en el historial');
+  /* motivo obligatorio */
+  await page.click('#gbody .row[data-i="11"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(500);
+  await page.click('[data-act="res"][data-n="No interesado"]'); await page.waitForSelector('#mMot.on');
+  ok(!(await aux('_Seguimiento')).some(r => r[0] === '100112' && r[2] === 'No interesado'), '«No interesado» no se guarda sin motivo');
+  await page.click('#motList [data-mot="Precio"]'); await page.waitForTimeout(400);
+  ok((await aux('_Seguimiento')).some(r => r[0] === '100112' && r[2] === 'No interesado' && r[3] === 'Precio'), 'Con el motivo elegido se guarda resultado y motivo');
+  /* posible duplicado (mismo RUC) */
+  ok(/Posible duplicado/.test(await page.textContent('#panel')) && /mismo RUC/.test(await page.textContent('#panel')), 'El panel avisa de un posible duplicado por RUC');
+  await page.click('#gbody .row[data-i="2"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(500);
 
   /* 7. número corregido */
   await page.click('#gbody .row[data-i="5"]');
@@ -227,10 +259,32 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   const hoy = await page.evaluate(() => { const d = new Date(), p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); });
   const fa = fsh && fsh.find(r => r[0] === hoy && r[1] === 'Ana');
   ok(fsVis === 'Visible' && fsh[0][0] === 'Fecha' && fsh[0][3] === 'Clientes efectivos', 'El administrador crea la pestaña visible «Seguimiento» con sus columnas');
-  ok(fa && +fa[2] === 4 && +fa[3] === 1 && +fa[15] === 1 && +fa[16] === 3800, `Una fila por fecha y ejecutivo: gestionados, efectivos, OV y venta [${fa ? fa.slice(0, 4).concat(fa.slice(15, 17)).join(' · ') : 'sin fila'}]`);
+  ok(fa && +fa[2] === 5 && +fa[3] === 1 && +fa[15] === 1 && +fa[16] === 2 && +fa[17] === 4600, `Una fila por fecha y ejecutivo: gestionados, efectivos, OV y venta [${fa ? fa.slice(0, 4).concat(fa.slice(16, 18)).join(' · ') : 'sin fila'}]`);
   ok(fsh.some(r => r[0] === 'Total' && r[1] === 'Ana'), 'Incluye los totales del período por ejecutivo');
+  ok(fsh.some(r => r[0] === 'Resumen por semana (lunes a domingo)') && fsh.some(r => r[0] === 'Semana (lunes)' && r[7] === 'Efectivos vs semana anterior'), 'Incluye el resumen por semana con la comparación');
   const h1b = await aux('Hoja1');
   ok(h1b.length === cartera.length && h1b[0].join('|') === COLS.join('|'), 'La hoja de clientes no cambia al crear el reporte');
+
+  /* 9b2. dashboard: recuadros seleccionables, filtro por usuario y ventas por marca */
+  await page.click('#mainTabs [data-tab="dash"]'); await page.waitForTimeout(400);
+  if (await page.$('#dMode [data-dm="gest"]:not(.on)')) await page.click('#dMode [data-dm="gest"]');
+  await page.click('[data-dk="att"]'); await page.waitForTimeout(300);
+  ok(/Atendidos por usuario/.test(await page.textContent('#dash .dsel')), 'Al seleccionar «Atendidos» se ve el detalle por usuario');
+  await page.click('#dUsers [data-du="Ana"]'); await page.waitForTimeout(300);
+  ok(/interactuó/.test(await page.textContent('#dash .d-head')), 'El dashboard cambia según el usuario elegido');
+  await page.click('#dUsers [data-du=""]'); await page.click('#dMode [data-dm="ventas"]'); await page.waitForTimeout(400);
+  const vt = await page.textContent('#dash');
+  ok(/Marcas más recurrentes/.test(vt) && /Combos frecuentes/.test(vt) && /A qué marcas pedir promoción/.test(vt) && /HP.*Lenovo|Lenovo.*HP/s.test(vt), 'Ventas muestra marcas recurrentes, combos (HP + Lenovo) y a qué marcas pedir promoción');
+  await page.click('#dMode [data-dm="gest"]');
+  /* Mi día: resumen lateral, listas con su barra y ranking */
+  await page.click('#mainTabs [data-tab="day"]'); await page.waitForTimeout(700);
+  ok(await page.$('#vDay .day2 .hero.vert') && (await page.$$eval('#vDay .dscroll', l => l.map(x => getComputedStyle(x).overflowY))).every(x => x === 'auto'), 'Mi día: resumen al costado y cada lista con su propia barra de desplazamiento');
+  ok(/Ranking de hoy/.test(await page.textContent('#dRank')) && /Ana/.test(await page.textContent('#dRank')) && /Efectivos hoy/.test(await page.textContent('#vDay')), 'Mi día muestra la meta de efectivos y el ranking del día');
+  await shot('15-mi-dia-ranking');
+  /* campana: recordatorio de llamadas para hoy */
+  await page.click('#bBell'); await page.waitForTimeout(200);
+  ok(/OV por cerrar/.test(await page.textContent('#bellPop')), 'La campana sigue mostrando las OV abiertas');
+  await page.click('#mainTabs [data-tab="list"]');
 
   /* 9c. estadísticas */
   await page.click('#mainTabs [data-tab="stats"]'); await page.waitForTimeout(700);
@@ -254,6 +308,20 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.reload(); await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana'); await page.waitForTimeout(300);
   const sg2 = await aux('_Seguimiento'), cfg2 = await aux('_Config');
   ok(sg2.slice(1).every(r => !r[6]) && cfg2.some(r => r[0] === 'tiposV2' && r[1] === 'SI'), 'Los tipos de negocio anteriores se dejan sin tipo una sola vez');
+
+  /* 9f. plantillas de WhatsApp elegidas en el panel */
+  await page.click('#bCfg'); await page.fill('#cTpl', 'Promo JBL | Hola {legal}, JBL con precio especial'); await page.click('#bCfgOk'); await page.waitForTimeout(400);
+  await page.click('#mainTabs [data-tab="list"]'); await page.click('#gbody .row[data-i="2"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(500);
+  await page.selectOption('#pTpl', 'Promo JBL');
+  await page.evaluate(() => { window.__opened = []; const o = window.open; window.open = (u, ...a) => { window.__opened.push(u); return /^https:\/\/gcx\.local/.test(u) ? o(u, ...a) : { close() {}, focus() {} }; }; });
+  await page.click('#panel .p-actions [data-act="wa"]'); await page.waitForTimeout(200);
+  if (await page.$('#mWa.on')) { await page.click('#mWa [data-wa="web"]'); await page.waitForTimeout(200); }
+  ok(decodeURIComponent((await page.evaluate(() => window.__opened.pop())) || '').includes('Hola Inversiones Kallpa SRL, JBL con precio especial'), 'WhatsApp abre con la plantilla elegida y los datos del cliente');
+  /* reasignar clientes sin gestión (los recién asignados todavía no cuentan) */
+  await page.click('#bResv'); await page.waitForTimeout(150); await page.click('#rpMode [data-m="stale"]'); await page.fill('#rpDays', '5'); await page.waitForTimeout(100);
+  await page.click('#bDoResv'); await page.waitForTimeout(400);
+  ok(/0 clientes reasignados/.test(await toast()), 'Reasignar sin gestión respeta los días: recién asignados no se mueven');
+  await page.click('#mResv [data-close]');
 
   /* 10. selección en la hoja → abre el cliente */
   await page.click('#mainTabs [data-tab="list"]');

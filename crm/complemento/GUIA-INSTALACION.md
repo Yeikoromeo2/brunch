@@ -56,6 +56,16 @@ Si «Cargar mi complemento» no aparece, la organización lo tiene bloqueado y s
 - **Estadísticas** (pestaña nueva): embudo, resultados, tipo de negocio, marcas, líneas, departamentos, efectivos por día, efectividad por ejecutivo y grupos de «cómo atacar», con filtros de período, ejecutivo, tipo, línea y departamento.
 - **Lista:** por defecto muestra fila, Customer ID, Legal Name, Tax Reg No, State Name y City Name. En Ajustes eliges otras columnas (también Gestión y Comentario) y cada columna se ensancha arrastrando el borde de su título.
 
+## Ventas, cotizaciones y comentarios
+
+- **Venta:** solo marca y monto en **US$ sin IGV** («JBL 1200, Lenovo 5400» y Enter). El IGV 18 % y el total con IGV se muestran calculados. El N° de OV, la fecha y la nota son opcionales (en «Más datos»); sin N° se genera uno con el Customer ID. Al guardar aparece un ✓ «Guardado» al instante y el libro se escribe detrás; si algo falla, el formulario vuelve con lo escrito.
+- **Cotizaciones:** «Registrar cotización» con las marcas (y monto opcional). Pasa sola a «Ganada» al registrar la venta, o se marca Ganada/Perdida a mano.
+- **Comentarios:** el lápiz junto a cada comentario propio permite editarlo; el texto anterior queda en el historial.
+- **Motivo obligatorio** para «No interesado» y «Número errado».
+- **Plantillas de WhatsApp** (Ajustes, administrador: una por línea `Nombre | mensaje` con `{legal}`, `{marca}`…); cada persona elige la suya en el panel del cliente.
+- **Posibles duplicados:** el panel avisa si otro cliente tiene el mismo RUC o teléfono; lista completa en Reportes → Posibles duplicados.
+- **Metas y ranking:** Mi día muestra gestiones y efectivos de hoy frente a la meta (Ajustes) y el ranking del equipo. La campana avisa también las llamadas de hoy y las vencidas.
+
 ## Mi día y borradores
 
 - **Mi día** muestra solo tus pendientes: los clientes cuya última gestión hiciste tú y que quedaron en **Volver a llamar** (primero los vencidos y los de hoy) o **Revisados sin comentario**. Lo de tus compañeros no se mezcla. En la lista, el chip **Mis pendientes** filtra lo mismo.

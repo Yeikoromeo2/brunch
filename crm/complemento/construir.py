@@ -198,8 +198,6 @@ rep_re(r"<script>\n/\* =+\n   SERVIDOR SIMULADO.*?</script>\n", '<!--CAPA-DATOS-
 # ---------- aplicación ----------
 rep("const DEMO = true;", "const DEMO = false;")
 rep("$$('[data-demo]').forEach(b => b.onclick = () => { const [n, p] = b.dataset.demo.split('|'); $('#lgName').value = n; $('#lgPin').value = p; $('#loginForm').requestSubmit(); });\n", "")
-rep("const money = n => 'S/ ' + Math.round(Number(n) || 0).toLocaleString('es-PE');",
-    "const money = n => 'S/ ' + Math.round(Number(String(n == null ? '' : n).replace(/[^\\d.-]/g, '')) || 0).toLocaleString('es-PE');")
 rep("const d = daysSince(val(r, 'last')), cr = +val(r, 'credit') || 0,",
     "const d = daysSince(val(r, 'last')), cr = +val(r, 'credit').replace(/[^\\d.]/g, '') || 0,")
 

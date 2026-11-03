@@ -13,7 +13,7 @@ const KEYS = ['org', 'kam', 'exec', 'id', 'legal', 'tax', 'addr', 'state', 'city
 const C = Object.fromEntries(KEYS.map((k, i) => [k, i]));
 
 /* ---------- pestañas internas ---------- */
-const SH = { cfg: '_Config', users: '_Usuarios', asg: '_Asignaciones', seg: '_Seguimiento', cm: '_ClienteMarcas', mar: '_Marcas', ord: '_Ordenes', ven: '_Ventas', his: '_Historial', tel: '_Telefonos', rep: '_Reparto' };
+const SH = { cfg: '_Config', users: '_Usuarios', asg: '_Asignaciones', seg: '_Seguimiento', cm: '_ClienteMarcas', mar: '_Marcas', ord: '_Ordenes', ven: '_Ventas', his: '_Historial', tel: '_Telefonos', rep: '_Reparto', cot: '_Cotizaciones' };
 const HDR = {
   cfg: ['Clave', 'Valor'],
   users: ['Nombre', 'Rol', 'Activo', 'PinHash', 'Salt', 'CambiarPin', 'Intentos', 'BloqueadoHasta', 'Nombre en cartera'],
@@ -25,12 +25,13 @@ const HDR = {
   ven: ['OV', 'Customer ID', 'Fecha OV', 'Marca', 'Monto sin IGV', 'Ejecutivo'],
   his: ['Customer ID', 'Fecha', 'Usuario', 'Acción', 'Icono'],
   tel: ['Customer ID', 'Teléfono original', 'Teléfono corregido', 'Corregido por', 'Fecha'],
-  rep: ['Customer ID', 'Ejecutivo', 'Asignado por', 'Fecha']
+  rep: ['Customer ID', 'Ejecutivo', 'Asignado por', 'Fecha'],
+  cot: ['ID', 'Customer ID', 'Fecha', 'Marcas', 'Monto US$ sin IGV', 'Ejecutivo', 'Estado', 'Fecha cierre', 'Cerrado por']
 };
 const S_ = Object.fromEntries(HDR.seg.map((h, i) => [h, i]));
 const CATALOGO = {"Cómputo": ["ASUS", "Dell", "HP", "Lenovo", "MSI", "Huawei"], "Gaming": ["ROG", "HyperX", "Razer", "Primus Gaming"], "Componentes": ["AMD", "Intel", "Gigabyte"], "Almacenamiento y memoria": ["A-Data", "Kingston", "PNY", "SanDisk", "Seagate", "Western Digital", "QNAP"], "Servidores y centro de datos": ["HPE", "Dell EMC"], "Redes y conectividad": ["Ubiquiti", "TP-Link", "Meraki", "Ruckus", "Nexxt Solutions Home", "Nexxt Solutions Infrastructure", "Furukawa", "Starlink", "Riverbed"], "Energía": ["APC", "Salicru", "Forza"], "Seguridad electrónica": ["Hikvision", "EZVIZ", "Hanwha", "Axis", "VideoIQ", "Honeywell", "Firelite"], "Hogar inteligente": ["Ring", "Eufy", "Philips Hue", "Wiz"], "Punto de venta y código de barras": ["Zebra", "Newland", "Unitech", "Logic Controls", "Elo", "Custom"], "Impresión": ["Epson", "Xerox"], "Colaboración y videoconferencia": ["Jabra", "Poly", "Logitech", "Screenbeam", "Promethean"], "Audio profesional": ["AKG", "JBL Pro", "Crown", "Soundcraft"], "Audio de consumo": ["JBL", "Harman Kardon", "Soundcore"], "Pantallas y monitores": ["LG", "Viewsonic", "Philips", "Haier"], "Accesorios y periféricos": ["Anker", "Belkin", "Gear4", "Zagg", "Klip Xtreme", "Xtech", "StarTech.com", "Wacom"], "Móviles y wearables": ["Motorola", "Realme", "Oura"], "Software y ciberseguridad": ["Microsoft", "Bitdefender", "ESET", "McAfee", "BitTitan"], "Por definir": ["ELISE", "Folksafe", "Cyrus", "Nebula"]};
-const CFG_DEF = { cc: '51', mobLen: 9, lockRow: true, scopeOwn: true, minInt: 2, poll: 20, goal: 40, salesGoal: 0, waMode: 'web', waMsg: '', mailMode: 'outlook', mailSubj: '' };
-const NUM_CFG = ['mobLen', 'minInt', 'poll', 'goal', 'salesGoal'], BOOL_CFG = ['lockRow', 'scopeOwn'];
+const CFG_DEF = { cc: '51', mobLen: 9, lockRow: true, scopeOwn: true, minInt: 2, poll: 20, goal: 40, goalEf: 10, salesGoal: 0, waMode: 'web', waMsg: '', waTpl: '', mailMode: 'outlook', mailSubj: '' };
+const NUM_CFG = ['mobLen', 'minInt', 'poll', 'goal', 'goalEf', 'salesGoal'], BOOL_CFG = ['lockRow', 'scopeOwn'];
 const ESTADOS = ['Despachando', 'Incidencia', 'Terminado', 'Anulada'];
 const TIPOS = ['Reseller tienda virtual', 'Reseller tienda física', 'Oficina (B2B)', 'Híbrido'];
 /* recuperación de PIN de administrador: aquí solo va el SHA-256 de cada código (el código se entrega
@@ -130,6 +131,17 @@ async function upsert(ctx, key, match, build) {
   writeRow(f.ws, f.i > 0 ? f.i : Math.max(f.n, 1), arr); await ctx.sync();
   return arr;
 }
+/* varias actualizaciones en la misma pestaña con una sola lectura de claves y una sola escritura final */
+async function upsertMany(ctx, key, items) {
+  if (!items.length) return;
+  const ws = await sheet(ctx, SH[key]), kc = await keyCols(ctx, ws);
+  let next = Math.max(kc.n, 1);
+  for (const it of items) {
+    const i = kc.keys.findIndex((r, j) => j > 0 && it.match(r));
+    writeRow(ws, i > 0 ? i : next++, it.build());
+  }
+  await ctx.sync();
+}
 /* seq sube con cada cambio. KNOWN es el seq que ya refleja esta pantalla: si al subirlo
    nadie más había escrito, la pantalla sigue al día y no necesita recargar */
 let KNOWN = -1;
@@ -220,6 +232,7 @@ function addBrand(T, a) { const k = str(a[0]), b = str(a[1]); if (!k || !b || st
 function addHisRow(T, a) { const k = str(a[0]); if (k) T(k).hist.push({ d: str(a[1]), who: str(a[2]), txt: str(a[3]), k: str(a[4]) || 'clock', cm: str(a[4]) === 'msg' }); }
 const sortHist = t => { t.hist.sort((x, y) => y.d.localeCompare(x.d)); t.hist = t.hist.slice(0, 40); };
 const ordObj = a => ({ ov: str(a[0]), k: str(a[1]), d: str(a[2]), tot: num(a[3]), est: ESTADOS.includes(str(a[4])) ? str(a[4]) : 'Despachando', by: str(a[5]), fin: str(a[6]), finBy: str(a[7]), nota: str(a[8]) });
+const cotObj = a => ({ id: str(a[0]), k: str(a[1]), d: str(a[2]), b: str(a[3]), m: num(a[4]), by: str(a[5]), est: str(a[6]) || 'Enviada', fin: str(a[7]), finBy: str(a[8]) });
 const venObj = a => ({ ov: str(a[0]), k: str(a[1]), d: str(a[2]), b: str(a[3]), m: num(a[4]), by: str(a[5]) });
 
 /* ---------- lectura completa ---------- */
@@ -244,7 +257,8 @@ async function loadDB(ctx) {
   orders.forEach(o => { if (o.est === 'Anulada') return; const t = T(o.k); t.buy = true; t.monto = String(num(t.monto) + o.tot); });
   /* reparto de cartera del administrador: cada cliente (por Customer ID) asignado a un ejecutivo */
   const repart = {}; R.rep.forEach(a => { const k = str(a[0]), u = str(a[1]).trim(); if (k && u) repart[k] = { user: u, by: str(a[2]), d: str(a[3]) }; });
-  DB = { cart, cfg, seq, users, assigns, brands, track, orders, sales, repart, setup: R.users.length > 0, at: Date.now() };
+  const quotes = R.cot.filter(a => str(a[0])).map(cotObj);
+  DB = { cart, cfg, seq, users, assigns, brands, track, orders, sales, repart, quotes, setup: R.users.length > 0, at: Date.now() };
   return DB;
 }
 const ensureDB = async () => DB || run(ctx => loadDB(ctx));
@@ -386,7 +400,7 @@ const API = {
       vis.forEach(r => { if (DB.track[r.k]) track[r.k] = DB.track[r.k]; });
       return { me: { name: u.name, role: u.role }, cfg: DB.cfg, scoped: vis.length < DB.cart.rows.length, total: DB.cart.rows.length, header: COLS, C, assigns: DB.assigns,
         users: DB.users.filter(x => x.active).map(x => x.name), seq: DB.seq, lastRow: DB.cart.rows.length + 1, today: TODAY(), sheet: DB.cart.name,
-        rows: vis.map(r => [r.k, r.r, r.v]), track, asg: Object.fromEntries(vis.filter(r => DB.repart[r.k]).map(r => [r.k, DB.repart[r.k].user])), brands: DB.brands, orders: DB.orders.filter(o => ks.has(o.k)), sales: DB.sales.filter(x => ks.has(x.k)), warnings: [] };
+        rows: vis.map(r => [r.k, r.r, r.v]), track, asg: Object.fromEntries(vis.filter(r => DB.repart[r.k]).map(r => [r.k, DB.repart[r.k].user])), quotes: DB.quotes.filter(q => ks.has(q.k)), brands: DB.brands, orders: DB.orders.filter(o => ks.has(o.k)), sales: DB.sales.filter(x => ks.has(x.k)), warnings: [] };
     });
   },
   /* sincronización: si solo hubo cambios propios no se lee nada más; si otra persona cambió algo,
@@ -409,7 +423,7 @@ const API = {
       if (keys.join('|') !== oldKeys.join('|') || JSON.stringify([DB.cfg, DB.users.map(x => [x.name, x.role, x.active]), DB.brands.length]) !== oldMeta) return Object.assign(base, { reload: true, assigns: DB.assigns, seq: DB.seq });
       const ks = new Set(keys);
       return Object.assign(base, { assigns: DB.assigns, seq: DB.seq, changes: keys.filter(k => snap(k) !== old[k]).map(k => stateOf(rowOf(k))),
-        orders: DB.orders.filter(o => ks.has(o.k)), sales: DB.sales.filter(x => ks.has(x.k)) });
+        quotes: DB.quotes.filter(q => ks.has(q.k)), orders: DB.orders.filter(o => ks.has(o.k)), sales: DB.sales.filter(x => ks.has(x.k)) });
     });
   },
 
@@ -439,12 +453,30 @@ const API = {
           row.r = i + 2; row.v[C.comment] = prev ? line + ' | ' + prev : line;
           H.push([txt, 'msg']); break;
         }
+        case 'editcmt': {
+          /* editar un comentario: solo el propio (el administrador, cualquiera). Se conserva la fecha y el
+             autor, el resto de comentarios no se toca y el texto anterior queda en el historial */
+          const v = p.val || {}, txt = str(v.txt).trim(); if (!txt) err('El comentario no puede quedar vacío.');
+          const cws = cartWs(ctx), ids = cws.getRangeByIndexes(1, C.id, Math.max(1, DB.cart.rows.length + 50), 1); ids.load('text'); await ctx.sync();
+          const i = clientKeys(ids.text.map(x => str(x[0]).trim())).indexOf(row.k);
+          if (i < 0) err('No se encontró al cliente en la hoja. Pulsa recargar.');
+          const cell = cws.getRangeByIndexes(i + 1, C.comment, 1, 1); cell.load('values'); await ctx.sync();
+          const parts = str(cell.values[0][0]).split(' | '), j = num(v.i), old = str(v.old);
+          if (parts[j] !== old) err('Ese comentario cambió mientras lo editabas. Pulsa recargar y vuelve a intentarlo.');
+          const m = old.match(/^(\d{2}\/\d{2}) ([^:]+): /);
+          if (!isAdm(u) && (!m || m[2].trim() !== u.name)) err('Solo puedes editar tus propios comentarios.');
+          parts[j] = m ? `${m[1]} ${m[2]}: ${txt}` : txt;
+          cell.values = [[parts.join(' | ')]]; await ctx.sync();
+          row.r = i + 2; row.v[C.comment] = parts.join(' | ');
+          H.push([`Editó un comentario: «${m ? old.slice(m[0].length) : old}» → «${txt}»`, 'pencil']); break;
+        }
         case 'rev': t.rev = !!p.val; H.push([p.val ? 'Marcó revisado' : 'Quitó revisado', 'eye']); break;
         case 'result':
           t.res = str(p.val); if (p.val) t.rev = true; t.next = p.val === 'Volver a llamar' ? (p.date || t.next || TODAY()) : '';
-          if (p.val !== 'No interesado') t.motivo = '';
+          if (!['No interesado', 'Número errado'].includes(p.val)) t.motivo = '';
+          else { if (!str(p.motivo).trim()) err('Elige el motivo de «' + p.val + '».'); t.motivo = str(p.motivo).trim(); }
           if (p.val === 'No contesta' && (!t.lastc || Date.now() - new Date(t.lastc.replace(' ', 'T')).getTime() > 15 * 60000)) { t.int = (t.int || 0) + 1; t.lastc = now; }
-          H.push([p.val ? 'Resultado: ' + p.val : 'Quitó el resultado', ICON[p.val] || 'x']); break;
+          H.push([p.val ? 'Resultado: ' + p.val : 'Quitó el resultado', ICON[p.val] || 'x']); if (t.motivo) H.push(['Motivo: ' + t.motivo, 'ban']); break;
         case 'next': t.next = str(p.val); H.push(['Reagendó para ' + (p.val || '—'), 'cal']); break;
         case 'motivo': t.motivo = str(p.val); H.push(['Motivo: ' + (p.val || '—'), 'ban']); break;
         case 'tipo': if (p.val && !TIPOS.includes(str(p.val))) err('Tipo de negocio no válido.'); t.tipo = str(p.val); H.push(['Tipo de negocio: ' + (p.val || 'sin definir'), 'store']); break;
@@ -478,14 +510,15 @@ const API = {
     return run(async ctx => {
       const row = rowOf(p.k); if (!row) err('Cliente no encontrado.');
       if (!inScope(u, row)) err('Este cliente no está en tu cartera.');
-      const ov = str(p.ov).trim().toUpperCase();
-      if (!ov) err('El número de OV es obligatorio.');
-      if (!/^[A-Z0-9][A-Z0-9\-\/]{2,24}$/.test(ov)) err('La OV solo puede tener letras, números, guiones o barras (3 a 25 caracteres).');
-      const kc = await keyCols(ctx, await sheet(ctx, SH.ord)), dup = kc.keys.slice(1).find(a => str(a[0]).toUpperCase() === ov);
-      if (dup) { const c = rowOf(str(dup[1])); err(`La OV ${ov} ya está registrada para ${c ? c.v[C.legal] : 'otro cliente'}.`); }
-      const lines = (p.lines || []).map(l => ({ b: l.b, m: Math.round(num(l.m) * 100) / 100 })).filter(l => l.m > 0);
-      if (!lines.length) err('Agrega al menos una marca con su monto sin IGV.');
-      lines.forEach(l => { if (!DB.brands.some(x => x.m === l.b)) err('La marca ' + l.b + ' no está en el catálogo.'); });
+      /* el N° de OV es opcional: si no se escribe, se arma con el Customer ID y la fecha y hora (único) */
+      let ov = str(p.ov).trim().toUpperCase();
+      if (ov && !/^[A-Z0-9][A-Z0-9\-\/]{2,30}$/.test(ov)) err('La OV solo puede tener letras, números, guiones o barras (3 a 30 caracteres).');
+      const kc = await keyCols(ctx, await sheet(ctx, SH.ord)), used = new Set(kc.keys.slice(1).map(a => str(a[0]).toUpperCase()));
+      if (ov && used.has(ov)) { const dup = kc.keys.slice(1).find(a => str(a[0]).toUpperCase() === ov), c = rowOf(str(dup[1])); err(`La OV ${ov} ya está registrada para ${c ? c.v[C.legal] : 'otro cliente'}.`); }
+      if (!ov) { const st = nowStr().replace(/\D/g, '').slice(2, 12), base = ('OC-' + row.k.replace(/[^A-Za-z0-9]/g, '') + '-' + st).toUpperCase(); ov = base; for (let i = 2; used.has(ov); i++) ov = base + '-' + i; }
+      /* la marca se reconoce sin importar mayúsculas, acentos ni espacios; se guarda como está en el catálogo */
+      const lines = (p.lines || []).map(l => { const b = DB.brands.find(x => norm(x.m) === norm(l.b)); if (!b) err('La marca ' + str(l.b) + ' no está en el catálogo.'); return { b: b.m, m: Math.round(num(l.m) * 100) / 100 }; }).filter(l => l.m > 0);
+      if (!lines.length) err('Agrega al menos una marca con su monto en US$ sin IGV.');
       const d = /^\d{4}-\d{2}-\d{2}$/.test(p.d || '') ? p.d : TODAY(), tot = lines.reduce((a, l) => a + l.m, 0), now = nowStr();
       const o = { ov, k: row.k, d, tot, est: 'Despachando', by: u.name, fin: '', finBy: '', nota: str(p.nota) };
       await appendRows(ctx, 'ord', [[ov, row.k, d, String(tot), o.est, u.name, '', '', o.nota]]);
@@ -495,13 +528,47 @@ const API = {
       const t = DB.track[row.k] || (DB.track[row.k] = { brands: [], bmeta: {}, hist: [] });
       t.buy = true; t.rev = true; t.monto = String(num(t.monto) + tot); if (!t.own) t.own = u.name; if (!t.first) t.first = now; t.last = now;
       await upsert(ctx, 'seg', r => str(r[0]) === row.k, () => segArr(row.k, t));
-      for (const l of lines) {
-        await upsert(ctx, 'cm', r => str(r[0]) === row.k && str(r[1]) === l.b, () => [row.k, l.b, 'habitual', u.name, TODAY()]);
-        if (!t.brands.includes(l.b)) t.brands.push(l.b); t.bmeta = t.bmeta || {}; t.bmeta[l.b] = { rel: 'habitual', by: u.name, d: TODAY() };
-      }
-      await addHist(ctx, row.k, u.name, `Registró ${ov} · ${lines.map(l => l.b + ' S/ ' + l.m.toLocaleString('es-PE')).join(', ')} · total S/ ${tot.toLocaleString('es-PE')} sin IGV · Despachando`, 'cart');
+      /* las marcas de la venta quedan como «habitual» del cliente, todas en una sola escritura */
+      await upsertMany(ctx, 'cm', lines.map(l => ({ match: r => str(r[0]) === row.k && norm(r[1]) === norm(l.b), build: () => [row.k, l.b, 'habitual', u.name, TODAY()] })));
+      lines.forEach(l => { if (!t.brands.includes(l.b)) t.brands.push(l.b); t.bmeta = t.bmeta || {}; t.bmeta[l.b] = { rel: 'habitual', by: u.name, d: TODAY() }; });
+      /* la cotización abierta más reciente del cliente queda «Ganada» al registrar la venta */
+      const oq = DB.quotes.filter(q => q.k === row.k && q.est === 'Enviada').sort((a, b) => b.d.localeCompare(a.d))[0];
+      if (oq) { oq.est = 'Ganada'; oq.fin = TODAY(); oq.finBy = u.name; await upsert(ctx, 'cot', r => str(r[0]) === oq.id, cur => { const a = cur.slice(); a[6] = 'Ganada'; a[7] = oq.fin; a[8] = u.name; return a; }); }
+      await addHist(ctx, row.k, u.name, `Registró ${ov} · ${lines.map(l => l.b + ' US$ ' + l.m.toLocaleString('es-PE')).join(', ')} · total US$ ${tot.toLocaleString('es-PE')} sin IGV · Despachando`, 'cart');
       await bumpSeq(ctx);
-      return { order: o, lines: ls, state: stateOf(row) };
+      return { order: o, lines: ls, quote: oq || null, state: stateOf(row) };
+    });
+  },
+  async api_addQuote(tk, p) {
+    const u = who(tk);
+    return run(async ctx => {
+      const row = rowOf(p.k); if (!row) err('Cliente no encontrado.');
+      if (!inScope(u, row)) err('Este cliente no está en tu cartera.');
+      const bs = [...new Set((p.brands || []).map(b => { const x = DB.brands.find(y => norm(y.m) === norm(b)); if (!x) err('La marca ' + str(b) + ' no está en el catálogo.'); return x.m; }))];
+      if (!bs.length) err('Elige al menos una marca para la cotización.');
+      let ws = await sheet(ctx, SH.cot); if (!ws) { ws = ctx.workbook.worksheets.add(SH.cot); writeRow(ws, 0, HDR.cot); ws.visibility = 'VeryHidden'; await ctx.sync(); }
+      const q = { id: 'C' + randId().slice(0, 9).toUpperCase(), k: row.k, d: TODAY(), b: bs.join(', '), m: Math.round(num(p.m) * 100) / 100, by: u.name, est: 'Enviada', fin: '', finBy: '' };
+      await appendRows(ctx, 'cot', [[q.id, q.k, q.d, q.b, String(q.m || ''), q.by, q.est, '', '']]);
+      DB.quotes.push(q);
+      const t = DB.track[row.k] || (DB.track[row.k] = newTrack()); const now = nowStr(); if (!t.own) t.own = u.name; if (!t.first) t.first = now; t.last = now;
+      await upsert(ctx, 'seg', r => str(r[0]) === row.k, () => segArr(row.k, t));
+      await upsertMany(ctx, 'cm', bs.filter(b => !t.brands.includes(b)).map(b => ({ match: r => str(r[0]) === row.k && norm(r[1]) === norm(b), build: () => [row.k, b, 'interes', u.name, TODAY()] })));
+      bs.forEach(b => { if (!t.brands.includes(b)) { t.brands.push(b); t.bmeta[b] = { rel: 'interes', by: u.name, d: TODAY() }; } });
+      await addHist(ctx, row.k, u.name, `Registró cotización ${q.id} · ${q.b}${q.m ? ' · US$ ' + q.m.toLocaleString('es-PE') + ' sin IGV' : ''}`, 'file');
+      await bumpSeq(ctx);
+      return { quote: q, state: stateOf(row) };
+    });
+  },
+  async api_setQuote(tk, id, est) {
+    const u = who(tk); if (!['Enviada', 'Ganada', 'Perdida'].includes(est)) err('Estado no válido.');
+    return run(async ctx => {
+      const q = DB.quotes.find(x => x.id === id); if (!q) err('Cotización no encontrada.');
+      const row = rowOf(q.k); if (!row || !inScope(u, row)) err('Esta cotización no es de tu cartera.');
+      q.est = est; q.fin = est === 'Enviada' ? '' : TODAY(); q.finBy = est === 'Enviada' ? '' : u.name;
+      await upsert(ctx, 'cot', r => str(r[0]) === id, cur => { const a = cur.slice(); a[6] = q.est; a[7] = q.fin; a[8] = q.finBy; return a; });
+      await addHist(ctx, q.k, u.name, `Cotización ${id}: ${est}`, est === 'Ganada' ? 'check' : est === 'Perdida' ? 'ban' : 'file');
+      await bumpSeq(ctx);
+      return { quote: q, state: stateOf(row) };
     });
   },
   async api_setOrder(tk, ov, est, nota) {
@@ -563,7 +630,7 @@ const API = {
       const hs = await sheet(ctx, SH.his), his = hs ? (await readAll(ctx, hs)).slice(1) : [];
       const efectivo = k => { const t = DB.track[k]; return !!t && t.res === 'Contestó' && (!!t.tipo || (t.brands || []).length > 0); };
       const G = {}, key = (d, w) => d + '|' + w;
-      const g = (d, w) => G[key(d, w)] || (G[key(d, w)] = { d, w, cli: new Set(), ok: new Set(), okNo: new Set(), noc: new Set(), call: new Set(), wrong: new Set(), noint: new Set(), rev: new Set(), cm: 0, ct: 0, tel: 0, br: 0, tp: 0, ov: 0, m: 0 });
+      const g = (d, w) => G[key(d, w)] || (G[key(d, w)] = { d, w, cli: new Set(), ok: new Set(), okNo: new Set(), noc: new Set(), call: new Set(), wrong: new Set(), noint: new Set(), rev: new Set(), cm: 0, ct: 0, tel: 0, br: 0, tp: 0, cot: 0, ov: 0, m: 0 });
       const inRange = d => (!from || d >= from) && (!to || d <= to);
       his.forEach(a => {
         const k = str(a[0]), d = str(a[1]).slice(0, 10), w = str(a[2]), txt = str(a[3]), ic = str(a[4]);
@@ -580,17 +647,26 @@ const API = {
         else if (/^Corrigió el número/.test(txt)) x.tel++;
         else if (/^(Agregó la marca|Actualizó )/.test(txt)) x.br++;
         else if (/^Tipo de negocio: /.test(txt) && !/sin definir$/.test(txt)) x.tp++;
+        else if (/^Registró cotización/.test(txt)) x.cot++;
       });
       DB.orders.forEach(o => { if (o.est === 'Anulada' || !o.by || !inRange(o.d)) return; const x = g(o.d, o.by); x.ov++; x.m += o.tot; });
-      const HEAD = ['Fecha', 'Ejecutivo', 'Clientes gestionados', 'Clientes efectivos', 'Contestó sin tipo ni marca', 'No contesta', 'Volver a llamar', 'Número errado', 'No interesado', 'Revisados', 'Comentarios', 'Intentos de contacto', 'Números corregidos', 'Marcas registradas', 'Tipos de negocio registrados', 'OV registradas', 'Venta sin IGV (S/)', '% efectividad'];
-      const line = x => [x.d, x.w, x.cli.size, x.ok.size, x.okNo.size, x.noc.size, x.call.size, x.wrong.size, x.noint.size, x.rev.size, x.cm, x.ct, x.tel, x.br, x.tp, x.ov, Math.round(x.m * 100) / 100, x.cli.size ? Math.round(x.ok.size / x.cli.size * 1000) / 10 : 0];
+      const HEAD = ['Fecha', 'Ejecutivo', 'Clientes gestionados', 'Clientes efectivos', 'Contestó sin tipo ni marca', 'No contesta', 'Volver a llamar', 'Número errado', 'No interesado', 'Revisados', 'Comentarios', 'Intentos de contacto', 'Números corregidos', 'Marcas registradas', 'Tipos de negocio registrados', 'Cotizaciones', 'OV registradas', 'Venta sin IGV (US$)', '% efectividad'];
+      const line = x => [x.d, x.w, x.cli.size, x.ok.size, x.okNo.size, x.noc.size, x.call.size, x.wrong.size, x.noint.size, x.rev.size, x.cm, x.ct, x.tel, x.br, x.tp, x.cot, x.ov, Math.round(x.m * 100) / 100, x.cli.size ? Math.round(x.ok.size / x.cli.size * 1000) / 10 : 0];
       const list = Object.values(G).sort((a, b) => b.d.localeCompare(a.d) || a.w.localeCompare(b.w));
       /* totales por ejecutivo en el período */
-      const T = {}; list.forEach(x => { const t = T[x.w] || (T[x.w] = { d: 'Total', w: x.w, cli: new Set(), ok: new Set(), okNo: new Set(), noc: new Set(), call: new Set(), wrong: new Set(), noint: new Set(), rev: new Set(), cm: 0, ct: 0, tel: 0, br: 0, tp: 0, ov: 0, m: 0 });
-        ['cli', 'ok', 'okNo', 'noc', 'call', 'wrong', 'noint', 'rev'].forEach(f => x[f].forEach(k => t[f].add(k))); ['cm', 'ct', 'tel', 'br', 'tp', 'ov', 'm'].forEach(f => { t[f] += x[f]; }); });
+      const T = {}; list.forEach(x => { const t = T[x.w] || (T[x.w] = { d: 'Total', w: x.w, cli: new Set(), ok: new Set(), okNo: new Set(), noc: new Set(), call: new Set(), wrong: new Set(), noint: new Set(), rev: new Set(), cm: 0, ct: 0, tel: 0, br: 0, tp: 0, cot: 0, ov: 0, m: 0 });
+        ['cli', 'ok', 'okNo', 'noc', 'call', 'wrong', 'noint', 'rev'].forEach(f => x[f].forEach(k => t[f].add(k))); ['cm', 'ct', 'tel', 'br', 'tp', 'cot', 'ov', 'm'].forEach(f => { t[f] += x[f]; }); });
+      /* resumen semanal (lunes a domingo) por ejecutivo, comparado con la semana anterior */
+      const monday = d => { const x = new Date(d + 'T12:00:00'), w = (x.getDay() + 6) % 7; x.setDate(x.getDate() - w); return dayStr(x); };
+      const W = {}; list.forEach(x => { const wk = monday(x.d), kk = wk + '|' + x.w, o = W[kk] || (W[kk] = { wk, w: x.w, cli: new Set(), ok: new Set(), ov: 0, m: 0 }); x.cli.forEach(k => o.cli.add(k)); x.ok.forEach(k => o.ok.add(k)); o.ov += x.ov; o.m += x.m; });
+      const WEEK = ['Semana (lunes)', 'Ejecutivo', 'Clientes gestionados', 'Clientes efectivos', '% efectividad', 'OV registradas', 'Venta sin IGV (US$)', 'Efectivos vs semana anterior', 'Venta vs semana anterior (US$)'];
+      const prevOf = o => { const d = new Date(o.wk + 'T12:00:00'); d.setDate(d.getDate() - 7); return W[dayStr(d) + '|' + o.w]; };
+      const weeks = Object.values(W).sort((a, b) => b.wk.localeCompare(a.wk) || a.w.localeCompare(b.w)).map(o => { const pv = prevOf(o); return [o.wk, o.w, o.cli.size, o.ok.size, o.cli.size ? Math.round(o.ok.size / o.cli.size * 1000) / 10 : 0, o.ov, Math.round(o.m * 100) / 100, pv ? o.ok.size - pv.ok.size : '', pv ? Math.round((o.m - pv.m) * 100) / 100 : '']; });
       const rows = [HEAD, ...list.map(line)], tot = Object.values(T).sort((a, b) => a.w.localeCompare(b.w)).map(line);
       const info = `Generado el ${nowStr()} por ${u.name}${from || to ? ' · período ' + (from || 'inicio') + ' a ' + (to || 'hoy') : ''}. «Clientes efectivos»: marcados «Contestó» ese día que hoy tienen tipo de negocio o al menos una marca.`;
-      const out = [...rows, Array(HEAD.length).fill(''), ['Totales del período', ...Array(HEAD.length - 1).fill('')], HEAD.map((h, i) => i === 0 ? '' : h), ...tot, Array(HEAD.length).fill(''), [info, ...Array(HEAD.length - 1).fill('')]];
+      const pad = r => [...r, ...Array(Math.max(0, HEAD.length - r.length)).fill('')];
+      const out = [...rows, Array(HEAD.length).fill(''), pad(['Totales del período']), HEAD.map((h, i) => i === 0 ? '' : h), ...tot,
+        Array(HEAD.length).fill(''), pad(['Resumen por semana (lunes a domingo)']), pad(WEEK), ...weeks.map(pad), Array(HEAD.length).fill(''), pad([info])];
       let ws = await sheet(ctx, 'Seguimiento');
       if (!ws) ws = ctx.workbook.worksheets.add('Seguimiento');
       const old = ws.getUsedRangeOrNullObject(true); old.load('rowIndex,rowCount,columnCount'); await ctx.sync();
@@ -602,6 +678,7 @@ const API = {
       try {
         const hd = ws.getRangeByIndexes(0, 0, 1, HEAD.length); hd.format.font.bold = true; hd.format.fill.color = '#0b7f6c'; hd.format.font.color = '#ffffff';
         const th = ws.getRangeByIndexes(rows.length + 2, 0, 2, HEAD.length); th.format.font.bold = true;
+        const wh = ws.getRangeByIndexes(rows.length + 4 + tot.length, 0, 2, HEAD.length); wh.format.font.bold = true;
         ws.getRangeByIndexes(0, 0, out.length, HEAD.length).format.autofitColumns();
         ws.freezePanes.freezeRows(1);
       } catch (e) {}
@@ -613,8 +690,10 @@ const API = {
   async api_activity(tk) {
     who(tk);
     const days = Array.from({ length: 14 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() + i - 13); return dayStr(d); }), m = {};
+    const e = {};
+    Object.entries(DB.track).forEach(([, t]) => { const ok = t.res === 'Contestó' && (!!t.tipo || (t.brands || []).length > 0), se = {}; t.hist.forEach(h => { const d = h.d.slice(0, 10); if (ok && h.txt === 'Resultado: Contestó' && days.includes(d) && !se[h.who + d]) { se[h.who + d] = 1; (e[h.who] = e[h.who] || {})[d] = ((e[h.who] || {})[d] || 0) + 1; } }); });
     Object.entries(DB.track).forEach(([, t]) => { const seen = {}; t.hist.forEach(h => { const d = h.d.slice(0, 10); if (!days.includes(d) || seen[h.who + d]) return; seen[h.who + d] = 1; (m[h.who] = m[h.who] || {})[d] = ((m[h.who] || {})[d] || 0) + 1; }); });
-    return { days, m };
+    return { days, m, e };
   },
   async api_saveReport(tk, name, aoa) {
     who(tk);
@@ -678,7 +757,12 @@ const API = {
       const byRow = new Map(DB.cart.rows.map(r => [r.r, r.k])), now = nowStr(), map = Object.assign({}, DB.repart);
       const names = DB.users.filter(x => x.active && x.role !== 'admin').map(x => x.name).concat(DB.users.filter(x => x.active && x.role === 'admin').map(x => x.name));
       let n = 0;
-      if (p.mode === 'alt') {
+      if (p.mode === 'stale') {
+        const days = Math.max(1, parseInt(p.days, 10) || 15), lim = (() => { const d = new Date(); d.setDate(d.getDate() - days); return dayStr(d); })();
+        const us = (p.users || []).filter(x => names.includes(x)); if (!us.length) err('Elige a quién pasarlos.');
+        const cand = Object.entries(map).filter(([k, a]) => (!p.from || a.user === p.from) && str(a.d).slice(0, 10) <= lim && (() => { const t = DB.track[k]; return !t || !t.last || t.last.slice(0, 10) <= lim; })());
+        let i = 0; cand.forEach(([k, a]) => { const opts = us.filter(x => x !== a.user); if (!opts.length) return; map[k] = { user: opts[i++ % opts.length], by: u.name, d: now }; n++; });
+      } else if (p.mode === 'alt') {
         const us = (p.users || []).filter(x => names.includes(x)); if (!us.length) err('Elige al menos un ejecutivo.');
         const from = Math.max(2, parseInt(p.from, 10) || 2), to = parseInt(p.to, 10) || (DB.cart.rows.length + 1), block = Math.max(1, parseInt(p.block, 10) || 1);
         if (to < from) err('Rango de filas no válido.');
@@ -726,7 +810,7 @@ const API = {
   },
   async api_saveCfg(tk, c) {
     const u = who(tk); if (!isAdm(u)) err('Solo el administrador.');
-    const v = Object.assign({}, DB.cfg, c, { mobLen: num(c.mobLen) || 9, minInt: Math.max(1, num(c.minInt) || 1), poll: Math.max(10, num(c.poll) || 20), goal: Math.max(1, num(c.goal) || 40), salesGoal: Math.max(0, num(c.salesGoal)), cc: str(c.cc).replace(/\D/g, '') });
+    const v = Object.assign({}, DB.cfg, c, { mobLen: num(c.mobLen) || 9, minInt: Math.max(1, num(c.minInt) || 1), poll: Math.max(10, num(c.poll) || 20), goal: Math.max(1, num(c.goal) || 40), goalEf: Math.max(0, num(c.goalEf)), salesGoal: Math.max(0, num(c.salesGoal)), cc: str(c.cc).replace(/\D/g, '') });
     return run(async ctx => {
       for (const k of Object.keys(CFG_DEF)) await upsert(ctx, 'cfg', r => str(r[0]) === k, () => [k, typeof CFG_DEF[k] === 'boolean' ? (v[k] ? 'SI' : 'NO') : String(v[k])]);
       await bumpSeq(ctx); DB.cfg = v; return v;
