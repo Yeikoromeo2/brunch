@@ -1,0 +1,54 @@
+# CLAUDE.md
+
+Este repositorio contiene el firmware brunch y, en `crm/`, el sistema de gestión de cartera (CRM) del usuario. Responde siempre en español.
+
+## Estructura de la cartera: regla fija
+
+La cartera de clientes es la base de todo el CRM. Su estructura está definida en `crm/estructura/columnas-cartera.json`, con la plantilla original en `crm/estructura/plantilla-cartera.xlsx`.
+
+- Las 18 columnas de `Hoja1` (de `Organization` a `Comentario Créditos`) nunca se agregan, quitan, renombran ni reordenan.
+- **La hoja de la cartera no se modifica.** Lo único que el sistema escribe en `Hoja1` es la columna `Comentario Créditos`, siempre agregando (`dd/mm Usuario: texto`) sin borrar lo anterior. Cada persona puede **editar el texto de sus propios comentarios** (el administrador, cualquiera): se conservan fecha y autor, los demás comentarios no se tocan y el texto anterior queda en `_Historial`. No escribe en `Ejecutivo`, no pinta filas ni cambia formatos.
+- **Opción B (decidida):** como el usuario no tiene acceso a Entra ID para registrar una app de Microsoft Graph, todo dato adicional (seguimiento, historial, asignaciones, marcas, ventas, órdenes, teléfonos) se guarda en **pestañas internas «muy ocultas»** (`VeryHidden`) del mismo archivo, enlazadas por `Customer ID`. No aparecen en «Mostrar hojas». Si más adelante TI registra la app, esos datos se migran a un archivo paralelo sin cambiar su estructura.
+- Cada fila es un cliente independiente. Se identifica por `Customer ID`, nunca por el número de fila, porque la hoja puede ordenarse o filtrarse.
+- `Customer ID`, `Tax Reg No` y los teléfonos se tratan como texto.
+- Antes de procesar un Excel real, validarlo con `python3 crm/estructura/validar_cartera.py <archivo.xlsx>`. Si no pasa, no procesarlo.
+- La versión final trabaja sobre el Excel en OneDrive (complemento de Excel web). Los reportes y listas se abren como **libros nuevos** (`Excel.createWorkbook`), con las 18 columnas en el mismo orden; no se borran datos. Excepción pedida: «Exportar contactos» (vista Contactos de la Lista) crea un libro con código, razón social, RUC, teléfono, correo, marcas, tipo y ejecutivo de la lista filtrada, para marketing.
+- **Única hoja visible que crea el sistema:** la pestaña `Seguimiento` (reporte de actividad por fecha y ejecutivo). Solo la crea o actualiza el administrador al pulsar el botón en Reportes; nunca de forma automática. Ninguna otra hoja visible se agrega al archivo.
+
+## Ventas y órdenes (OV)
+
+- Toda venta se registra con una línea por marca y su monto, enlazada al cliente por su Customer ID. El **número de OV es opcional y único**: si no se escribe, se genera `OC-<CustomerID>-<aammddhhmm>`.
+- Los montos siempre son **en dólares (US$) y sin IGV**; el IGV (18 %) se muestra calculado, nunca se guarda en el monto.
+- La marca de cada línea se reconoce sin importar mayúsculas ni acentos y queda registrada como «habitual» del cliente.
+- **Courier habitual** (`_Courier`): un registro por Customer ID (courier, agencia, destino, consignatario, documento, teléfono, nota); se muestra al registrar cada venta.
+- **Cotizaciones** (`_Cotizaciones`): marcas y monto opcional en US$; al registrar una venta del cliente, su cotización abierta más reciente pasa sola a «Ganada».
+- Al registrar una OV su estado pasa automáticamente a **Despachando**. La alerta sigue activa hasta que alguien la marque como **Terminado**; no se puede desactivar.
+- Estados: `Despachando` → `Terminado`, con `Incidencia` para problemas de entrega. Solo el administrador puede **reabrir** una OV cerrada o **anularla**; las anuladas no cuentan en las ventas.
+- El monto comprado de cada cliente es la suma de sus OV no anuladas; no se escribe a mano.
+- Dashboard de ventas: período, marca, línea, tipo y ejecutivo como filtros; share de venta y de clientes por marca y por línea, venta mensual frente a los 12 meses anteriores, avance y proyección de la meta mensual, escala y estatus de compradores.
+
+## Tipo de negocio y marcas
+
+- Tipo de negocio de cada cliente: **Reseller tienda virtual**, **Reseller tienda física**, **Oficina (B2B)** o **Híbrido** (combina lo anterior). Se sugiere por palabras clave del comentario y se confirma en el panel; se guarda en `_Seguimiento`. Los tipos anteriores (Tienda/Oficina/Híbrido) se dejaron sin tipo una sola vez (`tiposV2` en `_Config`).
+- **Resultados de contacto:** solo `Gestionado` (verde), `No responde` (rojo) y `Volver a llamar` (morado), marcados por la persona con un clic; copiar el contacto o abrir WhatsApp no marcan nada. Los nombres anteriores (`Contestó`, `No contesta`) se leen como los nuevos. `Número errado` y `No interesado` ya no se ofrecen ni cuentan en métricas. Un cliente trabajado otro día sin resultado se muestra como «Volver a llamar» al día siguiente (automático, sin escribir en el libro).
+- **Comprado** sale de registrar la venta; el comprador es «Nuevo del mes», «Nuevo del año» o «Recurrente» según su primera venta registrada.
+- **Cliente efectivo:** marcado «Gestionado» y con tipo de negocio o al menos una marca. Es la cifra que cuentan el reporte `Seguimiento` y las Estadísticas.
+- El catálogo de marcas está en `crm/estructura/marcas.json` (pestaña `_Marcas`). Las marcas que distribuye cada cliente van en `_ClienteMarcas`, nunca como columnas de la cartera.
+- Cada marca de un cliente lleva su relación (`habitual`, `ocasional`, `interes`), quién la registró y la fecha. Pasados 90 días se marca «por confirmar».
+
+## Visibilidad
+
+- **Reparto de cartera:** el administrador asigna clientes a cada ejecutivo por filas (rangos como al imprimir, `2-500, 650`) o alternados entre varios. Se guarda por Customer ID en `_Reparto`. En cuanto hay reparto, cada ejecutivo ve y trabaja **solo** lo que le asignaron.
+- La campana y los pendientes de Mi día son de cada usuario (sus OV y sus llamadas). El administrador tiene además «Equipo» en Mi día: pendientes agrupados por ejecutivo.
+- El administrador puede **reasignar** clientes asignados sin gestión hace N días a otros ejecutivos, en turno.
+- Mientras no haya reparto, el ejecutivo ve su cartera según la columna `Ejecutivo` (con su «Nombre en cartera»), sus filas reservadas o los clientes que gestionó. El administrador ve todo.
+- El modelo completo de pestañas auxiliares está en `crm/estructura/modelo-datos.md`.
+
+## Complemento de Excel (`crm/complemento/`)
+
+- `taskpane.html` y `ventana.html` se **generan** con `python3 crm/complemento/construir.py` a partir de `crm/prototipo-pro/index.html`; los cambios de diseño se hacen en el prototipo y luego se regenera. No editarlos a mano.
+- La ventana aparte (botón «Ampliar») no tiene acceso al libro: `puente.js` envía sus llamadas `api_*` al panel, que las atiende con `datos.js`. El panel debe quedar abierto mientras se usa la ventana.
+- `datos.js` es la única capa que toca el libro (Office.js) y expone las funciones `api_*` con el mismo contrato que la versión Sheets. Las llamadas se atienden en fila, una a la vez.
+- Acceso con nombre y PIN: el primero que abre el libro lo configura y queda como administrador; los demás reciben un PIN temporal que cambian al entrar. Los PIN se guardan como SHA-256 con sal en `_Usuarios`.
+- Antes de subir cambios, correr `node crm/complemento/pruebas/prueba-flujo.js` (simulador de Excel + Playwright); debe terminar en «Todas las pruebas pasaron».
+- Instalación y publicación (GitHub Pages, «Cargar mi complemento»): `crm/complemento/GUIA-INSTALACION.md`.
