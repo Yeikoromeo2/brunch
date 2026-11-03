@@ -53,7 +53,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.click('#suBtn');
   await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana');
   const vis = await page.evaluate(() => window.__book.raw.sheets.map(s => s.name + ':' + s.visibility));
-  ok(vis.filter(x => x.startsWith('_')).length === 12 && vis.filter(x => x.startsWith('_')).every(x => x.endsWith(':VeryHidden')), '12 pestañas internas creadas como VeryHidden');
+  ok(vis.filter(x => x.startsWith('_')).length === 13 && vis.filter(x => x.startsWith('_')).every(x => x.endsWith(':VeryHidden')), '13 pestañas internas creadas como VeryHidden');
   ok(vis.includes('Hoja1:Visible') && vis.includes('Resumen:Visible'), 'Hoja1 y hojas ajenas siguen visibles');
   ok((await aux('_Marcas')).length === 90, 'Catálogo de 89 marcas en _Marcas');
   const u0 = await aux('_Usuarios');
@@ -108,11 +108,11 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.click('#gbody .row[data-i="2"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(600);
 
   /* 5. resultado, tipo y marca */
-  await page.click('[data-act="res"][data-n="Contestó"]'); await page.waitForTimeout(150);
+  await page.click('[data-act="res"][data-n="Gestionado"]'); await page.waitForTimeout(150);
   await page.click('[data-act="tipo"][data-n="Reseller tienda física"]'); await page.waitForTimeout(150);
   await page.fill('#pBrand', 'HP'); await page.press('#pBrand', 'Enter'); await page.waitForTimeout(200);
   const seg = await aux('_Seguimiento'), cm = await aux('_ClienteMarcas');
-  ok(seg.some(r => r[0] === '100103' && r[2] === 'Contestó' && r[6] === 'Reseller tienda física' && r[7] === 'Ana'), '_Seguimiento guarda resultado, tipo y gestor por Customer ID');
+  ok(seg.some(r => r[0] === '100103' && r[2] === 'Gestionado' && r[6] === 'Reseller tienda física' && r[7] === 'Ana'), '_Seguimiento guarda resultado, tipo y gestor por Customer ID');
   ok(cm.some(r => r[0] === '100103' && r[1] === 'HP' && r[2] === 'habitual'), '_ClienteMarcas guarda la marca con su relación');
 
   /* 5b. WhatsApp: la primera vez pregunta web o aplicación y luego recuerda la elección */
@@ -138,11 +138,13 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   const wa = await page.evaluate(() => [window.__opened[0], window.__openedArgs[0]]);
   ok(/^https:\/\/web\.whatsapp\.com\/send\?phone=51987650222/.test(wa[0]) && wa[1][0] === 'gcWhatsApp' && /popup=yes,width=\d+/.test(wa[1][1]), 'WhatsApp Web se abre en una ventana al costado, siempre la misma');
   await page.evaluate(() => { const u = JSON.parse(localStorage.getItem('gcp:ui')); u.wa = 'app'; localStorage.setItem('gcp:ui', JSON.stringify(u)); });
+  await page.reload(); await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana');
+  await page.click('#mainTabs [data-tab="list"]'); await page.click('#gbody .row[data-i="2"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(400);
 
   /* 5c. lista sin franja de botones ni prioridad; colores por estado sin leyenda */
   ok(!(await page.$('#gbody .acts')) && !(await page.$('#gbody .tier')) && !(await page.$('#panel .score')), 'La lista no repite los botones de contacto y no se muestra la prioridad');
   ok(!(await page.$('#sAtt')) && (await page.$$('#sBar i')).length >= 3, 'La barrita usa los colores de cada estado, sin leyenda');
-  ok(await page.$('#gbody .row.cat-att') && await page.$('#gbody .row.cat-noint') && await page.$('#gbody .row.cat-none'), 'Cada fila se pinta con el color de su estado');
+  ok(await page.$('#gbody .row.cat-att') && await page.$('#gbody .row.cat-none'), 'Cada fila se pinta con el color de su estado');
   /* 5c2. copiar el teléfono desde la lista y desde el panel */
   await page.click('#gbody .row[data-i="2"] [data-act="copyph"]'); await page.waitForTimeout(200);
   ok(/Copiado: 987650222/.test(await toast()), 'La columna de teléfonos tiene botón de copiar el número');
@@ -208,12 +210,9 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.click('[data-act="cmtedok"]'); await page.waitForTimeout(400);
   ok(/^\d\d\/\d\d Ana: Pidió precios de HP y Lenovo \| Tiene tienda en galería Wilson$/.test((await aux('Hoja1'))[3][17]), 'Se edita el propio comentario sin tocar los demás');
   ok((await aux('_Historial')).some(r => r[0] === '100103' && /^Editó un comentario: «Pidió precios de HP» → «Pidió precios de HP y Lenovo»/.test(r[3])), 'El texto anterior queda en el historial');
-  /* motivo obligatorio */
+  /* solo tres resultados: Gestionado, No responde y Volver a llamar */
   await page.click('#gbody .row[data-i="11"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(500);
-  await page.click('[data-act="res"][data-n="No interesado"]'); await page.waitForSelector('#mMot.on');
-  ok(!(await aux('_Seguimiento')).some(r => r[0] === '100112' && r[2] === 'No interesado'), '«No interesado» no se guarda sin motivo');
-  await page.click('#motList [data-mot="Precio"]'); await page.waitForTimeout(400);
-  ok((await aux('_Seguimiento')).some(r => r[0] === '100112' && r[2] === 'No interesado' && r[3] === 'Precio'), 'Con el motivo elegido se guarda resultado y motivo');
+  ok(JSON.stringify(await page.$$eval('#panel .rchips [data-act="res"]', l => l.map(x => x.dataset.n))) === JSON.stringify(['Gestionado', 'No responde', 'Volver a llamar']), 'Resultados del contacto: solo Gestionado, No responde y Volver a llamar');
   /* posible duplicado (mismo RUC) */
   ok(/Posible duplicado/.test(await page.textContent('#panel')) && /mismo RUC/.test(await page.textContent('#panel')), 'El panel avisa de un posible duplicado por RUC');
   await page.click('#gbody .row[data-i="2"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(500);
@@ -259,11 +258,47 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   const hoy = await page.evaluate(() => { const d = new Date(), p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); });
   const fa = fsh && fsh.find(r => r[0] === hoy && r[1] === 'Ana');
   ok(fsVis === 'Visible' && fsh[0][0] === 'Fecha' && fsh[0][3] === 'Clientes efectivos', 'El administrador crea la pestaña visible «Seguimiento» con sus columnas');
-  ok(fa && +fa[2] === 5 && +fa[3] === 1 && +fa[15] === 1 && +fa[16] === 2 && +fa[17] === 4600, `Una fila por fecha y ejecutivo: gestionados, efectivos, OV y venta [${fa ? fa.slice(0, 4).concat(fa.slice(16, 18)).join(' · ') : 'sin fila'}]`);
+  ok(fa && +fa[2] === 4 && +fa[3] === 1 && +fa[13] === 1 && +fa[14] === 2 && +fa[15] === 4600, `Una fila por fecha y ejecutivo: gestionados, efectivos, OV y venta [${fa ? fa.slice(0, 4).concat(fa.slice(13, 16)).join(' · ') : 'sin fila'}]`);
   ok(fsh.some(r => r[0] === 'Total' && r[1] === 'Ana'), 'Incluye los totales del período por ejecutivo');
   ok(fsh.some(r => r[0] === 'Resumen por semana (lunes a domingo)') && fsh.some(r => r[0] === 'Semana (lunes)' && r[7] === 'Efectivos vs semana anterior'), 'Incluye el resumen por semana con la comparación');
   const h1b = await aux('Hoja1');
   ok(h1b.length === cartera.length && h1b[0].join('|') === COLS.join('|'), 'La hoja de clientes no cambia al crear el reporte');
+
+  /* 9a. lista: etiquetas de marca, filtro «la compra», vista Contactos y exportación para marketing */
+  await page.click('#mainTabs [data-tab="list"]'); await page.waitForTimeout(300);
+  ok((await page.$$('#gbody .row[data-i="2"] .btg')).length >= 3, 'Cada cliente muestra sus marcas como etiquetas de color en la lista');
+  await page.fill('#fMarca', 'jbl'); await page.selectOption('#fRel', 'compra'); await page.waitForTimeout(500);
+  ok((await page.$$('#gbody .row')).length === 1 && /Inversiones Kallpa/.test(await page.textContent('#gbody')), 'Filtrar por marca «jbl» que la compra deja solo sus compradores');
+  await page.click('#vMode [data-v="c"]'); await page.waitForTimeout(300);
+  const ch = await page.$$eval('#ghead .c', l => l.map(x => x.textContent.trim()));
+  ok(JSON.stringify(ch) === JSON.stringify(['Fila', 'Customer ID', 'Legal Name', 'Tax Reg No', 'Cust. Telephone', 'Cust. Mail Address', 'Marcas']) && !!(await page.$('#gbody .row [data-act="wa"]')), 'Vista Contactos: código, razón social, RUC, teléfono (con WhatsApp directo), correo y marcas');
+  await shot('16-contactos');
+  const nb = await page.evaluate(() => window.__book.raw.created.length);
+  await page.click('#bExpC'); await page.waitForTimeout(700);
+  ok(XLSX_JS ? (await page.evaluate(() => window.__book.raw.created.length)) === nb + 1 : true, 'Exportar contactos crea un libro de Excel para marketing con la lista filtrada');
+  await page.click('#vMode [data-v=""]'); await page.click('#bClear'); await page.waitForTimeout(300);
+  /* courier habitual y comprador nuevo */
+  await page.click('#gbody .row[data-i="2"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(500);
+  await page.click('[data-act="cuedit"]'); await page.fill('#cuC', 'Shalom'); await page.fill('#cuAg', 'Av. México'); await page.fill('#cuDest', 'Arequipa');
+  await page.click('[data-act="cusave"]'); await page.waitForTimeout(400);
+  ok((await aux('_Courier')).some(r => r[0] === '100103' && r[1] === 'Shalom' && r[2] === 'Av. México' && r[3] === 'Arequipa'), 'El courier habitual se guarda por Customer ID');
+  await page.click('[data-act="ovopen"]'); await page.waitForTimeout(150);
+  ok(/Envío por Shalom · Av\. México · Arequipa/.test(await page.textContent('#panel .ovform')), 'Al registrar una venta se muestra el courier habitual');
+  await page.click('[data-act="ovopen"]');
+  ok(/Nuevo del mes/.test(await page.textContent('#pBadges')), 'Un cliente con su primera compra este mes aparece como «Nuevo del mes»');
+  /* Mi día del administrador: pendientes del equipo por ejecutivo */
+  await page.click('#mainTabs [data-tab="day"]'); await page.waitForTimeout(300);
+  await page.click('[data-dt="1"]'); await page.waitForTimeout(300);
+  ok(!!(await page.$('#vDay .tgrid .tcol')) && /Ana/.test(await page.textContent('#vDay .tgrid')), 'El administrador ve los pendientes del equipo agrupados por ejecutivo');
+  await shot('17-equipo');
+  await page.click('[data-dt=""]');
+  /* Marcas: gráficos y segmentación por tipo */
+  await page.click('#mainTabs [data-tab="brands"]'); await page.waitForTimeout(400);
+  ok(/Tipo de negocio/.test(await page.textContent('#vBrands .bcharts')) && /Marcas preferidas/.test(await page.textContent('#vBrands .bcharts')), 'Marcas muestra donas y barras de participación y preferencias');
+  await page.click('#vBrands [data-bft="Reseller tienda física"]'); await page.waitForTimeout(300);
+  ok(!!(await page.$('#vBrands .bft.on')) && (await page.getAttribute('#vBrands .kpis .kpi .v', 'data-count')) === '1', 'Al elegir un tipo de negocio la vista de Marcas se segmenta');
+  await shot('18-marcas');
+  await page.click('#vBrands .bft.on'); await page.click('#mainTabs [data-tab="list"]'); await page.waitForTimeout(200);
 
   /* 9b2. dashboard: recuadros seleccionables, filtro por usuario y ventas por marca */
   await page.click('#mainTabs [data-tab="dash"]'); await page.waitForTimeout(400);
@@ -274,6 +309,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok(/interactuó/.test(await page.textContent('#dash .d-head')), 'El dashboard cambia según el usuario elegido');
   await page.click('#dUsers [data-du=""]'); await page.click('#dMode [data-dm="ventas"]'); await page.waitForTimeout(400);
   const vt = await page.textContent('#dash');
+  ok(/Clientes nuevos/.test(vt) && /Clientes recurrentes/.test(vt), 'Ventas muestra cuántos compradores del período son nuevos y cuántos recurrentes');
   ok(/Marcas más recurrentes/.test(vt) && /Combos frecuentes/.test(vt) && /A qué marcas pedir promoción/.test(vt) && /HP.*Lenovo|Lenovo.*HP/s.test(vt), 'Ventas muestra marcas recurrentes, combos (HP + Lenovo) y a qué marcas pedir promoción');
   await page.click('#dMode [data-dm="gest"]');
   /* Mi día: resumen lateral, listas con su barra y ranking */
@@ -303,11 +339,14 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
 
   /* 9e. cliente efectivo y tipos nuevos */
   await page.click('#gbody .row[data-i="2"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(500);
-  ok(/Efectivo/.test(await page.textContent('#pBadges')), '«Contestó» con tipo o marca muestra «Efectivo»');
+  ok(/Efectivo/.test(await page.textContent('#pBadges')), '«Gestionado» con tipo o marca muestra «Efectivo»');
   await page.evaluate(() => { const c = window.__book.sheet('_Config'); c.cells = c.cells.filter(x => !(x && x[0] === 'tiposV2')); const sg = window.__book.sheet('_Seguimiento'); sg.cells.forEach((x, i) => { if (i && x && x[0] === '100105') x[6] = 'Tienda'; }); return Excel.run(async () => {}); });
   await page.reload(); await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana'); await page.waitForTimeout(300);
   const sg2 = await aux('_Seguimiento'), cfg2 = await aux('_Config');
   ok(sg2.slice(1).every(r => !r[6]) && cfg2.some(r => r[0] === 'tiposV2' && r[1] === 'SI'), 'Los tipos de negocio anteriores se dejan sin tipo una sola vez');
+  await page.evaluate(() => { const sg = window.__book.sheet('_Seguimiento'); sg.cells.push(['100109', 'SI', '', '', '0', '', '', 'Ana', '2026-01-05 10:00', '2026-01-05 10:00', '', '', '']); const c = window.__book.sheet('_Config').cells.find(x => x && x[0] === 'seq'); c[1] = String(+c[1] + 1); return Excel.run(async () => {}); });
+  await page.reload(); await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana'); await page.click('#mainTabs [data-tab="list"]'); await page.waitForTimeout(300);
+  ok(/Volver a llamar \(auto\)/.test(await page.textContent('#gbody .row[data-i="8"]')), 'Un cliente trabajado otro día sin resultado pasa solo a «Volver a llamar»');
 
   /* 9f. plantillas de WhatsApp elegidas en el panel */
   await page.click('#bCfg'); await page.fill('#cTpl', 'Promo JBL | Hola {legal}, JBL con precio especial'); await page.click('#bCfgOk'); await page.waitForTimeout(400);
@@ -315,7 +354,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.selectOption('#pTpl', 'Promo JBL');
   await page.evaluate(() => { window.__opened = []; const o = window.open; window.open = (u, ...a) => { window.__opened.push(u); return /^https:\/\/gcx\.local/.test(u) ? o(u, ...a) : { close() {}, focus() {} }; }; });
   await page.click('#panel .p-actions [data-act="wa"]'); await page.waitForTimeout(200);
-  if (await page.$('#mWa.on')) { await page.click('#mWa [data-wa="web"]'); await page.waitForTimeout(200); }
+  if (await page.$('#mWa.on')) { await page.click('#mWa [data-wa="app"]'); await page.waitForTimeout(200); }
   ok(decodeURIComponent((await page.evaluate(() => window.__opened.pop())) || '').includes('Hola Inversiones Kallpa SRL, JBL con precio especial'), 'WhatsApp abre con la plantilla elegida y los datos del cliente');
   /* reasignar clientes sin gestión (los recién asignados todavía no cuentan) */
   await page.click('#bResv'); await page.waitForTimeout(150); await page.click('#rpMode [data-m="stale"]'); await page.fill('#rpDays', '5'); await page.waitForTimeout(100);
@@ -351,7 +390,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await win.click('#panel .p-actions [data-act="wa"]'); await win.waitForTimeout(200);
   if (await win.$('#mWa.on')) { await win.click('#mWa [data-wa="app"]'); await win.waitForTimeout(200); }
   const wl = await win.evaluate(() => [window.__hrefs, window.__wopen]);
-  ok(wl[0].length === 1 && /^whatsapp:\/\/send\?phone=51/.test(wl[0][0]) && wl[1] === 0, 'Desde la ventana grande la aplicación de WhatsApp se lanza sin abrir ventanas');
+  ok(wl[0].length === 1 && /^whatsapp:\/\/send\?phone=51/.test(wl[0][0]) && wl[1] === 0, 'Desde la ventana grande la aplicación de WhatsApp se lanza sin abrir ventanas' + ` [${JSON.stringify(wl)}]`);
   await win.fill('#pCmt', 'Desde la ventana');
   await win.click('[data-act="cmtadd"]'); await win.waitForTimeout(300);
   ok(/^\d\d\/\d\d Ana: Desde la ventana$/.test((await aux('Hoja1'))[8][17]), 'Comentario hecho en la ventana queda guardado en el libro');
@@ -463,7 +502,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.reload(); await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Harold');
   await page.click('#mainTabs [data-tab="list"]'); await page.waitForTimeout(300);
   const heads = await page.$$eval('#ghead .c', l => l.map(x => x.textContent.trim()));
-  ok(JSON.stringify(heads) === JSON.stringify(['Fila', 'Customer ID', 'Legal Name', 'Tax Reg No', 'State Name', 'City Name']), 'Por defecto la lista muestra fila, Customer ID, Legal Name, Tax Reg No, State Name y City Name' + (heads.length !== 6 ? ' [' + heads.join(', ') + ']' : ''));
+  ok(JSON.stringify(heads) === JSON.stringify(['Fila', 'Customer ID', 'Legal Name', 'Tax Reg No', 'State Name', 'City Name', 'Marcas']), 'Por defecto la lista muestra fila, Customer ID, Legal Name, Tax Reg No, State Name, City Name y sus marcas' + (heads.length !== 7 ? ' [' + heads.join(', ') + ']' : ''));
   const lg = await page.$('#ghead .c:nth-child(3) .rz'), bx = await lg.boundingBox(), w0 = (await (await page.$('#ghead .c:nth-child(3)')).boundingBox()).width;
   await page.mouse.move(bx.x + 3, bx.y + 10); await page.mouse.down(); await page.mouse.move(bx.x + 83, bx.y + 10, { steps: 4 }); await page.mouse.up(); await page.waitForTimeout(200);
   const w1 = (await (await page.$('#ghead .c:nth-child(3)')).boundingBox()).width, saved = await page.evaluate(() => JSON.parse(localStorage.getItem('gcp:ui')).colW || {});

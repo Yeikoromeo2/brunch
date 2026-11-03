@@ -53,18 +53,11 @@ CSS = """
 .p-nav{display:none;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:2}
 .p-nav .spacer{flex:1}
 .p-nav .btn{height:30px}
-#bFilt{display:none}
 @media (max-width:1000px){.p-nav{display:flex}}
 @media (max-width:760px){
   header.top{padding:6px 8px;gap:4px}
   header.top .btn{padding:0 7px}
   .tabs button{padding:0 9px}
-  #bFilt{display:inline-flex}
-  .toolbar .field:not(.search),.toolbar #bClear,.toolbar .ck{display:none}
-  .toolbar.open .field,.toolbar.open #bClear,.toolbar.open .ck{display:flex}
-  .toolbar .field.search{flex:1 1 100%}
-  .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}
-  .chips .chip{flex:none}
   .strip{gap:10px;padding:6px 10px}
   #panel{width:100%}
 }
@@ -183,8 +176,6 @@ rep('<button class="btn ghost" id="bReload" title="Recargar datos">',
     '<button class="btn" id="bWin" title="Abrir el Gestor en una ventana aparte, más grande"><svg><use href="#i-ext"/></svg>Ampliar</button>\n  <button class="btn ghost" id="bReload" title="Recargar datos">')
 rep('<svg style="display:none" xmlns="http://www.w3.org/2000/svg">',
     '<svg style="display:none" xmlns="http://www.w3.org/2000/svg">\n  <symbol id="i-ext" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 3h7v7M21 3l-9 9M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/></symbol>')
-rep('<div class="field search"><svg><use href="#i-search"/></svg>',
-    '<button class="btn ghost" id="bFilt" type="button" title="Mostrar filtros"><svg><use href="#i-flag"/></svg>Filtros</button>\n  <div class="field search"><svg><use href="#i-search"/></svg>')
 
 # ---------- usuarios: PIN temporal ----------
 rep('<label class="fl"><span>PIN (4 a 8 números)</span><input type="text" id="uPin"',
@@ -286,7 +277,7 @@ rep("""  if (b) { e.preventDefault(); if (!b.disabled) act(r, b.dataset.act, act
     """  if (b) { e.preventDefault(); if (!b.disabled) act(r, b.dataset.act, actArg(b)); }
   else if (!e.target.closest('.cmt')) { $('#grid').focus({ preventScroll: true }); if (innerWidth <= 1000 && !UI.panelM) { UI.panelM = true; saveUI(); applyPanel(); } }""")
 rep("$('#bReload').onclick = () => { flushAll(); loadAll(false); };",
-    "$('#bReload').onclick = () => { flushAll(); loadAll(false); };\n$('#bFilt').onclick = () => $('#toolbar').classList.toggle('open');")
+    "$('#bReload').onclick = () => { flushAll(); loadAll(false); };")
 
 # lista angosta (panel de Excel): la vuelve a armar al cruzar los 760 px
 rep("window.addEventListener('resize', () => { render(); applyPanel(); moveInd(); });",

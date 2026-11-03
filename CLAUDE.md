@@ -12,7 +12,7 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 - Cada fila es un cliente independiente. Se identifica por `Customer ID`, nunca por el número de fila, porque la hoja puede ordenarse o filtrarse.
 - `Customer ID`, `Tax Reg No` y los teléfonos se tratan como texto.
 - Antes de procesar un Excel real, validarlo con `python3 crm/estructura/validar_cartera.py <archivo.xlsx>`. Si no pasa, no procesarlo.
-- La versión final trabaja sobre el Excel en OneDrive (complemento de Excel web). Los reportes y listas se abren como **libros nuevos** (`Excel.createWorkbook`), con las 18 columnas en el mismo orden; no se borran datos.
+- La versión final trabaja sobre el Excel en OneDrive (complemento de Excel web). Los reportes y listas se abren como **libros nuevos** (`Excel.createWorkbook`), con las 18 columnas en el mismo orden; no se borran datos. Excepción pedida: «Exportar contactos» (vista Contactos de la Lista) crea un libro con código, razón social, RUC, teléfono, correo, marcas, tipo y ejecutivo de la lista filtrada, para marketing.
 - **Única hoja visible que crea el sistema:** la pestaña `Seguimiento` (reporte de actividad por fecha y ejecutivo). Solo la crea o actualiza el administrador al pulsar el botón en Reportes; nunca de forma automática. Ninguna otra hoja visible se agrega al archivo.
 
 ## Ventas y órdenes (OV)
@@ -20,6 +20,7 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 - Toda venta se registra con una línea por marca y su monto, enlazada al cliente por su Customer ID. El **número de OV es opcional y único**: si no se escribe, se genera `OC-<CustomerID>-<aammddhhmm>`.
 - Los montos siempre son **en dólares (US$) y sin IGV**; el IGV (18 %) se muestra calculado, nunca se guarda en el monto.
 - La marca de cada línea se reconoce sin importar mayúsculas ni acentos y queda registrada como «habitual» del cliente.
+- **Courier habitual** (`_Courier`): un registro por Customer ID (courier, agencia, destino, consignatario, documento, teléfono, nota); se muestra al registrar cada venta.
 - **Cotizaciones** (`_Cotizaciones`): marcas y monto opcional en US$; al registrar una venta del cliente, su cotización abierta más reciente pasa sola a «Ganada».
 - Al registrar una OV su estado pasa automáticamente a **Despachando**. La alerta sigue activa hasta que alguien la marque como **Terminado**; no se puede desactivar.
 - Estados: `Despachando` → `Terminado`, con `Incidencia` para problemas de entrega. Solo el administrador puede **reabrir** una OV cerrada o **anularla**; las anuladas no cuentan en las ventas.
@@ -29,15 +30,16 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 ## Tipo de negocio y marcas
 
 - Tipo de negocio de cada cliente: **Reseller tienda virtual**, **Reseller tienda física**, **Oficina (B2B)** o **Híbrido** (combina lo anterior). Se sugiere por palabras clave del comentario y se confirma en el panel; se guarda en `_Seguimiento`. Los tipos anteriores (Tienda/Oficina/Híbrido) se dejaron sin tipo una sola vez (`tiposV2` en `_Config`).
-- Los resultados de contacto solo los marca la persona con un clic: copiar el contacto o abrir WhatsApp no marcan «Revisado» ni ningún resultado.
-- «No interesado» y «Número errado» no se guardan sin **motivo**.
-- **Cliente efectivo:** marcado «Contestó» y con tipo de negocio o al menos una marca. Es la cifra que cuentan el reporte `Seguimiento` y las Estadísticas.
+- **Resultados de contacto:** solo `Gestionado` (verde), `No responde` (rojo) y `Volver a llamar` (morado), marcados por la persona con un clic; copiar el contacto o abrir WhatsApp no marcan nada. Los nombres anteriores (`Contestó`, `No contesta`) se leen como los nuevos. `Número errado` y `No interesado` ya no se ofrecen ni cuentan en métricas. Un cliente trabajado otro día sin resultado se muestra como «Volver a llamar» al día siguiente (automático, sin escribir en el libro).
+- **Comprado** sale de registrar la venta; el comprador es «Nuevo del mes», «Nuevo del año» o «Recurrente» según su primera venta registrada.
+- **Cliente efectivo:** marcado «Gestionado» y con tipo de negocio o al menos una marca. Es la cifra que cuentan el reporte `Seguimiento` y las Estadísticas.
 - El catálogo de marcas está en `crm/estructura/marcas.json` (pestaña `_Marcas`). Las marcas que distribuye cada cliente van en `_ClienteMarcas`, nunca como columnas de la cartera.
 - Cada marca de un cliente lleva su relación (`habitual`, `ocasional`, `interes`), quién la registró y la fecha. Pasados 90 días se marca «por confirmar».
 
 ## Visibilidad
 
 - **Reparto de cartera:** el administrador asigna clientes a cada ejecutivo por filas (rangos como al imprimir, `2-500, 650`) o alternados entre varios. Se guarda por Customer ID en `_Reparto`. En cuanto hay reparto, cada ejecutivo ve y trabaja **solo** lo que le asignaron.
+- La campana y los pendientes de Mi día son de cada usuario (sus OV y sus llamadas). El administrador tiene además «Equipo» en Mi día: pendientes agrupados por ejecutivo.
 - El administrador puede **reasignar** clientes asignados sin gestión hace N días a otros ejecutivos, en turno.
 - Mientras no haya reparto, el ejecutivo ve su cartera según la columna `Ejecutivo` (con su «Nombre en cartera»), sus filas reservadas o los clientes que gestionó. El administrador ve todo.
 - El modelo completo de pestañas auxiliares está en `crm/estructura/modelo-datos.md`.

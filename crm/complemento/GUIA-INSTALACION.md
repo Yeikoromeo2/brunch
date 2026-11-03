@@ -56,6 +56,19 @@ Si «Cargar mi complemento» no aparece, la organización lo tiene bloqueado y s
 - **Estadísticas** (pestaña nueva): embudo, resultados, tipo de negocio, marcas, líneas, departamentos, efectivos por día, efectividad por ejecutivo y grupos de «cómo atacar», con filtros de período, ejecutivo, tipo, línea y departamento.
 - **Lista:** por defecto muestra fila, Customer ID, Legal Name, Tax Reg No, State Name y City Name. En Ajustes eliges otras columnas (también Gestión y Comentario) y cada columna se ensancha arrastrando el borde de su título.
 
+## Lista: filtros, marcas y contactos
+
+- Los **filtros** están en una barra lateral (buscar, estado, marca y relación, línea, tipo, filas). Se pliega con el botón **Filtros**; en el panel angosto de Excel se abre encima de la lista.
+- La columna **Marcas** muestra cada marca del cliente como etiqueta con su color: llena = habitual, con borde = a veces, solo contorno = le interesa.
+- **Vista Contactos** (arriba, junto a Gestión): código de cliente, razón social, RUC, teléfono con WhatsApp y copiar, correo y marcas. Ejemplo: Marca «Forza» + Relación «La compra» y tienes la lista para escribirles uno por uno. **Exportar contactos** crea un Excel de esa misma lista para marketing.
+
+## Resultados, courier y compradores
+
+- **Resultados:** Gestionado (verde), No responde (rojo) y Volver a llamar (morado). Si un cliente se trabajó y quedó sin resultado, al día siguiente aparece solo como «Volver a llamar».
+- **Courier habitual:** en el panel del cliente; se guarda una vez y aparece en cada venta.
+- **Compradores:** «Nuevo del mes», «Nuevo del año» o «Recurrente» según su primera venta registrada; en Estadísticas y en Dashboard → Ventas (nuevos y recurrentes del período elegido).
+- **Pendientes:** la campana y Mi día muestran solo lo de cada usuario. El administrador tiene «Equipo» en Mi día, con los pendientes de cada ejecutivo.
+
 ## Ventas, cotizaciones y comentarios
 
 - **Venta:** solo marca y monto en **US$ sin IGV** («JBL 1200, Lenovo 5400» y Enter). El IGV 18 % y el total con IGV se muestran calculados. El N° de OV, la fecha y la nota son opcionales (en «Más datos»); sin N° se genera uno con el Customer ID. Al guardar aparece un ✓ «Guardado» al instante y el libro se escribe detrás; si algo falla, el formulario vuelve con lo escrito.

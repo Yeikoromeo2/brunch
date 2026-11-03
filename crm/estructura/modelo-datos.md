@@ -14,7 +14,7 @@ Si TI registra más adelante la app de Microsoft Graph, estas mismas pestañas s
 |---|---|
 | Customer ID | Clave del cliente |
 | Revisado | SI / vacío |
-| Resultado | Contestó · No contesta · Volver a llamar · Número errado · No interesado |
+| Resultado | Gestionado · No responde · Volver a llamar (los anteriores Contestó/No contesta se leen así; Número errado y No interesado quedan solo como histórico) |
 | Motivo | Motivo de «No interesado» |
 | Intentos | Número de intentos de contacto |
 | Compra / Monto | SI y monto en soles |
@@ -64,6 +64,9 @@ Customer ID · Fecha y hora · Usuario · Acción (resultado, comentario, marca,
 
 ### `_Reparto`: cartera asignada por el administrador
 Customer ID · Ejecutivo · Asignado por · Fecha. Una fila por cliente. Con reparto, cada ejecutivo ve solo sus clientes.
+
+### `_Courier`: courier habitual del cliente
+Customer ID · Courier · Agencia o sede · Destino · Consignatario · DNI o RUC del consignatario · Teléfono · Nota · Actualizado por · Fecha. Uno por cliente.
 
 ### `_Cotizaciones`: una fila por cotización
 ID · Customer ID · Fecha · Marcas · Monto US$ sin IGV · Ejecutivo · Estado (`Enviada` · `Ganada` · `Perdida`) · Fecha cierre · Cerrado por. Al registrar una venta, la cotización abierta más reciente del cliente pasa a `Ganada`.

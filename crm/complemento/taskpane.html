@@ -353,6 +353,54 @@ body.resizing{cursor:col-resize;user-select:none}
 .qi .ac{grid-column:1/-1;display:flex;gap:6px}
 .qi .ac .btn{height:28px}
 .qform{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.dtog{position:relative;z-index:1;display:flex;gap:4px;background:rgba(255,255,255,.12);border-radius:9px;padding:3px}
+.dtog button{flex:1;height:28px;border:0;border-radius:7px;background:transparent;color:#fff;font-weight:600;cursor:pointer;opacity:.85}
+.dtog button.on{background:#fff;color:var(--hero-a);opacity:1}
+.tgrid{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(280px,1fr);gap:14px;min-height:0;overflow-x:auto;grid-column:2/-1}
+.tcol{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px}
+.thd{display:flex;gap:10px;align-items:center;padding:2px 2px 8px;border-bottom:1px solid var(--line)}
+.thd small{display:block;color:var(--muted);font-size:11.5px}
+.thd .u{color:var(--crit);font-weight:700}
+@media (max-width:1000px){.tgrid{grid-auto-flow:row;grid-column:auto;overflow:visible}}
+.cuform{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cukv{margin:0}
+.bft{cursor:pointer;border-radius:7px;padding:2px 6px;margin:-2px -6px}
+.bft:hover{background:var(--hover)}
+.bft.on{background:var(--accent-soft);font-weight:700}
+.hbar .tr.stk{display:flex;gap:2px;background:var(--surface3)}
+.hbar .tr.stk i{border-radius:0}
+.hbar .tr.stk i:last-child{border-radius:0 4px 4px 0}
+a.lk{color:var(--accent);cursor:pointer;text-decoration:underline}
+#vList{min-width:0}
+.fside{flex:none;width:248px;flex-direction:column;align-items:stretch;flex-wrap:nowrap;gap:8px;padding:12px;border-bottom:0;border-right:1px solid var(--line);overflow:auto;background:var(--surface)}
+.fside[hidden]{display:none}
+.fside.closed{display:none}
+.fside > *,.fside .field.search{flex:none}
+.fside .field{width:100%;min-width:0;box-sizing:border-box}
+.fside .two .field input{width:100%}
+.fside .field input,.fside .field select{flex:1;min-width:0;width:auto}
+.fside .two{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fside .chips{flex-direction:column;gap:3px}
+.fside .chip{justify-content:flex-start;height:30px}
+.fside .chip .n{margin-left:auto}
+.fs-h{display:flex;align-items:center;justify-content:space-between}
+.fs-h b{font-size:14px}
+.fs-h .btn{height:28px}
+.fs-t{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.strip .spacer{flex:1}
+.vmode{padding:2px}
+.vmode button{height:26px;padding:0 10px;display:inline-flex;align-items:center;gap:5px;flex:none}
+.vmode button svg{width:14px;height:14px}
+.btags{gap:3px;flex-wrap:nowrap}
+.btg{font:700 10.5px var(--fm);padding:2px 6px;border-radius:5px;color:#fff;background:var(--bc);letter-spacing:.02em;flex:none;line-height:1.3}
+.btg.ocasional{background:color-mix(in srgb,var(--bc) 18%,var(--surface));color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--bc)}
+.btg.interes{background:transparent;color:var(--ink2);box-shadow:inset 0 0 0 1.5px var(--bc);border:1px dashed transparent}
+.btg.more{background:var(--surface3);color:var(--ink2)}
+@media (max-width:760px){
+  .fside{position:absolute;left:0;top:0;bottom:0;z-index:28;width:86%;max-width:320px;box-shadow:var(--shadow-lg);display:none}
+  .fside.open{display:flex}
+  .fside.closed.open{display:flex}
+}
 .demo{font-size:12px;color:var(--ink2);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
 .demo b{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .demo button{border:1px solid var(--line2);background:var(--surface);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;text-align:left}
@@ -675,18 +723,11 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
 .p-nav{display:none;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:2}
 .p-nav .spacer{flex:1}
 .p-nav .btn{height:30px}
-#bFilt{display:none}
 @media (max-width:1000px){.p-nav{display:flex}}
 @media (max-width:760px){
   header.top{padding:6px 8px;gap:4px}
   header.top .btn{padding:0 7px}
   .tabs button{padding:0 9px}
-  #bFilt{display:inline-flex}
-  .toolbar .field:not(.search),.toolbar #bClear,.toolbar .ck{display:none}
-  .toolbar.open .field,.toolbar.open #bClear,.toolbar.open .ck{display:flex}
-  .toolbar .field.search{flex:1 1 100%}
-  .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}
-  .chips .chip{flex:none}
   .strip{gap:10px;padding:6px 10px}
   #panel{width:100%}
 }
@@ -885,40 +926,46 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
   <div class="me"><span class="av" id="meAv"></span><span class="hide-sm"><b id="meName"></b> <span class="role hide-md" id="meRole"></span></span><button class="btn ghost" id="bOut" title="Salir" style="height:28px;padding:0 6px"><svg><use href="#i-out"/></svg></button></div>
 </header>
 
-<div class="toolbar" id="toolbar">
-  <button class="btn ghost" id="bFilt" type="button" title="Mostrar filtros"><svg><use href="#i-flag"/></svg>Filtros</button>
-  <div class="field search"><svg><use href="#i-search"/></svg><input id="q" placeholder="Buscar cliente, ID, RUC, teléfono…  ( / )"></div>
-  <div class="field num"><label for="fFrom">Fila desde</label><input id="fFrom" type="number" min="2" placeholder="—"></div>
-  <div class="field num"><label for="fTo">hasta</label><input id="fTo" type="number" min="2" placeholder="—"></div>
-  <div class="field"><label for="fTipo">Tipo</label><select id="fTipo"><option value="">Todos</option><option>Reseller tienda virtual</option><option>Reseller tienda física</option><option>Oficina (B2B)</option><option>Híbrido</option><option value="-">Sin definir</option></select></div>
-  <div class="field"><label for="fCat">Línea</label><select id="fCat"><option value="">Todas</option></select></div>
-  <div class="field"><label for="fMarca">Marca</label><input id="fMarca" list="dlBrands" placeholder="Todas" style="width:112px"></div>
-  <div class="field"><label for="fRel">Compra</label><select id="fRel"><option value="">Cualquiera</option><option value="habitual">Habitual</option><option value="ocasional">A veces</option><option value="interes">Le interesa</option></select></div>
-  <datalist id="dlBrands"></datalist>
-  <button class="btn ghost" id="bClear">Limpiar</button>
-  <div class="chips" id="chips">
-    <button class="chip on" data-st="all">Todos <span class="n" data-n="all">0</span></button>
-    <button class="chip" data-st="mine"><span class="sw mine"></span>Mis clientes <span class="n" data-n="mine">0</span></button>
-    <button class="chip" data-st="mypend"><span class="sw agenda"></span>Mis pendientes <span class="n" data-n="mypend">0</span></button>
-    <button class="chip" data-st="none"><span class="sw none"></span>Pendientes <span class="n" data-n="none">0</span></button>
-    <button class="chip" data-st="rev"><span class="sw rev"></span>Revisados <span class="n" data-n="rev">0</span></button>
-    <button class="chip" data-st="att"><span class="sw att"></span>Atendidos <span class="n" data-n="att">0</span></button>
-    <button class="chip" data-st="noc"><span class="sw noc"></span>No contesta <span class="n" data-n="noc">0</span></button>
-    <button class="chip" data-st="agenda"><span class="sw agenda"></span>Llamar hoy <span class="n" data-n="agenda">0</span></button>
-    <button class="chip" data-st="buy"><span class="sw buy"></span>Con compra <span class="n" data-n="buy">0</span></button>
-  </div>
-  <label class="ck" title="Ocultar clientes marcados como depurados"><input type="checkbox" id="hideDep" checked> Ocultar depurados</label>
-</div>
 <div class="strip" id="strip">
   <span>Mostrando <b id="sShow">0</b></span>
   <div class="mini" id="sBar"></div>
   <span id="sResv"></span>
   <span class="hide-sm" id="sPos"></span>
+  <span class="spacer"></span>
+  <div class="seg2 vmode" id="vMode"><button data-v="" class="on" type="button"><svg><use href="#i-list"/></svg>Gestión</button><button data-v="c" type="button"><svg><use href="#i-contact"/></svg>Contactos</button></div>
+  <button class="btn" id="bExpC" type="button" title="Exportar la lista mostrada (con los filtros) a un Excel para marketing"><svg><use href="#i-down"/></svg><span class="hide-sm">Exportar contactos</span></button>
+  <button class="btn ghost" id="bFside" type="button" title="Mostrar u ocultar los filtros"><svg><use href="#i-search"/></svg><span class="hide-sm">Filtros</span></button>
 </div>
 
 <main>
   <section class="view" id="vDay"></section>
   <section class="view on" id="vList">
+    <aside class="toolbar fside" id="toolbar">
+      <div class="fs-h"><b>Filtros</b><button class="btn ghost" id="bClear" type="button">Limpiar</button></div>
+      <div class="field search"><svg><use href="#i-search"/></svg><input id="q" placeholder="Cliente, ID, RUC, teléfono…  ( / )"></div>
+      <div class="fs-t">Estado</div>
+      <div class="chips" id="chips">
+        <button class="chip on" data-st="all">Todos <span class="n" data-n="all">0</span></button>
+        <button class="chip" data-st="mine"><span class="sw mine"></span>Mis clientes <span class="n" data-n="mine">0</span></button>
+        <button class="chip" data-st="mypend"><span class="sw agenda"></span>Mis pendientes <span class="n" data-n="mypend">0</span></button>
+        <button class="chip" data-st="none"><span class="sw none"></span>Pendientes <span class="n" data-n="none">0</span></button>
+        <button class="chip" data-st="rev"><span class="sw rev"></span>Revisados <span class="n" data-n="rev">0</span></button>
+        <button class="chip" data-st="att"><span class="sw att"></span>Gestionados <span class="n" data-n="att">0</span></button>
+        <button class="chip" data-st="noc"><span class="sw noc"></span>No responde <span class="n" data-n="noc">0</span></button>
+        <button class="chip" data-st="agenda"><span class="sw agenda"></span>Llamar hoy <span class="n" data-n="agenda">0</span></button>
+        <button class="chip" data-st="buy"><span class="sw buy"></span>Comprado <span class="n" data-n="buy">0</span></button>
+      </div>
+      <div class="fs-t">Marca y línea</div>
+      <div class="field"><label for="fMarca">Marca</label><input id="fMarca" list="dlBrands" placeholder="Todas"></div>
+      <div class="field"><label for="fRel">Relación</label><select id="fRel"><option value="">Cualquiera</option><option value="compra">La compra (habitual o a veces)</option><option value="habitual">Habitual</option><option value="ocasional">A veces</option><option value="interes">Le interesa</option></select></div>
+      <div class="field"><label for="fCat">Línea</label><select id="fCat"><option value="">Todas</option></select></div>
+      <datalist id="dlBrands"></datalist>
+      <div class="fs-t">Tipo de negocio</div>
+      <div class="field"><label for="fTipo">Tipo</label><select id="fTipo"><option value="">Todos</option><option>Reseller tienda virtual</option><option>Reseller tienda física</option><option>Oficina (B2B)</option><option>Híbrido</option><option value="-">Sin definir</option></select></div>
+      <div class="fs-t">Filas</div>
+      <div class="two"><div class="field num"><label for="fFrom">Desde</label><input id="fFrom" type="number" min="2" placeholder="—"></div><div class="field num"><label for="fTo">Hasta</label><input id="fTo" type="number" min="2" placeholder="—"></div></div>
+      <label class="ck" title="Ocultar clientes marcados como depurados"><input type="checkbox" id="hideDep" checked> Ocultar depurados</label>
+    </aside>
     <div id="grid" tabindex="0"><div id="ghead"></div><div id="gbody"></div></div>
     <div class="psplit" id="pSplit" title="Arrastra para cambiar el ancho del detalle"></div>
     <aside id="panel"><div class="p-empty">Selecciona una fila para ver el detalle.</div></aside>
@@ -983,7 +1030,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
         <label class="ck"><input type="checkbox" id="cScope"> Cada ejecutivo ve solo su cartera (asignados, reservados o gestionados por él)</label>
         <label class="ck"><input type="checkbox" id="cLock"> Bloquear el cliente cuando alguien lo gestiona</label>
         <div class="two">
-          <label class="fl"><span>Intentos para reporte «No contestaron»</span><input type="number" id="cMin" min="1" max="20"></label>
+          <label class="fl"><span>Intentos para reporte «No respondieron»</span><input type="number" id="cMin" min="1" max="20"></label>
           <label class="fl"><span>Meta diaria de gestiones</span><input type="number" id="cGoal" min="1" max="500"></label>
           <label class="fl"><span>Meta diaria de clientes efectivos</span><input type="number" id="cGoalEf" min="0" max="500"></label>
           <label class="fl"><span>Meta mensual de venta por ejecutivo (US$ sin IGV)</span><input type="number" id="cSGoal" min="0" step="1000"></label>
@@ -1062,7 +1109,7 @@ details.bcat summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--a
     <span><kbd>W</kbd> / <kbd>M</kbd></span><span>WhatsApp / correo</span>
     <span><kbd>C</kbd></span><span>Copiar contacto (ID // Nombre // Departamento)</span>
     <span><kbd>I</kbd> / <kbd>T</kbd></span><span>Copiar Customer ID / Tax Reg No</span>
-    <span><kbd>1</kbd>…<kbd>5</kbd></span><span>Resultado: Contestó · No contesta · Volver a llamar · Número errado · No interesado</span>
+    <span><kbd>1</kbd>…<kbd>3</kbd></span><span>Resultado: Gestionado · No responde · Volver a llamar</span>
     <span><kbd>0</kbd></span><span>Quitar resultado</span>
     <span><kbd>R</kbd> / <kbd>V</kbd></span><span>Revisado / compra con éxito</span>
     <span><kbd>E</kbd></span><span>Editar número del cliente</span>
@@ -1088,11 +1135,18 @@ const DEMO = false;
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const RH = 42;
+/* resultados del contacto: solo tres, marcados a mano. «Número errado» y «No interesado» ya no se ofrecen
+   ni cuentan en las métricas; si un cliente los tenía, solo se muestran. «Comprado» sale de registrar la venta. */
 const RES = {
-  'Contestó': { c: 'var(--good)', k: '1', i: 'check' }, 'No contesta': { c: 'var(--crit)', k: '2', i: 'x' }, 'Volver a llamar': { c: 'var(--violet)', k: '3', i: 'clock' },
-  'Número errado': { c: 'var(--serious)', k: '4', i: 'hash' }, 'No interesado': { c: 'var(--muted)', k: '5', i: 'ban' }
+  'Gestionado': { c: 'var(--good)', k: '1', i: 'check' }, 'No responde': { c: 'var(--crit)', k: '2', i: 'x' }, 'Volver a llamar': { c: 'var(--violet)', k: '3', i: 'clock' }
 };
+const RES_OLD = { 'Número errado': 'var(--serious)', 'No interesado': 'var(--muted)' };
 const RES_LIST = Object.keys(RES);
+/* si un cliente se trabajó un día y quedó sin resultado, al día siguiente pasa solo a «Volver a llamar» */
+function autoT(t) {
+  if (!t.res && !t.buy && !t.dep && t.last && t.last.slice(0, 10) < S.today) { t.res = 'Volver a llamar'; t.next = t.next || addDays(t.last.slice(0, 10), 1); t.auto = true; }
+  return t;
+}
 const MOTIVOS = ['Precio', 'Ya compra a otro proveedor', 'No lo necesita ahora', 'Problema de crédito', 'Cerró el negocio', 'Otro'];
 const emptyT = () => ({ rev: false, res: '', int: 0, buy: false, next: '', own: '', first: '', last: '', lastc: '', dep: '', motivo: '', monto: '', fix: '', tipo: '', brands: [], bmeta: {}, hist: [] });
 const SERIES = ['--s1', '--s2', '--s3', '--s4', '--s5', '--s6', '--s7', '--s8'];
@@ -1119,7 +1173,7 @@ function call(fn, ...args) {
 }
 
 /* ---------- estado ---------- */
-const S = { quotes: [], qf: null, dups: { tax: new Map(), tel: new Map() }, stf: { per: '30', exec: '', tipo: '', cat: '', state: '' }, asg: {}, drafts: {}, phMap: {}, ovMap: {}, token: '', me: null, cfg: {}, header: [], C: {}, rows: [], byKey: new Map(), view: [], active: null, st: 'all', tab: 'list',
+const S = { courier: {}, cf: null, quotes: [], qf: null, dups: { tax: new Map(), tel: new Map() }, stf: { per: '30', exec: '', tipo: '', cat: '', state: '' }, asg: {}, drafts: {}, phMap: {}, ovMap: {}, token: '', me: null, cfg: {}, header: [], C: {}, rows: [], byKey: new Map(), view: [], active: null, st: 'all', tab: 'list',
   assigns: [], users: [], seq: 0, lastRow: 0, today: '', pending: 0, cmtT: {}, needReload: false, activity: null, activityAt: 0, rep: { type: 'noc' }, sheets: [], fixOpen: null, phDraft: '', brands: [], catOf: {}, cats: [], catOpen: false, addRel: 'habitual', scoped: false, total: 0, bf: { q: '', cat: '', marca: '', rel: '', exec: '', tipo: '', empty: false, mode: 'cli' }, orders: [], sales: [], ov: null, dashMode: 'gest', sf: { per: 'mes', marca: '', cat: '', exec: '', tipo: '' } };
 
 /* ---------- utilidades ---------- */
@@ -1140,18 +1194,19 @@ const addDays = (s, n) => { const d = new Date(s + 'T12:00:00'); d.setDate(d.get
 const daysSince = s => s ? Math.round((new Date(S.today + 'T12:00:00') - new Date(String(s).slice(0, 10) + 'T12:00:00')) / 864e5) : 9999;
 const val = (r, k) => S.C[k] == null ? '' : String(r.v[S.C[k]] == null ? '' : r.v[S.C[k]]);
 const status = r => val(r, 'comment').trim() ? 'att' : (r.t.rev ? 'rev' : 'none');
-const isNoc = r => r.t.res === 'No contesta';
-/* cliente efectivo: se marcó «Contestó» y tiene tipo de negocio o al menos una marca registrada */
-const isEfectivo = r => r.t.res === 'Contestó' && (!!r.t.tipo || (r.t.brands || []).length > 0);
+const isNoc = r => r.t.res === 'No responde';
+/* cliente efectivo: se marcó «Gestionado» y tiene tipo de negocio o al menos una marca registrada */
+const isEfectivo = r => r.t.res === 'Gestionado' && (!!r.t.tipo || (r.t.brands || []).length > 0);
 /* un solo color por cliente, en este orden: compra, atendido (con comentario), volver a llamar, no contesta,
    número errado, no interesado, revisado y pendiente. Lo usan la barrita y las filas de la lista. */
-const CATS = [['buy', r => r.t.buy], ['att', r => !!val(r, 'comment').trim()], ['call', r => r.t.res === 'Volver a llamar'], ['noc', r => r.t.res === 'No contesta'],
-  ['wrong', r => r.t.res === 'Número errado'], ['noint', r => r.t.res === 'No interesado'], ['rev', r => r.t.rev], ['none', () => true]];
-const CAT_TX = { buy: 'Con compra', att: 'Atendidos', call: 'Volver a llamar', noc: 'No contesta', wrong: 'Número errado', noint: 'No interesado', rev: 'Revisados', none: 'Pendientes' };
+const CATS = [['buy', r => r.t.buy], ['att', r => r.t.res === 'Gestionado' || !!val(r, 'comment').trim()], ['call', r => r.t.res === 'Volver a llamar'], ['noc', r => r.t.res === 'No responde'],
+  ['rev', r => r.t.rev], ['none', () => true]];
+const CAT_TX = { buy: 'Comprado', att: 'Atendidos', call: 'Volver a llamar', noc: 'No responde', wrong: 'Número errado', noint: 'No interesado', rev: 'Revisados', none: 'Pendientes' };
 const cat = r => CATS.find(([, f]) => f(r))[0];
 /* «mis pendientes»: clientes cuya última gestión hice yo y que quedaron en volver a llamar o revisados sin comentario */
 const lastBy = r => (r.t.hist[0] && r.t.hist[0].who) || r.t.own;
-const isMyPend = r => !r.t.dep && S.me && lastBy(r) === S.me.name && (r.t.res === 'Volver a llamar' || (r.t.rev && !val(r, 'comment').trim()));
+const isPendOf = (r, u) => !r.t.dep && !!u && lastBy(r) === u && (r.t.res === 'Volver a llamar' || (r.t.rev && !val(r, 'comment').trim()));
+const isMyPend = r => !!S.me && isPendOf(r, S.me.name);
 const isAgenda = r => r.t.res === 'Volver a llamar' && r.t.next && r.t.next <= S.today;
 const isAdmin = () => S.me && S.me.role === 'admin';
 const resvFor = n => S.assigns.find(a => n >= a.from && n <= a.to);
@@ -1174,7 +1229,7 @@ function score(r) {
   const rec = d <= 30 ? 3 : d <= 90 ? 2 : d <= 180 ? 1 : 0;
   const cre = cr >= 50000 ? 3 : cr >= 20000 ? 2 : cr >= 5000 ? 1 : 0;
   const cla = cl === 'A' ? 2 : cl === 'B' ? 1 : 0;
-  const resp = t.buy || t.res === 'Contestó' || t.res === 'Volver a llamar' ? 2 : !t.res ? 1 : 0;
+  const resp = t.buy || t.res === 'Gestionado' || t.res === 'Volver a llamar' ? 2 : !t.res ? 1 : 0;
   return { total: rec + cre + cla + resp, d, cr, cl };
 }
 const tier = r => { const s = score(r).total; return s >= 8 ? 'A' : s >= 6 ? 'B' : s >= 4 ? 'C' : 'D'; };
@@ -1260,7 +1315,7 @@ const brandsBy = (r, rel) => (r.t.brands || []).filter(b => relOf(r, b) === rel)
 function brandMatch(r, cat, mq, rel) {
   if (!cat && !mq && !rel) return true;
   const mx = mq ? findBrand(mq) : null;
-  return (r.t.brands || []).some(x => (!cat || S.catOf[x] === cat) && (!mq || (mx ? x === mx.m : norm(x).includes(norm(mq)))) && (!rel || relOf(r, x) === rel));
+  return (r.t.brands || []).some(x => (!cat || S.catOf[x] === cat) && (!mq || (mx ? x === mx.m : norm(x).includes(norm(mq)))) && (!rel || (rel === 'compra' ? relOf(r, x) !== 'interes' : relOf(r, x) === rel)));
 }
 const SHORT = { 'Cómputo': 'Cómputo', 'Gaming': 'Gaming', 'Componentes': 'Compon.', 'Almacenamiento y memoria': 'Almacen.', 'Servidores y centro de datos': 'Servid.', 'Redes y conectividad': 'Redes', 'Energía': 'Energía', 'Seguridad electrónica': 'Segur.', 'Hogar inteligente': 'Hogar', 'Punto de venta y código de barras': 'POS', 'Impresión': 'Impres.', 'Colaboración y videoconferencia': 'Colab.', 'Audio profesional': 'Audio pro', 'Audio de consumo': 'Audio', 'Pantallas y monitores': 'Pantallas', 'Accesorios y periféricos': 'Acces.', 'Móviles y wearables': 'Móviles', 'Software y ciberseguridad': 'Software', 'Por definir': 'Otros' };
 
@@ -1344,15 +1399,15 @@ async function loadAll(first, quiet, pre) {
     if (d.same) { S.needReload = false; setSync('', 'Sincronizado'); startPoll(); $('#loading').hidden = true; return; }
     if (!pre) CACHE.set({ name: d.me.name, token: S.token, d });
     S.me = d.me; S.drafts = LS.get('drafts:' + d.me.name, {}); S.cfg = d.cfg; S.header = d.header; S.C = d.C; S.assigns = d.assigns; S.users = d.users;
-    S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false; S.brands = d.brands; S.orders = d.orders || []; S.sales = d.sales || []; S.asg = d.asg || {}; S.quotes = d.quotes || []; S.scoped = !!d.scoped; S.total = d.total || d.rows.length; fillBrandLists();
-    S.rows = d.rows.map(([k, r, v]) => ({ k, r, v, t: Object.assign(emptyT(), d.track[k] || {}), hay: null, _vi: null }));
+    S.seq = d.seq; S.lastRow = d.lastRow; S.today = d.today; S.needReload = false; S.brands = d.brands; S.orders = d.orders || []; S.sales = d.sales || []; S.asg = d.asg || {}; S.quotes = d.quotes || []; S.courier = d.courier || {}; S.scoped = !!d.scoped; S.total = d.total || d.rows.length; fillBrandLists();
+    S.rows = d.rows.map(([k, r, v]) => ({ k, r, v, t: autoT(Object.assign(emptyT(), d.track[k] || {})), hay: null, _vi: null }));
     S.byKey = new Map(S.rows.map(r => [r.k, r])); buildDups();
     ['#login', '#setup', '#pinCover', '#probCover', '#winCover', '#recCover'].forEach(s => $(s).hidden = true);
     $('#brandSheet').textContent = 'Excel · ' + d.sheet;
     $('#meName').textContent = S.me.name; $('#meRole').textContent = isAdmin() ? 'Administrador' : 'Ejecutivo';
     $('#meAv').textContent = initials(S.me.name); $('#meAv').style.background = userColor(S.me.name);
     $('#bUsers').hidden = !isAdmin(); $('#bResv').hidden = !isAdmin();
-    buildCols(); applyFilter();
+    applyFside(); buildCols(); applyFilter();
     const r = keepKey && S.byKey.get(keepKey);
     S.active = null;
     if (r && r._vi != null) { setActive(r._vi, first); if (!first) $('#grid').scrollTop = keepTop; }
@@ -1422,7 +1477,7 @@ function applyState(st) {
   const cmt = val(r, 'comment');
   r.v = st.v.slice(); r.r = st.r;
   if (keepCmt) r.v[S.C.comment] = cmt;
-  r.t = Object.assign(emptyT(), st.t || {});
+  r.t = autoT(Object.assign(emptyT(), st.t || {}));
   r.hay = null;
   refreshRow(r);
   if (r === S.active) renderPanel();
@@ -1444,7 +1499,7 @@ function applyLocal(r, p) {
     case 'buy': t.buy = !!p.val; if (p.val) t.rev = true; break;
     case 'result': t.res = p.val || ''; if (p.val) t.rev = true; t.next = p.val === 'Volver a llamar' ? (p.date || t.next || tomorrow()) : '';
       t.motivo = ['No interesado', 'Número errado'].includes(p.val) ? (p.motivo || '') : '';
-      if (p.val === 'No contesta' && (!t.lastc || Date.now() - new Date(t.lastc.replace(' ', 'T')).getTime() > 15 * 60000)) { t.int++; t.lastc = nowStr(); } break;
+      if (p.val === 'No responde' && (!t.lastc || Date.now() - new Date(t.lastc.replace(' ', 'T')).getTime() > 15 * 60000)) { t.int++; t.lastc = nowStr(); } break;
     case 'next': t.next = p.val || ''; break;
     case 'motivo': t.motivo = p.val || ''; break;
     case 'monto': t.monto = String(p.val || ''); break;
@@ -1606,7 +1661,7 @@ function act(r, a, n) {
     if (v === 'No interesado' || v === 'Número errado') return askMotivo(r, v);
     send(r, { op: 'result', val: v, date: v === 'Volver a llamar' ? (r.t.next || tomorrow()) : '' });
     if (v === 'Número errado') { S.fixOpen = r; S.phDraft = ''; }
-    if (v === 'Contestó' && !r.t.tipo && !(r.t.brands || []).length) toast('Marca el tipo de negocio o al menos una marca para que cuente como cliente efectivo.');
+    if (v === 'Gestionado' && !r.t.tipo && !(r.t.brands || []).length) toast('Marca el tipo de negocio o al menos una marca para que cuente como cliente efectivo.');
   } else if (a === 'unlock') { if (confirm('¿Liberar este cliente para que otra persona lo pueda gestionar?')) send(r, { op: 'unlock' }); }
   else if (a === 'brandfocus') { const i = $('#pBrand'); if (i) { i.focus(); i.scrollIntoView({ block: 'center' }); } }
   else if (a === 'ovopen') { if (lk) return toast(lk, true); S.ov = S.ov && S.ov.k === r.k ? null : { k: r.k, num: '', date: S.today, nota: '', lines: brandsBy(r, 'habitual').length === 1 ? [{ b: brandsBy(r, 'habitual')[0], m: '' }] : [] }; renderPanel(true); const i = $('#oQuick'); if (i) i.focus(); }
@@ -1624,6 +1679,8 @@ function act(r, a, n) {
     S.cEdit = null;
     send(r, { op: 'editcmt', val: { i: e.i, old, txt } }).then(ok => { if (ok) flashOk('cmt', r); });
   }
+  else if (a === 'cuedit') { S.cf = S.cf && S.cf.k === r.k ? null : { k: r.k }; renderPanel(true); const i = $('#cuC'); if (i) i.focus(); }
+  else if (a === 'cusave') saveCourier(r);
   else if (a === 'qopen' || a === 'qpick' || a === 'qrm' || a === 'qsave' || a === 'qst') return quoteAct(r, a, n);
   else if (a === 'dupopen') { openClient(n); }
   else if (a === 'tipo') { send(r, { op: 'tipo', val: r.t.tipo === n ? '' : n }); }
@@ -1706,16 +1763,20 @@ function buildCols() {
   const narrow = innerWidth <= 760; NARROW = narrow;
   const FIRST = narrow ? ['legal', 'id', 'tax', 'state', 'city', 'phone', 'mail', 'exec'] : ['id', 'legal', 'tax', 'state', 'city', 'phone', 'mail', 'exec'];
   const rank = c => { const i = FIRST.indexOf(c.k); return i < 0 ? 100 + c.j : i; };
-  COLS = S.header.map((h, j) => ({ j, h, k: keyOf(j) })).filter(c => c.k !== 'comment' && !UI.hidden.includes(norm(c.h))).sort((a, b) => rank(a) - rank(b));
-  S.showGest = !UI.hidden.includes('_gest'); S.showCmt = !narrow && !UI.hidden.includes('_cmt');
+  const CV = ['id', 'legal', 'tax', 'phone', 'mail'];
+  COLS = UI.cview ? CV.map(k => ({ j: S.C[k], h: S.header[S.C[k]], k })).filter(c => c.j != null)
+    : S.header.map((h, j) => ({ j, h, k: keyOf(j) })).filter(c => c.k !== 'comment' && !UI.hidden.includes(norm(c.h))).sort((a, b) => rank(a) - rank(b));
+  S.showGest = !UI.cview && !UI.hidden.includes('_gest'); S.showCmt = !UI.cview && !narrow && !UI.hidden.includes('_cmt'); S.showBr = UI.cview || !UI.hidden.includes('_brands');
+  $('#grid').classList.toggle('cview', !!UI.cview); $$('#vMode button').forEach(b => b.classList.toggle('on', (b.dataset.v === 'c') === !!UI.cview));
   applyWidths();
   const rz = k => `<span class="rz" data-k="${k}" title="Arrastra para cambiar el ancho"></span>`;
   $('#ghead').innerHTML = `<div class="c s0">Fila</div>` + (S.showGest ? `<div class="c">Gestión${rz('_gest')}</div>` : '') +
     COLS.map(c => `<div class="c${c.k === 'credit' ? ' num' : ''}" title="${esc(c.h)}"><span class="t">${esc(c.h)}</span>${rz(c.k)}</div>`).join('') +
+    (S.showBr ? `<div class="c">Marcas${rz('_brands')}</div>` : '') +
     (S.showCmt ? `<div class="c sr">${esc(S.header[S.C.comment])}</div>` : '');
 }
 function applyWidths() {
-  let w = [NARROW ? 70 : 78, ...(S.showGest ? [colW('_gest', NARROW ? 124 : 200)] : []), ...COLS.map(c => colW(c.k, NARROW && c.k === 'legal' ? 210 : WIDTH[c.k] || 130)), ...(S.showCmt ? [colW('_cmt', 300)] : [])];
+  let w = [NARROW ? 70 : 78, ...(S.showGest ? [colW('_gest', NARROW ? 124 : 200)] : []), ...COLS.map(c => colW(c.k, NARROW && c.k === 'legal' ? 210 : WIDTH[c.k] || 130)), ...(S.showBr ? [colW('_brands', 210)] : []), ...(S.showCmt ? [colW('_cmt', 300)] : [])];
   const g = $('#grid');
   /* si sobran espacios, las columnas se estiran en proporción para llenar el ancho de la lista */
   const room = g.clientWidth - 2, sum = w.reduce((a, b) => a + b, 0);
@@ -1736,7 +1797,7 @@ $('#ghead').addEventListener('mousedown', e => {
 function resHTML(t) {
   if (t.dep) return `<span class="badge dep">Depurado</span>`;
   let h = '';
-  if (t.res) h += `<span class="res"><i style="background:${RES[t.res] ? RES[t.res].c : 'var(--muted)'}"></i>${esc(t.res)}</span>`;
+  if (t.res) h += `<span class="res" ${t.auto ? 'title="Quedó sin resultado: pasa solo a volver a llamar"' : ''}><i style="background:${RES[t.res] ? RES[t.res].c : RES_OLD[t.res] || 'var(--muted)'}"></i>${esc(t.res)}${t.auto ? ' (auto)' : ''}</span>`;
   if (t.int) h += `<span class="cnt" title="Intentos de contacto">×${t.int}</span>`;
   if (t.res === 'Volver a llamar' && t.next) h += `<span class="cnt" title="Volver a llamar">${icon('cal')}${ddmm(t.next)}</span>`;
   if (t.buy && t.monto) h += `<span class="cnt" title="Monto de la compra">${money(t.monto)}</span>`;
@@ -1767,6 +1828,7 @@ function rowHTML(r, i) {
     + `<div class="c s0 fila"><span>${r.r}</span><span class="ico buyi" title="Compra con éxito">${icon('star')}</span><span class="ico lki" title="${esc(lk)}">${icon('lock')}</span><span class="ico dfi" title="Borrador sin guardar">${icon('pencil')}</span></div>`
     + (S.showGest ? `<div class="c">${resHTML(r.t)}${who}</div>` : '')
     + COLS.map(c => cellHTML(r, c)).join('')
+    + (S.showBr ? `<div class="c btags">${brandTags(r)}</div>` : '')
     + (S.showCmt ? `<div class="c sr" title="${esc(val(r, 'comment'))}"><input class="cmt" data-i="${i}" value="${esc(S.drafts[r.k] || '')}" placeholder="${lk ? esc(lk) : esc(val(r, 'comment') || 'Agregar comentario… (Enter)')}" ${dis}></div>` : '') + `</div>`;
 }
 let rq = 0;
@@ -1818,8 +1880,8 @@ function ensureVisible(i) {
 function badgesHTML(r) {
   const st = status(r);
   return (st === 'att' ? `<span class="badge att">● Atendido</span>` : st === 'rev' ? `<span class="badge rev">● Revisado</span>` : `<span class="badge">○ Sin interacción</span>`)
-    + (isEfectivo(r) ? `<span class="badge att">${icon('check')}Efectivo</span>` : r.t.res === 'Contestó' ? `<span class="badge" title="Marca el tipo de negocio o una marca">Contestó · falta tipo o marca</span>` : '')
-    + (r.t.buy ? `<span class="badge buy">★ Compra${r.t.monto ? ' · ' + money(r.t.monto) : ''}</span>` : '') + (r.t.dep ? `<span class="badge dep">Depurado ${ddmm(r.t.dep)}</span>` : '')
+    + (isEfectivo(r) ? `<span class="badge att">${icon('check')}Efectivo</span>` : r.t.res === 'Gestionado' ? `<span class="badge" title="Marca el tipo de negocio o una marca">Gestionado · falta tipo o marca</span>` : '')
+    + (r.t.buy ? `<span class="badge buy">★ Comprado${r.t.monto ? ' · ' + money(r.t.monto) : ''}</span>` : '') + (() => { const k = buyerKind(r.k, firstBuy()); return k ? `<span class="badge ${k === 'rec' ? '' : 'att'}">${BUYER_TX[k]}</span>` : ''; })() + (r.t.dep ? `<span class="badge dep">Depurado ${ddmm(r.t.dep)}</span>` : '')
     + (r.t.int ? `<span class="badge">${r.t.int} intento${r.t.int > 1 ? 's' : ''}</span>` : '') + (r.t.fix ? `<span class="badge att">${icon('check')}Número corregido</span>` : '');
 }
 function updBadges() { const b = $('#pBadges'); if (b && S.active) b.innerHTML = badgesHTML(S.active); }
@@ -1867,6 +1929,7 @@ function renderPanel(force) {
     ${r.t.res === 'Número errado' ? fixBox : ''}</div>
     ${quoteHTML(r, lk)}
     ${ovHTML(r, lk, dis)}
+    ${courierHTML(r, lk)}
     ${bizHTML(r, lk, dis)}
     <div class="p-sec"><h3><span>${esc(S.header[S.C.comment])}${okChk('cmt', r)}</span></h3>
       ${val(r, 'comment') ? `<div class="curcmt">${val(r, 'comment').split(' | ').map((x, i) => S.cEdit && S.cEdit.k === r.k && S.cEdit.i === i
@@ -1919,6 +1982,7 @@ function ovHTML(r, lk, dis) {
       <div class="badd" style="margin:0"><input class="txtin" id="oBrand" list="dlBrands" placeholder="Otra marca… escribe y Enter"></div>
       <div class="ovtot"><span>Sin IGV · ${f.lines.length} marca${f.lines.length === 1 ? '' : 's'}</span><b id="oTot">${money(tot)}</b></div>
       <div class="ovigv" id="oIgv">${igvTx(tot)}</div>
+      ${S.courier[r.k] ? `<div class="hint" style="margin:0">${icon('store')} Envío por <b>${esc(S.courier[r.k].c)}</b>${S.courier[r.k].ag ? ' · ' + esc(S.courier[r.k].ag) : ''}${S.courier[r.k].dest ? ' · ' + esc(S.courier[r.k].dest) : ''}</div>` : ''}
       <details class="ovmore"><summary>Más datos (opcional): N° de OV, fecha y nota</summary>
         <div class="two"><label class="fl"><span>N° de OV</span><input class="txtin" id="oNum" placeholder="Vacío = se genera solo" value="${esc(f.num)}" autocomplete="off"></label><label class="fl"><span>Fecha</span><input type="date" class="datein" id="oDate" value="${esc(f.date)}"></label></div>
         <input class="txtin" id="oNota" placeholder="Nota: recojo, dirección de entrega…" value="${esc(f.nota)}">
@@ -1979,13 +2043,15 @@ async function ovSetState(ov, est) {
     toast(est === 'Terminado' ? `${ov}: proceso terminado` : `${ov}: ${est}`);
   } catch (e) { toast(e.message, true); }
 }
+/* la campana y los pendientes son de cada usuario: sus OV abiertas y sus llamadas */
+const myOrders = () => openOrders().filter(o => S.me && o.by === S.me.name);
 function updBell(rerender) {
-  const l = openOrders(), due = S.me ? myDay().calls.filter(x => x.urgent).length : 0, ct = $('#bellCt'); ct.hidden = !(l.length + due); ct.textContent = l.length + due;
+  const l = myOrders(), due = S.me ? myDay().calls.filter(x => x.urgent).length : 0, ct = $('#bellCt'); ct.hidden = !(l.length + due); ct.textContent = l.length + due;
   ct.style.background = due || l.some(o => ovLvl(o) === 2) ? 'var(--crit)' : 'var(--warn)';
   if (rerender && !$('#bellPop').hidden) renderBell();
 }
 function renderBell() {
-  const l = openOrders(), due = myDay().calls.filter(x => x.urgent);
+  const l = myOrders(), due = myDay().calls.filter(x => x.urgent);
   $('#bellPop').innerHTML = (due.length ? `<div class="hd"><b>Llamadas para hoy · ${due.length}</b><span class="sub" style="font-size:11px;color:var(--muted)">Clientes que pidieron que los llames</span></div>
   ${due.slice(0, 12).map(x => `<div class="nt"><span class="lv l${x.r.t.next < S.today ? 2 : 1}"></span><div><div class="tt"><b>${esc(val(x.r, 'legal'))}</b><span class="est">${x.r.t.next < S.today ? 'Vencida · ' + ddmm(x.r.t.next) : 'Hoy'}</span></div><div class="ac"><button class="btn primary" data-bopen="${esc(x.r.k)}">${icon('phone')}Abrir cliente</button></div></div></div>`).join('')}` : '') + `<div class="hd"><b>OV por cerrar · ${l.length}</b><span class="sub" style="font-size:11px;color:var(--muted)">Se quitan solo al marcar Terminado</span></div>
   ${l.length ? l.map(o => { const r = S.byKey.get(o.k), lv = ovLvl(o); return `<div class="nt"><span class="lv l${lv}"></span><div><div class="tt"><b>${esc(o.ov)}</b><span class="est ${o.est}"><i></i>${o.est} · ${ovAge(o)} d</span></div>
@@ -2123,6 +2189,7 @@ function renderSales(keep) {
       <div class="stk3" data-tip="Activos (≤90 días): ${stt.act}\nEn riesgo (91–180): ${stt.risk}\nInactivos (+180): ${stt.ina}"><i style="flex:${stt.act};background:var(--good)"></i><i style="flex:${stt.risk};background:var(--warn)"></i><i style="flex:${stt.ina};background:var(--crit)"></i></div>
       <div class="legend" style="margin:8px 0 0"><span><span class="sw" style="background:var(--good)"></span>Activos ${stt.act} · ${pct(stt.act, sttT)}%</span><span><span class="sw" style="background:var(--warn)"></span>En riesgo ${stt.risk} · ${pct(stt.risk, sttT)}%</span><span><span class="sw" style="background:var(--crit)"></span>Inactivos ${stt.ina} · ${pct(stt.ina, sttT)}%</span></div></div>
   </div>
+  ${buyersCard(cur, all, R)}
   ${salesInsights(cur)}
   ${isAdmin() ? `<div class="card rise" style="--d:9"><h3>Venta por ejecutivo</h3><div class="sub">Share de venta del período · clic para filtrar</div>
     ${byE.length ? shareHd.replace('Marca', 'Ejecutivo') + byE.map((o, i) => shareRow(o, Math.max(1, byE[0].v), i, `data-sexec="${esc(o.k)}"`)).join('') : '<div class="d-empty">Sin ventas.</div>'}</div>` : ''}`;
@@ -2131,7 +2198,7 @@ function renderSales(keep) {
 }
 /* detalle de un recuadro: cuántos de esos clientes tiene cada usuario (quien los gestionó por última vez) */
 const DK = { att: ['Atendidos', r => status(r) === 'att', 'att'], rev: ['Revisados', r => status(r) === 'rev', 'rev'], none: ['Pendientes', r => status(r) === 'none', 'none'], buy: ['Compras con éxito', r => r.t.buy, 'buy'],
-  recov: ['Recuperados', null, null], noc: ['No contestan', isNoc, 'noc'], agenda: ['Llamar hoy', isAgenda, 'agenda'] };
+  recov: ['Recuperados', null, null], noc: ['No responden', isNoc, 'noc'], agenda: ['Llamar hoy', isAgenda, 'agenda'] };
 function dashDetail(rows, recov) {
   const [lab, fn0, chip] = DK[S.dSel], fn = fn0 || (r => recov.includes(r)), list = rows.filter(fn);
   const by = {}; list.forEach(r => { const u = S.dSel === 'none' ? (S.asg[r.k] || val(r, 'exec').trim() || '(sin asignar)') : (lastBy(r) || '(sin usuario)'); by[u] = (by[u] || 0) + 1; });
@@ -2141,6 +2208,17 @@ function dashDetail(rows, recov) {
     ${arr.length ? arr.map(([u, v], i) => `<div class="dsu" data-du="${esc(u)}">${hbar(`<span class="sw" style="background:${userColor(u)}"></span>${esc(u)}`, v, mx, 'var(--s1)', `${fmtN(v)} · ${pct(v, list.length)}%`, `${u}: ${fmtN(v)} (clic: ver solo ${u})`, i)}</div>`).join('') : '<div class="d-empty">No hay clientes en este grupo.</div>'}</div>`;
 }
 /* qué marcas se repiten, cuáles se compran juntas y a cuáles conviene pedir promoción */
+/* compradores del período: nuevos (su primera compra cae en el período) y recurrentes (ya compraban antes) */
+function buyersCard(cur, all, R) {
+  const first = {}; all.forEach(x => { if (!first[x.k] || x.d < first[x.k]) first[x.k] = x.d; });
+  const ks = [...new Set(cur.map(x => x.k))], nw = ks.filter(k => first[k] >= R.from), rc = ks.filter(k => first[k] < R.from);
+  const mN = cur.filter(x => nw.includes(x.k)).reduce((a, x) => a + x.m, 0), mR = cur.filter(x => rc.includes(x.k)).reduce((a, x) => a + x.m, 0);
+  return `<div class="kpis">
+    <div class="kpi rise"><div class="l"><span class="sw" style="background:var(--s3)"></span>Clientes nuevos</div><div class="v" data-count="${nw.length}">0</div><div class="s">Primera compra en el período · ${money(mN)}</div></div>
+    <div class="kpi rise"><div class="l"><span class="sw" style="background:var(--s2)"></span>Clientes recurrentes</div><div class="v" data-count="${rc.length}">0</div><div class="s">Ya compraban antes · ${money(mR)}</div></div>
+    <div class="kpi rise"><div class="l">Recurrencia</div><div class="v" data-count="${ks.length ? Math.round(rc.length / ks.length * 100) : 0}" data-suf="%">0%</div><div class="s">De ${fmtN(ks.length)} compradores del período</div></div>
+  </div>`;
+}
 function salesInsights(cur) {
   if (!cur.length) return '';
   const B = {}; cur.forEach(x => { const o = B[x.b] || (B[x.b] = { b: x.b, ovs: new Set(), cli: {}, m: 0 }); o.ovs.add(x.ov); o.cli[x.k] = (o.cli[x.k] || new Set()).add(x.ov); o.m += x.m; });
@@ -2177,6 +2255,30 @@ function brandRows() {
     && (!f.exec || r.t.own === f.exec || val(r, 'exec') === f.exec || (resvFor(r.r) || {}).user === f.exec)
     && (!f.tipo || (f.tipo === '-' ? !r.t.tipo : r.t.tipo === f.tipo))
     && (!f.q || hay(r).includes(norm(f.q))));
+}
+/* participación y preferencias: tipo de negocio (clic para segmentar), cómo compran, marcas y líneas */
+function brandCharts(base) {
+  const f = S.bf, all = S.rows.filter(r => !r.t.dep && (!f.exec || r.t.own === f.exec || val(r, 'exec') === f.exec || (resvFor(r.r) || {}).user === f.exec) && (!f.q || hay(r).includes(norm(f.q))));
+  const tp = [...TIPOS.map((x, i) => ({ l: x, v: all.filter(r => r.t.tipo === x).length, c: `var(${SERIES[i]})`, k: x })), { l: 'Sin definir', v: all.filter(r => !r.t.tipo).length, c: 'var(--pend)', k: '-' }];
+  const rc = { habitual: 0, ocasional: 0, interes: 0 }; base.forEach(r => (r.t.brands || []).forEach(b => { rc[relOf(r, b)]++; }));
+  const rt = rc.habitual + rc.ocasional + rc.interes;
+  const B = {}; base.forEach(r => (r.t.brands || []).forEach(b => { const o = B[b] || (B[b] = { habitual: 0, ocasional: 0, interes: 0, n: 0 }); o[relOf(r, b)]++; o.n++; }));
+  const top = Object.entries(B).sort((a, b) => b[1].n - a[1].n || a[0].localeCompare(b[0])).slice(0, 10), bmx = Math.max(1, ...top.map(x => x[1].n));
+  const L = {}; base.forEach(r => new Set((r.t.brands || []).map(b => S.catOf[b])).forEach(c => { if (c) L[c] = (L[c] || 0) + 1; }));
+  const tl = Object.entries(L).sort((a, b) => b[1] - a[1]).slice(0, 8), lmx = Math.max(1, ...tl.map(x => x[1]));
+  return `<div class="grid2 bcharts">
+    <div class="card rise"><h3>Tipo de negocio</h3><div class="sub">Clic en un tipo para ver solo esos clientes${f.tipo ? ` · <a class="lk" data-bft="">ver todos</a>` : ''}</div>
+      <div class="donut-wrap">${donut(tp, all.length, fmtN(all.length), 'clientes')}
+        <div class="dl">${tp.map(x => `<div class="bft${f.tipo === x.k ? ' on' : ''}" data-bft="${esc(x.k)}"><span class="sw" style="background:${x.c}"></span>${esc(x.l)}<b>${fmtN(x.v)} · ${pct(x.v, all.length)}%</b></div>`).join('')}</div></div></div>
+    <div class="card rise"><h3>Cómo compran las marcas</h3><div class="sub">Registros de marcas de los clientes mostrados</div>
+      <div class="donut-wrap">${donut(REL_K.map(k => ({ l: REL[k].s, v: rc[k], c: REL[k].c })), rt, fmtN(rt), 'registros')}
+        <div class="dl">${REL_K.map(k => `<div><span class="sw" style="background:${REL[k].c}"></span>${REL[k].s}<b>${fmtN(rc[k])} · ${pct(rc[k], rt)}%</b></div>`).join('')}</div></div></div>
+    <div class="card rise"><h3>Marcas preferidas</h3><div class="sub">Clientes que distribuyen cada marca${f.tipo ? ' · ' + esc(f.tipo === '-' ? 'sin tipo' : f.tipo) : ''}</div>
+      ${top.length ? top.map(([b, o], i) => `<div class="hbar" data-tip="${esc(b)}: ${o.n} clientes\nHabitual ${o.habitual} · A veces ${o.ocasional} · Interés ${o.interes}"><span class="lb">${esc(b)}</span><div class="tr stk">${REL_K.map(k => o[k] ? `<i style="width:${o[k] / bmx * 100}%;background:${REL[k].c};animation-delay:${i * 40}ms"></i>` : '').join('')}</div><span class="vv">${fmtN(o.n)} · ${pct(o.n, base.length)}%</span></div>`).join('') : '<div class="d-empty">Aún no hay marcas registradas.</div>'}
+      <div class="legend" style="margin:6px 0 0">${REL_K.map(k => `<span><span class="sw" style="background:${REL[k].c}"></span>${REL[k].s}</span>`).join('')}</div></div>
+    <div class="card rise"><h3>Líneas de producto</h3><div class="sub">Clientes con al menos una marca de la línea</div>
+      ${tl.length ? tl.map(([c, v], i) => hbar(esc(c), v, lmx, 'var(--s1)', `${fmtN(v)} · ${pct(v, base.length)}%`, `${c}: ${fmtN(v)} clientes`, i)).join('') : '<div class="d-empty">Aún no hay marcas registradas.</div>'}</div>
+  </div>`;
 }
 const heatCell = (n, tip) => { const pc = [0, 26, 46, 66, 84][Math.min(n, 4)]; return `<td class="hc"><span class="heat${n ? '' : ' h0'}${n >= 3 ? ' dark' : ''}" style="${n ? `background:color-mix(in srgb,var(--s1) ${pc}%,var(--surface))` : ''}" data-tip="${esc(tip)}">${n || '·'}</span></td>`; };
 function renderBrands(keep) {
@@ -2223,6 +2325,7 @@ function renderBrands(keep) {
     <div class="kpi rise" style="--d:2"><div class="l">${icon('layers')}Marcas distintas</div><div class="v" data-count="${distinct}">0</div><div class="s">de ${S.brands.length} del catálogo</div></div>
     <div class="kpi rise" style="--d:3"><div class="l">${icon('clock')}Por confirmar</div><div class="v" data-count="${stale}">0</div><div class="s">registros con más de ${STALE} días</div></div>
   </div>
+  ${brandCharts(base)}
   <div class="bfilters">
     <div class="modes" id="bfMode"><button data-m="cli" class="${f.mode === 'cli' ? 'on' : ''}">${icon('users')}Por cliente</button><button data-m="brand" class="${f.mode === 'brand' ? 'on' : ''}">${icon('tag')}Por marca</button>${admin ? `<button data-m="exec" class="${f.mode === 'exec' ? 'on' : ''}">${icon('chart')}Por ejecutivo</button>` : ''}</div>
     <div class="field search" style="max-width:240px"><svg><use href="#i-search"/></svg><input id="bfQ" placeholder="Buscar cliente…" value="${esc(f.q)}"></div>
@@ -2250,6 +2353,7 @@ $('#vBrands').addEventListener('change', e => {
   if (k) { S.bf[k] = e.target.value; renderBrands(true); }
 });
 $('#vBrands').addEventListener('click', async e => {
+  const bt = e.target.closest('[data-bft]'); if (bt) { S.bf.tipo = S.bf.tipo === bt.dataset.bft ? '' : bt.dataset.bft; return renderBrands(true); }
   const m = e.target.closest('#bfMode [data-m]'); if (m) { S.bf.mode = m.dataset.m; return renderBrands(true); }
   if (e.target.closest('#bfEmpty')) { e.preventDefault(); S.bf.empty = !S.bf.empty; if (S.bf.empty) { S.bf.cat = S.bf.marca = S.bf.rel = ''; S.bf.mode = 'cli'; } return renderBrands(true); }
   if (e.target.closest('#bfClear')) { Object.assign(S.bf, { q: '', cat: '', marca: '', rel: '', exec: '', tipo: '', empty: false }); return renderBrands(true); }
@@ -2268,8 +2372,8 @@ $('#vBrands').addEventListener('click', async e => {
 /* ---------- Mi día ---------- */
 /* Mi día: solo lo mío (la última gestión la hice yo). Volver a llamar por fecha (primero vencidos) y
    revisados que quedaron sin comentario. Lo de los compañeros no se mezcla. */
-function myDay() {
-  const mine = S.rows.filter(isMyPend);
+function myDay(user) {
+  const u = user || (S.me && S.me.name), mine = S.rows.filter(r => isPendOf(r, u));
   const calls = mine.filter(r => r.t.res === 'Volver a llamar').sort((x, y) => (x.t.next || '9').localeCompare(y.t.next || '9') || x.r - y.r)
     .map(r => ({ r, why: !r.t.next ? 'Volver a llamar · sin fecha' : r.t.next < S.today ? 'Vencida · era el ' + ddmm(r.t.next) : r.t.next === S.today ? 'Llamar hoy' : 'Programada · ' + ddmm(r.t.next), urgent: !!r.t.next && r.t.next <= S.today }));
   const revs = mine.filter(r => r.t.res !== 'Volver a llamar').sort((x, y) => (y.t.last || '').localeCompare(x.t.last || ''))
@@ -2279,6 +2383,7 @@ function myDay() {
 function doneToday() { const ids = new Set(); S.rows.forEach(r => r.t.hist.forEach(h => { if (h.d.startsWith(S.today) && h.who === S.me.name) ids.add(r.k); })); return ids.size; }
 function updDayBadge() { if (!S.me) return; const n = myDay().calls.filter(x => x.urgent).length; $('#ctDay').hidden = !n; $('#ctDay').textContent = n; }
 function renderDay() {
+  if (isAdmin() && UI.dayTeam) return renderTeam();
   const { calls, revs } = myDay(), done = doneToday(), goal = S.cfg.goal || 40;
   const late = calls.filter(x => x.r.t.next && x.r.t.next < S.today).length, today = calls.filter(x => x.r.t.next === S.today).length;
   const R = 44, Cc = 2 * Math.PI * R, off = Cc * (1 - Math.min(1, done / goal));
@@ -2291,10 +2396,11 @@ function renderDay() {
     </section>`;
   $('#vDay').innerHTML = `<div class="day2">
   <aside class="hero vert rise">
+    ${isAdmin() ? dayToggle() : ''}
     <div><div class="eyb">${esc(dt)}</div><h2>${greet}, ${esc(S.me.name)}</h2><p>${calls.length || revs.length ? `Tus pendientes: ${fmtN(calls.length)} para volver a llamar y ${fmtN(revs.length)} revisados sin comentario.` : 'No tienes pendientes. Todo al día.'}</p></div>
     <div class="ring"><svg viewBox="0 0 104 104"><circle class="bg" cx="52" cy="52" r="${R}"/><circle class="fg" id="ringFg" cx="52" cy="52" r="${R}" stroke-dasharray="${Cc}" stroke-dashoffset="${Cc}"/></svg>
       <div class="lbl"><div><b data-count="${done}">0</b><small>de ${goal} gestiones hoy</small></div></div></div>
-    <div class="efbar" data-tip="Clientes efectivos hoy: «Contestó» con tipo de negocio o marca"><div class="t"><span>Efectivos hoy</span><b>${fmtN(efToday())} de ${fmtN(S.cfg.goalEf != null ? S.cfg.goalEf : 10)}</b></div><div class="tr"><i style="width:${Math.min(100, efToday() / Math.max(1, S.cfg.goalEf != null ? S.cfg.goalEf : 10) * 100)}%"></i></div></div>
+    <div class="efbar" data-tip="Clientes efectivos hoy: «Gestionado» con tipo de negocio o marca"><div class="t"><span>Efectivos hoy</span><b>${fmtN(efToday())} de ${fmtN(S.cfg.goalEf != null ? S.cfg.goalEf : 10)}</b></div><div class="tr"><i style="width:${Math.min(100, efToday() / Math.max(1, S.cfg.goalEf != null ? S.cfg.goalEf : 10) * 100)}%"></i></div></div>
     <div class="hstats">
       <div class="hstat"><b data-count="${late}">0</b><span>Llamadas vencidas</span></div>
       <div class="hstat"><b data-count="${today}">0</b><span>Para llamar hoy</span></div>
@@ -2311,6 +2417,35 @@ function renderDay() {
   requestAnimationFrame(() => requestAnimationFrame(() => { const fg = $('#ringFg'); if (fg) fg.style.strokeDashoffset = off; }));
   loadRank();
 }
+const dayToggle = () => `<div class="dtog"><button data-dt="" class="${UI.dayTeam ? '' : 'on'}">Mis pendientes</button><button data-dt="1" class="${UI.dayTeam ? 'on' : ''}">Equipo</button></div>`;
+/* pendientes del equipo (administrador): una columna por ejecutivo, con su propia barra */
+function renderTeam() {
+  const people = [...new Set([...S.users, ...S.rows.map(lastBy).filter(Boolean)])].filter(u => u !== '(sin usuario)');
+  const P = people.map(u => { const d = myDay(u), ov = openOrders().filter(o => o.by === u); return { u, ...d, ov, late: d.calls.filter(x => x.r.t.next && x.r.t.next < S.today).length, today: d.calls.filter(x => x.r.t.next === S.today).length }; })
+    .filter(x => x.calls.length || x.revs.length || x.ov.length).sort((a, b) => (b.late + b.today) - (a.late + a.today) || (b.calls.length + b.revs.length) - (a.calls.length + a.revs.length));
+  const tot = k => P.reduce((a, x) => a + (Array.isArray(x[k]) ? x[k].length : x[k]), 0);
+  const li = (r, why, c, urgent) => `<button class="li" data-open="${esc(r.k)}"><span class="co" style="--tc:var(${c})">${esc(initials(val(r, 'legal')))}</span><span class="g"><b>${esc(val(r, 'legal'))}</b><small class="${urgent ? 'u' : ''}">${esc(why)} · fila ${r.r}</small></span>${icon('right')}</button>`;
+  $('#vDay').innerHTML = `<div class="day2 team">
+  <aside class="hero vert rise">
+    ${dayToggle()}
+    <div><div class="eyb">Seguimiento del equipo</div><h2>Pendientes por ejecutivo</h2><p>Lo que dejó pendiente cada uno: llamadas por volver a hacer, revisados sin comentario y OV abiertas.</p></div>
+    <div class="hstats">
+      <div class="hstat"><b data-count="${tot('late')}">0</b><span>Llamadas vencidas</span></div>
+      <div class="hstat"><b data-count="${tot('today')}">0</b><span>Para llamar hoy</span></div>
+      <div class="hstat"><b data-count="${tot('revs')}">0</b><span>Revisados sin comentario</span></div>
+      <div class="hstat"><b data-count="${tot('ov')}">0</b><span>OV abiertas</span></div>
+    </div>
+  </aside>
+  <div class="tgrid">${P.length ? P.map(x => `<section class="dcol tcol">
+      <div class="thd"><span class="av" style="background:${userColor(x.u)}">${esc(initials(x.u))}</span><div><b>${esc(x.u)}</b><small>${x.late ? `<span class="u">${x.late} vencidas</span> · ` : ''}${x.today} hoy · ${x.calls.length} por llamar · ${x.revs.length} sin comentario · ${x.ov.length} OV</small></div></div>
+      <div class="dscroll">
+        ${x.calls.map(c => li(c.r, c.why, '--violet', c.urgent)).join('')}
+        ${x.revs.map(c => li(c.r, c.why, '--warn', false)).join('')}
+        ${x.ov.map(o => { const r = S.byKey.get(o.k); return r ? li(r, `${o.ov} · ${o.est} · hace ${ovAge(o)} d`, '--s1', ovLvl(o) === 2) : ''; }).join('')}
+      </div></section>`).join('') : '<div class="card d-empty">El equipo no tiene pendientes.</div>'}</div>
+  </div>`;
+  countUp($('#vDay'));
+}
 function openClient(k) {
   const r = S.byKey.get(k); if (!r) return;
   $('#q').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; $('#fTipo').value = ''; $('#fCat').value = ''; $('#fMarca').value = ''; $('#fRel').value = ''; S.st = 'all';
@@ -2320,6 +2455,7 @@ function openClient(k) {
   if (r._vi != null) { setActive(r._vi, true); const e = rowEl(r); if (e) e.classList.add('flash'); }
 }
 $('#vDay').addEventListener('click', e => {
+  const tg = e.target.closest('[data-dt]'); if (tg) { UI.dayTeam = !!tg.dataset.dt; saveUI(); renderDay(); return; }
   const b = e.target.closest('[data-open]'); if (b) return openClient(b.dataset.open);
   if (e.target.closest('#dBell')) { e.stopPropagation(); $('#bellPop').hidden = false; renderBell(); return; }
   if (e.target.closest('#dStart')) { const l = myDay(), f = l.calls[0] || l.revs[0]; if (f) openClient(f.r.k); }
@@ -2363,7 +2499,7 @@ function renderDash(skipFetch) {
   /* con un usuario elegido, todo se calcula sobre los clientes con los que ese usuario interactuó */
   const dU = S.dUser || '', rows = (scope === 'view' ? S.view : S.rows).filter(r => !r.t.dep && (!dU || r.t.own === dU || r.t.hist.some(h => h.who === dU)));
   const c = counts(rows), total = c.all, touched = c.att + c.rev;
-  const contacted = rows.filter(r => ['Contestó', 'Volver a llamar', 'No interesado'].includes(r.t.res) || r.t.buy).length;
+  const contacted = rows.filter(r => ['Gestionado', 'Volver a llamar', 'No interesado'].includes(r.t.res) || r.t.buy).length;
   const todayN = rows.filter(r => r.t.last.startsWith(S.today)).length;
   const deps = S.rows.filter(r => r.t.dep).length;
   const resC = RES_LIST.map(x => ({ l: x, v: rows.filter(r => r.t.res === x).length }));
@@ -2383,7 +2519,7 @@ function renderDash(skipFetch) {
   const rank = agg(rows.filter(r => r.t.own), r => r.t.own).sort((a, b) => (b.att + b.rev) - (a.att + a.rev));
   const stt = S.C.state != null ? agg(rows, r => val(r, 'state').trim()).sort((a, b) => (b.att + b.rev) - (a.att + a.rev) || b.total - a.total).slice(0, 12) : [];
   // comparativa por ejecutivo (3 series validadas para daltonismo)
-  const people = S.users, SER = [['Contestaron', '--s1', r => ['Contestó', 'Volver a llamar', 'No interesado'].includes(r.t.res) || r.t.buy], ['Compraron', '--s2', r => r.t.buy], ['Recuperados', '--s3', r => recov.includes(r)]];
+  const people = S.users, SER = [['Contestaron', '--s1', r => ['Gestionado', 'Volver a llamar', 'No interesado'].includes(r.t.res) || r.t.buy], ['Compraron', '--s2', r => r.t.buy], ['Recuperados', '--s3', r => recov.includes(r)]];
   const vals = people.map(p => SER.map(s => rows.filter(r => r.t.own === p && s[2](r)).length));
   const vmax = Math.max(1, ...vals.flat()), top = Math.max(2, Math.ceil(vmax / 2) * 2), PH = 150, PY = 16, W = 520, GW = (W - 30) / Math.max(1, people.length), bw = 26;
   const gridL = [0, top / 2, top].map(v => { const y = PY + PH - v / top * PH; return `<line x1="26" x2="${W}" y1="${y}" y2="${y}" stroke="var(--grid-c)"/><text class="m" x="0" y="${y + 3}">${v}</text>`; }).join('');
@@ -2412,7 +2548,7 @@ function renderDash(skipFetch) {
     <div class="kpi rise kpick${S.dSel === 'none' ? ' sel' : ''}" data-dk="none" title="Clic: ver por usuario" style="--d:3"><div class="l"><span class="sw none"></span>Pendientes</div><div class="v" data-count="${c.none}">0</div><div class="s">${pct(c.none, total)}% sin interacción</div></div>
     <div class="kpi rise kpick${S.dSel === 'buy' ? ' sel' : ''}" data-dk="buy" title="Clic: ver por usuario" style="--d:4"><div class="l"><span class="sw buy"></span>Compras con éxito</div><div class="v" data-count="${c.buy}">0</div><div class="s">${money(totalM)} · éxito ${pct(c.buy, touched)}%</div></div>
     <div class="kpi rise kpick${S.dSel === 'recov' ? ' sel' : ''}" data-dk="recov" title="Clic: ver por usuario" style="--d:5"><div class="l"><span class="sw" style="background:var(--s3)"></span>Recuperados</div><div class="v" data-count="${recov.length}">0</div><div class="s">No compraban hace +90 días</div></div>
-    <div class="kpi rise kpick${S.dSel === 'noc' ? ' sel' : ''}" data-dk="noc" title="Clic: ver por usuario" style="--d:6"><div class="l"><span class="sw noc"></span>No contestan</div><div class="v" data-count="${c.noc}">0</div><div class="s">${fmtN(rows.filter(r => isNoc(r) && r.t.int >= S.cfg.minInt).length)} con ${S.cfg.minInt}+ intentos</div></div>
+    <div class="kpi rise kpick${S.dSel === 'noc' ? ' sel' : ''}" data-dk="noc" title="Clic: ver por usuario" style="--d:6"><div class="l"><span class="sw noc"></span>No responden</div><div class="v" data-count="${c.noc}">0</div><div class="s">${fmtN(rows.filter(r => isNoc(r) && r.t.int >= S.cfg.minInt).length)} con ${S.cfg.minInt}+ intentos</div></div>
     <div class="kpi rise kpick${S.dSel === 'agenda' ? ' sel' : ''}" data-dk="agenda" title="Clic: ver por usuario" style="--d:7"><div class="l"><span class="sw agenda"></span>Llamar hoy</div><div class="v" data-count="${c.agenda}">0</div><div class="s">Gestionados hoy: ${fmtN(todayN)}</div></div>
   </div>
   ${S.dSel ? dashDetail(rows, recov) : ''}
@@ -2495,7 +2631,7 @@ $('#dash').addEventListener('click', e => {
 
 /* ---------- reportes ---------- */
 const REPORTS = {
-  noc: { t: 'No contestaron', d: 'Para barrido y depuración del sistema', ic: 'trash', c: 'var(--crit)' },
+  noc: { t: 'No respondieron', d: 'Para barrido y depuración del sistema', ic: 'trash', c: 'var(--crit)' },
   agenda: { t: 'Volver a llamar', d: 'Agenda de llamadas pendientes', ic: 'cal', c: 'var(--violet)' },
   buy: { t: 'Compras con éxito', d: 'Clientes que compraron, con monto', ic: 'star', c: 'var(--s1)' },
   tel: { t: 'Teléfonos corregidos', d: 'Para actualizar el sistema de la empresa', ic: 'pencil', c: 'var(--good)' },
@@ -2550,7 +2686,7 @@ async function renderRep(keep) {
   el.innerHTML = `
   <div class="d-head"><div><h2>Reportes</h2><div class="sub">Cada lista trae las 18 columnas originales en el mismo orden y, a la derecha, las de seguimiento. Nada se borra de la cartera.</div></div></div>
   ${isAdmin() ? `<div class="card rise fsheet" style="--d:0">
-    <div class="g"><b>${icon('chart')}Reporte de seguimiento del equipo</b><span>Crea o actualiza la pestaña <b>«Seguimiento»</b> en este Excel: una fila por fecha y ejecutivo con clientes gestionados, <b>clientes efectivos</b> (marcados «Contestó» con tipo de negocio o marca), resultados, comentarios, intentos, números corregidos, marcas, OV y venta. Solo se crea cuando pulsas el botón; la hoja de clientes no se toca.</span></div>
+    <div class="g"><b>${icon('chart')}Reporte de seguimiento del equipo</b><span>Crea o actualiza la pestaña <b>«Seguimiento»</b> en este Excel: una fila por fecha y ejecutivo con clientes gestionados, <b>clientes efectivos</b> (marcados «Gestionado» con tipo de negocio o marca), resultados, comentarios, intentos, números corregidos, marcas, OV y venta. Solo se crea cuando pulsas el botón; la hoja de clientes no se toca.</span></div>
     <div class="ff"><div class="field num"><label for="fsFrom">Desde</label><input id="fsFrom" type="date" value="${esc(S.rep.fsFrom || '')}"></div><div class="field num"><label for="fsTo">Hasta</label><input id="fsTo" type="date" value="${esc(S.rep.fsTo || '')}"></div>
     <button class="btn primary" id="rFollow">${icon('file')}Crear / actualizar pestaña Seguimiento</button></div>
   </div>` : ''}
@@ -2577,7 +2713,7 @@ async function renderRep(keep) {
         ${isAdmin() && o.dep && rows.some(r => r.t.dep) ? `<button class="btn" id="rUndo">Restaurar depurados</button>` : ''}
       </div>
     </div>
-    ${type === 'noc' ? `<div class="hint" style="margin:0 0 10px">Clientes con «No contesta» y al menos ${o.min} intento${o.min > 1 ? 's' : ''}${o.wrong ? ', más los de número errado' : ''}, sin compra y sin número corregido. Crea el archivo, dalos de baja en el sistema y luego márcalos como depurados (no se borran filas).</div>` : ''}
+    ${type === 'noc' ? `<div class="hint" style="margin:0 0 10px">Clientes con «No responde» y al menos ${o.min} intento${o.min > 1 ? 's' : ''}${o.wrong ? ', más los de número errado' : ''}, sin compra y sin número corregido. Crea el archivo, dalos de baja en el sistema y luego márcalos como depurados (no se borran filas).</div>` : ''}
     ${type === 'promo' ? `<div class="hint" style="margin:0 0 10px">${findBrand(o.marca) ? (o.modo === 'tiene' ? `Canales que ya distribuyen <b>${esc(findBrand(o.marca).m)}</b>: ideal para promociones, lanzamientos y reposición.` : `Canales que aún no distribuyen <b>${esc(findBrand(o.marca).m)}</b> pero venden la misma línea (${esc(findBrand(o.marca).c)}) o una complementaria: oportunidad de venta nueva.`) : 'Elige una marca para armar la lista de la promoción.'}</div>` : ''}
     ${type === 'tel' ? `<div class="hint" style="margin:0 0 10px">La columna «Teléfono corregido» trae el número validado. «Cust. Telephone» conserva el original.</div>` : ''}
     ${rows.length ? `<div class="rprev"><table><thead><tr>${tb[0].map((h, j) => `<th class="${j >= nH ? 'x' : ''}">${esc(h)}</th>`).join('')}</tr></thead><tbody>${tb.slice(1).map(r => `<tr>${r.map(v => `<td title="${esc(v)}">${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : '<div class="d-empty">No hay clientes que cumplan estos filtros.</div>'}
@@ -2629,7 +2765,7 @@ function statRows() {
 function renderStats(keep) {
   const el = $('#vStats'), f = S.stf;
   const { base, gest, since } = statRows(), n = base.length, g = gest.length, gs = new Set(gest);
-  const cont = gest.filter(r => r.t.res === 'Contestó'), ef = gest.filter(isEfectivo), buy = gest.filter(r => r.t.buy);
+  const cont = gest.filter(r => r.t.res === 'Gestionado'), ef = gest.filter(isEfectivo), buy = gest.filter(r => r.t.buy);
   const withB = gest.filter(r => (r.t.brands || []).length).length, withT = gest.filter(r => r.t.tipo).length;
   const people = [...new Set(S.rows.map(statWho))].sort(), states = [...new Set(S.rows.map(r => val(r, 'state').trim()).filter(Boolean))].sort();
   const sel = (id, label, cur, opts) => `<div class="field"><label for="${id}">${label}</label><select id="${id}">${opts.map(([v, t]) => `<option value="${esc(v)}" ${String(cur) === String(v) ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></div>`;
@@ -2643,18 +2779,17 @@ function renderStats(keep) {
   const topL = Object.entries(lc).sort((a, b) => b[1] - a[1]).slice(0, 10), lMax = Math.max(1, ...topL.map(x => x[1]));
   const sc = {}; base.forEach(r => { const s0 = val(r, 'state').trim() || '(sin dato)'; const o = sc[s0] || (sc[s0] = { n: 0, g: 0, e: 0 }); o.n++; if (gs.has(r)) o.g++; if (gs.has(r) && isEfectivo(r)) o.e++; });
   const topS = Object.entries(sc).sort((a, b) => b[1].e - a[1].e || b[1].g - a[1].g).slice(0, 12), sMax = Math.max(1, ...topS.map(x => x[1].g));
-  /* clientes efectivos por día: «Contestó» marcado ese día y hoy con tipo o marca */
+  /* clientes efectivos por día: «Gestionado» marcado ese día y hoy con tipo o marca */
   const days = Array.from({ length: 30 }, (_, i) => addDays(S.today, i - 29)), ed = {};
-  base.filter(isEfectivo).forEach(r => { const seen = new Set(); r.t.hist.forEach(h => { const d = h.d.slice(0, 10); if (h.txt === 'Resultado: Contestó' && !seen.has(d)) { seen.add(d); ed[d] = (ed[d] || 0) + 1; } }); });
+  base.filter(isEfectivo).forEach(r => { const seen = new Set(); r.t.hist.forEach(h => { const d = h.d.slice(0, 10); if (/^Resultado: (Gestionado|Contestó)$/.test(h.txt) && !seen.has(d)) { seen.add(d); ed[d] = (ed[d] || 0) + 1; } }); });
   const dMax = Math.max(1, ...days.map(d => ed[d] || 0));
   /* por ejecutivo (administrador) */
   const byP = isAdmin() ? people.map(p => { const mine = base.filter(r => statWho(r) === p), gg = mine.filter(r => gs.has(r)), e = gg.filter(isEfectivo).length; return { p, n: mine.length, g: gg.length, e, noc: gg.filter(isNoc).length, pct: gg.length ? pct(e, gg.length) : 0 }; }).filter(x => x.n) : [];
   /* cómo atacar */
   const att = [
-    ['Contestaron pero falta tipo o marca', gest.filter(r => r.t.res === 'Contestó' && !isEfectivo(r)).length, 'Complétalos: así cuentan como efectivos.', 'msg'],
+    ['Contestaron pero falta tipo o marca', gest.filter(r => r.t.res === 'Gestionado' && !isEfectivo(r)).length, 'Complétalos: así cuentan como efectivos.', 'msg'],
     ['Llamadas vencidas o para hoy', base.filter(r => r.t.res === 'Volver a llamar' && r.t.next && r.t.next <= S.today).length, 'El cliente pidió que lo llamen: son los más calientes.', 'clock'],
-    ['No contesta 2 o más veces', base.filter(r => isNoc(r) && r.t.int >= 2).length, 'Prueba WhatsApp o correo, o corrige el número.', 'phone'],
-    ['Números errados sin corregir', base.filter(r => r.t.res === 'Número errado' && !r.t.fix).length, 'Busca el número correcto y regístralo.', 'hash'],
+    ['No responde 2 o más veces', base.filter(r => isNoc(r) && r.t.int >= 2).length, 'Prueba WhatsApp o correo, o corrige el número.', 'phone'],
     ['Con marcas registradas y sin compra', gest.filter(r => (r.t.brands || []).length && !r.t.buy).length, 'Ya sabes qué venden: ofréceles esas marcas.', 'tag'],
     ['Sin gestionar todavía', base.filter(r => !r.t.last).length, 'Cartera virgen: el siguiente paso del día.', 'eye']
   ];
@@ -2672,21 +2807,24 @@ function renderStats(keep) {
   <div class="kpis">
     ${kpi('Cartera', n, 'clientes con estos filtros')}
     ${kpi('Gestionados', g, `${pct(g, n)}% de la cartera`)}
-    ${kpi('Contestó', cont.length, `${pct(cont.length, g)}% de los gestionados`)}
+    ${kpi('Gestionado', cont.length, `${pct(cont.length, g)}% de los gestionados`)}
     ${kpi('Clientes efectivos', ef.length, `${pct(ef.length, g)}% de los gestionados`, true)}
     ${kpi('Con tipo de negocio', withT, `${pct(withT, g)}% de los gestionados`)}
     ${kpi('Con marcas', withB, `${pct(withB, g)}% de los gestionados`)}
+    ${(() => { const fb = firstBuy(), bk = base.map(r => buyerKind(r.k, fb)), c = x => bk.filter(y => y === x).length; return kpi('Comprado', bk.filter(Boolean).length, `${fmtN(c('mes'))} nuevos del mes · ${fmtN(c('mes') + c('anio'))} nuevos del año · ${fmtN(c('rec'))} recurrentes`); })()}
     ${(() => { const bs = new Set(base.map(r => r.k)), qs = S.quotes.filter(q => bs.has(q.k) && (!since || q.d >= since)), won = qs.filter(q => q.est === 'Ganada').length; return kpi('Cotizaciones', qs.length, `${fmtN(won)} ganadas · ${pct(won, qs.length)}% pasó a venta`); })()}
   </div>
   <div class="grid2">
     <div class="card rise"><h3>Embudo de gestión</h3><div class="sub">De la cartera a la compra</div><div class="funnel">
-      ${[['Cartera', n], ['Gestionados', g], ['Contestó', cont.length], ['Efectivos', ef.length], ['Con compra', buy.length]].map(([l, v], i) => hbar(l, v, Math.max(1, n), 'var(--s1)', `${fmtN(v)} · ${pct(v, n)}%`, `${l}: ${fmtN(v)} (${pct(v, n)}% de la cartera)`, i)).join('')}</div></div>
+      ${[['Cartera', n], ['Gestionados', g], ['Gestionado', cont.length], ['Efectivos', ef.length], ['Con compra', buy.length]].map(([l, v], i) => hbar(l, v, Math.max(1, n), 'var(--s1)', `${fmtN(v)} · ${pct(v, n)}%`, `${l}: ${fmtN(v)} (${pct(v, n)}% de la cartera)`, i)).join('')}</div></div>
     <div class="card rise"><h3>Resultado del contacto</h3><div class="sub">Estado actual de los clientes gestionados</div>
       ${g ? CATS.map(([c]) => kc[c] ? hbar(`<i class="sw" style="background:${CAT_C[c]}"></i>${CAT_TX[c]}`, kc[c], catMax, CAT_C[c], `${fmtN(kc[c])} · ${pct(kc[c], g)}%`, `${CAT_TX[c]}: ${fmtN(kc[c])} (${pct(kc[c], g)}%)`) : '').join('') : '<div class="d-empty">Sin gestiones con estos filtros.</div>'}</div>
+    <div class="card rise"><h3>Compradores</h3><div class="sub">Según su primera venta registrada en el Gestor</div>
+      ${(() => { const fb = firstBuy(), bk = base.map(r => buyerKind(r.k, fb)), n0 = bk.filter(Boolean).length, mx = Math.max(1, n0); return [['mes', 'var(--s3)'], ['anio', 'var(--s1)'], ['rec', 'var(--s2)']].map(([k, col], i) => { const v = bk.filter(y => y === k).length; return hbar(BUYER_TX[k], v, mx, col, `${fmtN(v)} · ${pct(v, n0)}%`, `${BUYER_TX[k]}: ${fmtN(v)}`, i); }).join('') + (n0 ? '' : '<div class="d-empty">Aún no hay compras registradas.</div>'); })()}</div>
     <div class="card rise"><h3>Tipo de negocio</h3><div class="sub">Clientes gestionados por tipo</div>
       ${tipoC.map((x, i) => hbar(`${icon(TIPO_IC[x.x])}${esc(TIPO_CORTO[x.x])}`, x.v, tMax, x.c, `${fmtN(x.v)} · ${pct(x.v, g)}%`, `${x.x}: ${fmtN(x.v)}`, i)).join('')}
       ${hbar('Sin definir', sinT, tMax, 'var(--pend)', `${fmtN(sinT)} · ${pct(sinT, g)}%`, 'Sin tipo de negocio: ' + fmtN(sinT))}</div>
-    <div class="card rise"><h3>Clientes efectivos por día</h3><div class="sub">Últimos 30 días · «Contestó» con tipo o marca</div>
+    <div class="card rise"><h3>Clientes efectivos por día</h3><div class="sub">Últimos 30 días · «Gestionado» con tipo o marca</div>
       <div class="cols">${days.map((d, i) => `<div class="col" data-tip="${ddmm(d)}: ${fmtN(ed[d] || 0)} efectivos">${ed[d] ? `<span class="vl">${ed[d]}</span>` : ''}<div class="stk" style="animation-delay:${i * 20}ms"><i style="height:${(ed[d] || 0) / dMax * 130}px;background:var(--s1)"></i></div></div>`).join('')}</div>
       <div class="cols-x">${days.map((d, i) => `<span>${i % 5 === 4 ? d.slice(8) : ''}</span>`).join('')}</div></div>
     <div class="card rise"><h3>Marcas más registradas</h3><div class="sub">Clientes gestionados que distribuyen cada marca</div>
@@ -2699,7 +2837,7 @@ function renderStats(keep) {
       ${att.map(([t, v, h, ic]) => `<div class="atk"><span class="ic">${icon(ic)}</span><div><b>${fmtN(v)}</b> ${esc(t)}<small>${esc(h)}</small></div></div>`).join('')}</div></div>
   </div>
   ${byP.length ? `<div class="card rise"><h3>Por ejecutivo</h3><div class="sub">Efectividad: efectivos sobre gestionados en el período</div>
-    <div class="rprev"><table><thead><tr><th>Ejecutivo</th><th>Cartera</th><th>Gestionados</th><th>Efectivos</th><th>% efectividad</th><th>No contesta</th></tr></thead><tbody>
+    <div class="rprev"><table><thead><tr><th>Ejecutivo</th><th>Cartera</th><th>Gestionados</th><th>Efectivos</th><th>% efectividad</th><th>No responde</th></tr></thead><tbody>
     ${byP.map(x => `<tr><td>${esc(x.p)}</td><td>${fmtN(x.n)}</td><td>${fmtN(x.g)}</td><td><b>${fmtN(x.e)}</b></td><td>${x.pct}%</td><td>${fmtN(x.noc)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}`;
   if (keep) el.querySelectorAll('.rise').forEach(x => x.classList.remove('rise'));
   countUp(el);
@@ -2711,8 +2849,8 @@ $('#vStats').addEventListener('change', e => {
 $('#vStats').addEventListener('click', e => { if (e.target.closest('#stClear')) { S.stf = { per: '30', exec: '', tipo: '', cat: '', state: '' }; renderStats(true); } });
 
 /* ---------- metas y ranking del día ---------- */
-/* efectivos de hoy de la persona: marcó «Contestó» hoy y el cliente tiene tipo de negocio o marca */
-const efToday = () => S.rows.filter(r => isEfectivo(r) && r.t.hist.some(h => h.who === S.me.name && h.txt === 'Resultado: Contestó' && h.d.startsWith(S.today))).length;
+/* efectivos de hoy de la persona: marcó «Gestionado» hoy y el cliente tiene tipo de negocio o marca */
+const efToday = () => S.rows.filter(r => isEfectivo(r) && r.t.hist.some(h => h.who === S.me.name && /^Resultado: (Gestionado|Contestó)$/.test(h.txt) && h.d.startsWith(S.today))).length;
 function loadRank() {
   call('api_activity', S.token).then(A => {
     S.activity = A; const el = $('#dRank'); if (!el || !A) return;
@@ -2798,6 +2936,66 @@ function dupHTML(r) {
   return `<div class="dupbar"><b>${icon('alert')} Posible duplicado</b>${l.slice(0, 4).map(x => `<span>Fila ${x.r.r} · <a data-act="dupopen" data-n="${esc(x.r.k)}">${esc(val(x.r, 'legal') || x.r.k)}</a> (${x.why})</span>`).join('')}${l.length > 4 ? `<span>y ${l.length - 4} más (Reportes → Posibles duplicados)</span>` : ''}</div>`;
 }
 
+/* ---------- compradores: nuevo del mes, nuevo del año o recurrente (por su primera venta registrada) ---------- */
+function firstBuy() {
+  const m = {}; S.orders.forEach(o => { if (o.est !== 'Anulada' && o.d && (!m[o.k] || o.d < m[o.k])) m[o.k] = o.d; });
+  return m;
+}
+const buyerKind = (k, fb) => { const d = fb[k]; if (!d) return ''; return d.slice(0, 7) === S.today.slice(0, 7) ? 'mes' : d.slice(0, 4) === S.today.slice(0, 4) ? 'anio' : 'rec'; };
+const BUYER_TX = { mes: 'Nuevo del mes', anio: 'Nuevo del año', rec: 'Recurrente' };
+
+/* ---------- etiquetas de marca: sigla con el color de la marca (o uno fijo calculado del nombre) ---------- */
+const BRAND_C = { HP: '#0096d6', Lenovo: '#e2231a', Dell: '#007db8', 'Dell EMC': '#007db8', ASUS: '#00539b', ROG: '#c4002b', MSI: '#d20a11', Huawei: '#cf0a2c', Intel: '#0071c5', AMD: '#ed1c24', Gigabyte: '#f26522',
+  Kingston: '#c8102e', HyperX: '#e31837', Razer: '#44d62c', 'A-Data': '#d7000f', SanDisk: '#ed1c24', Seagate: '#6ebe49', 'Western Digital': '#0072c6', PNY: '#00539b', QNAP: '#00a0e9', HPE: '#01a982',
+  Ubiquiti: '#0559c9', 'TP-Link': '#4acbd6', Meraki: '#67b346', Ruckus: '#ff8c00', APC: '#8cc63f', Forza: '#e30613', Salicru: '#e2001a', Hikvision: '#e60012', EZVIZ: '#00a0e9', Axis: '#ffcc33', Honeywell: '#e60012',
+  Epson: '#003399', Xerox: '#d22630', Zebra: '#1e1e1e', Logitech: '#00b8fc', Jabra: '#ffd100', Poly: '#e5202e', JBL: '#ff6600', 'JBL Pro': '#ff6600', 'Harman Kardon': '#1b1b1b', Soundcore: '#00a7e1', LG: '#a50034',
+  Viewsonic: '#5b2c86', Philips: '#0b5ed7', Anker: '#00a7e1', Belkin: '#00a5b5', Microsoft: '#00a4ef', ESET: '#00a0a0', Bitdefender: '#ed1c24', McAfee: '#c01818', Motorola: '#5c92fa', Starlink: '#111111', Wacom: '#e60012' };
+const BRAND_PAL = ['#2a78d6', '#eb6834', '#1baf7a', '#8b5cf6', '#d97706', '#0891b2', '#db2777', '#4d7c0f'];
+const brandColor = b => BRAND_C[b] || BRAND_PAL[[...b].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) >>> 0, 7) % BRAND_PAL.length];
+const brandAbbr = b => { const w = b.replace(/[^A-Za-z0-9 ]/g, '').trim(); return w.length <= 4 ? w.toUpperCase() : w.includes(' ') ? w.split(/\s+/).map(x => x[0]).join('').slice(0, 3).toUpperCase() : w.slice(0, 3).toUpperCase(); };
+function brandTags(r) {
+  const l = (r.t.brands || []).slice().sort((a, b) => REL_K.indexOf(relOf(r, a)) - REL_K.indexOf(relOf(r, b)));
+  return l.slice(0, 6).map(b => { const rel = relOf(r, b); return `<span class="btg ${rel}" style="--bc:${brandColor(b)}" title="${esc(b)} · ${esc(REL[rel].s)}">${esc(brandAbbr(b))}</span>`; }).join('') + (l.length > 6 ? `<span class="btg more" title="${esc(l.slice(6).join(', '))}">+${l.length - 6}</span>` : '');
+}
+/* exportar contactos de la lista mostrada para marketing (código, razón social, RUC, teléfono, correo y marcas) */
+async function exportContacts() {
+  const rows = S.view; if (!rows.length) return toast('No hay clientes en la lista.', true);
+  const mq = $('#fMarca').value.trim(), mb = mq ? findBrand(mq) : null;
+  const aoa = [['Código de cliente', 'Razón social', 'RUC', 'Teléfono', 'Correo', 'Marcas', 'Tipo de negocio', 'Ejecutivo'],
+    ...rows.map(r => { const ps = phonesOf(r); return [val(r, 'id'), val(r, 'legal'), val(r, 'tax'), ps.length ? ps.map(p => p.d).join(' / ') : val(r, 'phone'), parseMails(val(r, 'mail')).join('; ') || val(r, 'mail'),
+      (r.t.brands || []).map(b => b + ' (' + REL[relOf(r, b)].s.toLowerCase() + ')').join(', '), r.t.tipo, S.asg[r.k] || r.t.own || val(r, 'exec')]; })];
+  $('#bExpC').disabled = true;
+  try { const res = await call('api_saveReport', S.token, 'Contactos ' + (mb ? mb.m + ' ' : '') + ddmm(S.today).replace('/', '-'), aoa); toast(`Libro «${res.sheet}» con ${fmtN(rows.length)} contactos: Excel lo abre en otra pestaña.`); }
+  catch (e) { toast(e.message, true); }
+  $('#bExpC').disabled = false;
+}
+$('#bExpC').onclick = exportContacts;
+$('#vMode').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; UI.cview = !!b.dataset.v; saveUI(); buildCols(); renderNow(); });
+$('#bFside').onclick = () => { if (innerWidth <= 760) $('#toolbar').classList.toggle('open'); else { UI.fside = UI.fside === false; saveUI(); applyFside(); } };
+function applyFside() { $('#toolbar').classList.toggle('closed', UI.fside === false); if (S.me && COLS.length) { applyWidths(); render(); } }
+
+/* ---------- courier habitual del cliente ---------- */
+const COURIERS = ['Shalom', 'Olva Courier', 'Marvisur', 'Cruz del Sur Cargo', 'Flores', 'Civa', 'Movil Bus', 'Recojo en almacén', 'Delivery propio'];
+const CU_F = [['cuC', 'c', 'Courier', 'Ej.: Shalom'], ['cuAg', 'ag', 'Agencia o sede', 'Ej.: Shalom Av. México'], ['cuDest', 'dest', 'Destino', 'Ciudad o dirección de entrega'], ['cuCons', 'cons', 'Consignatario', 'Quién recoge'], ['cuDoc', 'doc', 'DNI o RUC', ''], ['cuTel', 'tel', 'Teléfono', '']];
+function courierHTML(r, lk) {
+  const c = S.courier[r.k], f = S.cf && S.cf.k === r.k;
+  const used = [...new Set([...COURIERS, ...Object.values(S.courier).map(x => x.c).filter(Boolean)])];
+  return `<div class="p-sec"><h3><span>Courier habitual${okChk('cou', r)}</span>${lk ? '' : `<button class="linkbtn" data-act="cuedit">${icon(f ? 'x' : 'pencil')}${f ? 'Cancelar' : c ? 'Editar' : 'Registrar'}</button>`}</h3>
+    ${f ? `<div class="cuform"><datalist id="dlCour">${used.map(x => `<option value="${esc(x)}">`).join('')}</datalist>
+      ${CU_F.map(([id, k, l, ph]) => `<label class="fl"><span>${l}</span><input class="txtin" id="${id}" ${k === 'c' ? 'list="dlCour"' : ''} placeholder="${esc(ph)}" value="${esc(c ? c[k] : '')}"></label>`).join('')}
+      <label class="fl" style="grid-column:1/-1"><span>Nota</span><input class="txtin" id="cuNota" placeholder="Horario, pago en destino, indicaciones…" value="${esc(c ? c.nota : '')}"></label>
+      <button class="btn primary" data-act="cusave" style="grid-column:1/-1;justify-content:center">${icon('check')}Guardar courier</button></div>`
+      : c ? `<dl class="kv cukv"><dt>Courier</dt><dd><b>${esc(c.c)}</b></dd>${CU_F.slice(1).map(([, k, l]) => c[k] ? `<dt>${l}</dt><dd>${esc(c[k])}</dd>` : '').join('')}${c.nota ? `<dt>Nota</dt><dd>${esc(c.nota)}</dd>` : ''}<dt>Actualizado</dt><dd>${esc(c.by)} · ${ddmm(c.d)}</dd></dl>`
+      : '<div class="hint" style="margin:0">Sin courier registrado. Guárdalo una vez y aparece en cada venta.</div>'}</div>`;
+}
+async function saveCourier(r) {
+  const p = Object.fromEntries([...CU_F.map(([id, k]) => [k, ($('#' + id) || {}).value || '']), ['nota', ($('#cuNota') || {}).value || '']]);
+  if (!p.c.trim()) { const i = $('#cuC'); if (i) i.focus(); return toast('Escribe el courier.', true); }
+  const prev = S.courier[r.k]; S.courier[r.k] = Object.assign({}, p, { by: S.me.name, d: S.today }); S.cf = null; flashOk('cou', r);
+  try { const res = await call('api_setCourier', S.token, r.k, p); S.courier[r.k] = res.courier; applyState(res.state); }
+  catch (e) { if (prev) S.courier[r.k] = prev; else delete S.courier[r.k]; S.cf = { k: r.k }; if (r === S.active) renderPanel(true); toast(e.message, true); }
+}
+
 /* ---------- reparto de cartera (administrador) ---------- */
 let rpMode = 'rows';
 function parseRowsUI(spec) {
@@ -2877,7 +3075,7 @@ $('#bDoResv').onclick = async () => {
 
 /* ---------- ajustes / usuarios ---------- */
 function openCfg() {
-  $('#cCols').innerHTML = [['_gest', 'Gestión (resultado y estado)'], ...S.header.filter((h, j) => keyOf(j) !== 'comment').map(h => [norm(h), h]), ['_cmt', S.header[S.C.comment] + ' (escribir en la lista)']]
+  $('#cCols').innerHTML = [['_gest', 'Gestión (resultado y estado)'], ['_brands', 'Marcas (etiquetas de color)'], ...S.header.filter((h, j) => keyOf(j) !== 'comment').map(h => [norm(h), h]), ['_cmt', S.header[S.C.comment] + ' (escribir en la lista)']]
     .map(([k, h]) => `<label class="ck"><input type="checkbox" data-col="${esc(k)}" ${UI.hidden.includes(k) ? '' : 'checked'}> ${esc(h)}</label>`).join('')
     + `<button class="linkbtn" type="button" id="cColReset" style="grid-column:1/-1;justify-self:start">Volver a las columnas y anchos por defecto</button>`;
   $('#cAdmin').hidden = !isAdmin();
@@ -2979,7 +3177,6 @@ $('#pSplit').addEventListener('mousedown', e => {
 $('#bPanel').onclick = () => { if (innerWidth <= 1000) UI.panelM = !UI.panelM; else UI.panel = !UI.panel; saveUI(); applyPanel(); };
 $('#bResv').onclick = openResv; $('#bCfg').onclick = openCfg; $('#bUsers').onclick = openUsers; $('#bKeys').onclick = () => openModal('#mKeys');
 $('#bReload').onclick = () => { flushAll(); loadAll(false); };
-$('#bFilt').onclick = () => $('#toolbar').classList.toggle('open');
 
 /* ---------- eventos de la lista ---------- */
 let qT;

@@ -13,7 +13,7 @@ const KEYS = ['org', 'kam', 'exec', 'id', 'legal', 'tax', 'addr', 'state', 'city
 const C = Object.fromEntries(KEYS.map((k, i) => [k, i]));
 
 /* ---------- pestañas internas ---------- */
-const SH = { cfg: '_Config', users: '_Usuarios', asg: '_Asignaciones', seg: '_Seguimiento', cm: '_ClienteMarcas', mar: '_Marcas', ord: '_Ordenes', ven: '_Ventas', his: '_Historial', tel: '_Telefonos', rep: '_Reparto', cot: '_Cotizaciones' };
+const SH = { cfg: '_Config', users: '_Usuarios', asg: '_Asignaciones', seg: '_Seguimiento', cm: '_ClienteMarcas', mar: '_Marcas', ord: '_Ordenes', ven: '_Ventas', his: '_Historial', tel: '_Telefonos', rep: '_Reparto', cot: '_Cotizaciones', cou: '_Courier' };
 const HDR = {
   cfg: ['Clave', 'Valor'],
   users: ['Nombre', 'Rol', 'Activo', 'PinHash', 'Salt', 'CambiarPin', 'Intentos', 'BloqueadoHasta', 'Nombre en cartera'],
@@ -26,6 +26,7 @@ const HDR = {
   his: ['Customer ID', 'Fecha', 'Usuario', 'Acción', 'Icono'],
   tel: ['Customer ID', 'Teléfono original', 'Teléfono corregido', 'Corregido por', 'Fecha'],
   rep: ['Customer ID', 'Ejecutivo', 'Asignado por', 'Fecha'],
+  cou: ['Customer ID', 'Courier', 'Agencia o sede', 'Destino', 'Consignatario', 'DNI o RUC del consignatario', 'Teléfono', 'Nota', 'Actualizado por', 'Fecha'],
   cot: ['ID', 'Customer ID', 'Fecha', 'Marcas', 'Monto US$ sin IGV', 'Ejecutivo', 'Estado', 'Fecha cierre', 'Cerrado por']
 };
 const S_ = Object.fromEntries(HDR.seg.map((h, i) => [h, i]));
@@ -47,7 +48,12 @@ const norm = s => String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g
 const str = x => x == null ? '' : String(x);
 const num = x => { const n = +String(x == null ? '' : x).replace(/[^\d.-]/g, ''); return isFinite(n) ? n : 0; };
 const err = m => { throw new Error(m); };
-const ICON = { 'Contestó': 'check', 'No contesta': 'x', 'Volver a llamar': 'clock', 'Número errado': 'hash', 'No interesado': 'ban' };
+const ICON = { 'Gestionado': 'check', 'No responde': 'x', 'Volver a llamar': 'clock', 'Número errado': 'hash', 'No interesado': 'ban' };
+/* resultados del contacto: Gestionado, No responde y Volver a llamar. Los nombres anteriores se leen como los nuevos */
+const RES_OK = ['Gestionado', 'No responde', 'Volver a llamar'];
+const RES_OLD = { 'Contestó': 'Gestionado', 'No contesta': 'No responde' };
+const resNorm = v => RES_OLD[str(v)] || str(v);
+const isGestH = txt => txt === 'Resultado: Gestionado' || txt === 'Resultado: Contestó';
 
 /* fechas de la cartera: número de serie de Excel, dd/mm/aaaa o aaaa-mm-dd → aaaa-mm-dd */
 function isoDate(value, text) {
@@ -232,6 +238,7 @@ function addBrand(T, a) { const k = str(a[0]), b = str(a[1]); if (!k || !b || st
 function addHisRow(T, a) { const k = str(a[0]); if (k) T(k).hist.push({ d: str(a[1]), who: str(a[2]), txt: str(a[3]), k: str(a[4]) || 'clock', cm: str(a[4]) === 'msg' }); }
 const sortHist = t => { t.hist.sort((x, y) => y.d.localeCompare(x.d)); t.hist = t.hist.slice(0, 40); };
 const ordObj = a => ({ ov: str(a[0]), k: str(a[1]), d: str(a[2]), tot: num(a[3]), est: ESTADOS.includes(str(a[4])) ? str(a[4]) : 'Despachando', by: str(a[5]), fin: str(a[6]), finBy: str(a[7]), nota: str(a[8]) });
+const couObj = a => ({ c: str(a[1]), ag: str(a[2]), dest: str(a[3]), cons: str(a[4]), doc: str(a[5]), tel: str(a[6]), nota: str(a[7]), by: str(a[8]), d: str(a[9]) });
 const cotObj = a => ({ id: str(a[0]), k: str(a[1]), d: str(a[2]), b: str(a[3]), m: num(a[4]), by: str(a[5]), est: str(a[6]) || 'Enviada', fin: str(a[7]), finBy: str(a[8]) });
 const venObj = a => ({ ov: str(a[0]), k: str(a[1]), d: str(a[2]), b: str(a[3]), m: num(a[4]), by: str(a[5]) });
 
@@ -258,7 +265,8 @@ async function loadDB(ctx) {
   /* reparto de cartera del administrador: cada cliente (por Customer ID) asignado a un ejecutivo */
   const repart = {}; R.rep.forEach(a => { const k = str(a[0]), u = str(a[1]).trim(); if (k && u) repart[k] = { user: u, by: str(a[2]), d: str(a[3]) }; });
   const quotes = R.cot.filter(a => str(a[0])).map(cotObj);
-  DB = { cart, cfg, seq, users, assigns, brands, track, orders, sales, repart, quotes, setup: R.users.length > 0, at: Date.now() };
+  const courier = {}; R.cou.forEach(a => { const k = str(a[0]); if (k) courier[k] = couObj(a); });
+  DB = { cart, cfg, seq, users, assigns, brands, track, orders, sales, repart, quotes, courier, setup: R.users.length > 0, at: Date.now() };
   return DB;
 }
 const ensureDB = async () => DB || run(ctx => loadDB(ctx));
@@ -288,7 +296,7 @@ function segArr(k, t) {
   a[S_['Tipo de negocio']] = t.tipo; a[S_['Gestionado por']] = t.own; a[S_['Primera gestión']] = t.first; a[S_['Última gestión']] = t.last; a[S_['Último contacto']] = t.lastc; a[S_['Depurado']] = t.dep; a[S_['Teléfono corregido']] = t.fix;
   return a;
 }
-const segObj = a => ({ rev: str(a[S_['Revisado']]) === 'SI', res: str(a[S_['Resultado']]), motivo: str(a[S_['Motivo']]), int: num(a[S_['Intentos']]), next: str(a[S_['Próximo contacto']]), tipo: str(a[S_['Tipo de negocio']]), own: str(a[S_['Gestionado por']]), first: str(a[S_['Primera gestión']]), last: str(a[S_['Última gestión']]), lastc: str(a[S_['Último contacto']]), dep: str(a[S_['Depurado']]), fix: str(a[S_['Teléfono corregido']]) });
+const segObj = a => ({ rev: str(a[S_['Revisado']]) === 'SI', res: resNorm(a[S_['Resultado']]), motivo: str(a[S_['Motivo']]), int: num(a[S_['Intentos']]), next: str(a[S_['Próximo contacto']]), tipo: str(a[S_['Tipo de negocio']]), own: str(a[S_['Gestionado por']]), first: str(a[S_['Primera gestión']]), last: str(a[S_['Última gestión']]), lastc: str(a[S_['Último contacto']]), dep: str(a[S_['Depurado']]), fix: str(a[S_['Teléfono corregido']]) });
 async function addHist(ctx, k, user, txt, icon) {
   const d = nowStr(); await appendRows(ctx, 'his', [[k, d, user, txt, icon || 'clock']]);
   const t = DB.track[k]; if (t) t.hist.unshift({ d, who: user, txt, k: icon || 'clock', cm: icon === 'msg' });
@@ -400,7 +408,7 @@ const API = {
       vis.forEach(r => { if (DB.track[r.k]) track[r.k] = DB.track[r.k]; });
       return { me: { name: u.name, role: u.role }, cfg: DB.cfg, scoped: vis.length < DB.cart.rows.length, total: DB.cart.rows.length, header: COLS, C, assigns: DB.assigns,
         users: DB.users.filter(x => x.active).map(x => x.name), seq: DB.seq, lastRow: DB.cart.rows.length + 1, today: TODAY(), sheet: DB.cart.name,
-        rows: vis.map(r => [r.k, r.r, r.v]), track, asg: Object.fromEntries(vis.filter(r => DB.repart[r.k]).map(r => [r.k, DB.repart[r.k].user])), quotes: DB.quotes.filter(q => ks.has(q.k)), brands: DB.brands, orders: DB.orders.filter(o => ks.has(o.k)), sales: DB.sales.filter(x => ks.has(x.k)), warnings: [] };
+        rows: vis.map(r => [r.k, r.r, r.v]), track, asg: Object.fromEntries(vis.filter(r => DB.repart[r.k]).map(r => [r.k, DB.repart[r.k].user])), courier: Object.fromEntries(vis.filter(r => DB.courier[r.k]).map(r => [r.k, DB.courier[r.k]])), quotes: DB.quotes.filter(q => ks.has(q.k)), brands: DB.brands, orders: DB.orders.filter(o => ks.has(o.k)), sales: DB.sales.filter(x => ks.has(x.k)), warnings: [] };
     });
   },
   /* sincronización: si solo hubo cambios propios no se lee nada más; si otra persona cambió algo,
@@ -472,10 +480,11 @@ const API = {
         }
         case 'rev': t.rev = !!p.val; H.push([p.val ? 'Marcó revisado' : 'Quitó revisado', 'eye']); break;
         case 'result':
+          if (p.val && !RES_OK.includes(str(p.val))) err('Resultado no válido.');
           t.res = str(p.val); if (p.val) t.rev = true; t.next = p.val === 'Volver a llamar' ? (p.date || t.next || TODAY()) : '';
           if (!['No interesado', 'Número errado'].includes(p.val)) t.motivo = '';
           else { if (!str(p.motivo).trim()) err('Elige el motivo de «' + p.val + '».'); t.motivo = str(p.motivo).trim(); }
-          if (p.val === 'No contesta' && (!t.lastc || Date.now() - new Date(t.lastc.replace(' ', 'T')).getTime() > 15 * 60000)) { t.int = (t.int || 0) + 1; t.lastc = now; }
+          if (p.val === 'No responde' && (!t.lastc || Date.now() - new Date(t.lastc.replace(' ', 'T')).getTime() > 15 * 60000)) { t.int = (t.int || 0) + 1; t.lastc = now; }
           H.push([p.val ? 'Resultado: ' + p.val : 'Quitó el resultado', ICON[p.val] || 'x']); if (t.motivo) H.push(['Motivo: ' + t.motivo, 'ban']); break;
         case 'next': t.next = str(p.val); H.push(['Reagendó para ' + (p.val || '—'), 'cal']); break;
         case 'motivo': t.motivo = str(p.val); H.push(['Motivo: ' + (p.val || '—'), 'ban']); break;
@@ -559,6 +568,22 @@ const API = {
       return { quote: q, state: stateOf(row) };
     });
   },
+  /* courier habitual del cliente: un registro por Customer ID, se sobrescribe al actualizarlo */
+  async api_setCourier(tk, k, p) {
+    const u = who(tk);
+    return run(async ctx => {
+      const row = rowOf(k); if (!row) err('Cliente no encontrado.');
+      if (!inScope(u, row)) err('Este cliente no está en tu cartera.');
+      const c = { c: str(p.c).trim(), ag: str(p.ag).trim(), dest: str(p.dest).trim(), cons: str(p.cons).trim(), doc: str(p.doc).trim(), tel: str(p.tel).trim(), nota: str(p.nota).trim(), by: u.name, d: TODAY() };
+      if (!c.c) err('Escribe el courier (por ejemplo: Shalom, Olva, Marvisur).');
+      let ws = await sheet(ctx, SH.cou); if (!ws) { ws = ctx.workbook.worksheets.add(SH.cou); writeRow(ws, 0, HDR.cou); ws.visibility = 'VeryHidden'; await ctx.sync(); }
+      await upsert(ctx, 'cou', r => str(r[0]) === k, () => [k, c.c, c.ag, c.dest, c.cons, c.doc, c.tel, c.nota, c.by, c.d]);
+      DB.courier[k] = c;
+      await addHist(ctx, k, u.name, `Courier habitual: ${c.c}${c.ag ? ' · ' + c.ag : ''}${c.dest ? ' · ' + c.dest : ''}`, 'store');
+      await bumpSeq(ctx);
+      return { courier: c, state: stateOf(row) };
+    });
+  },
   async api_setQuote(tk, id, est) {
     const u = who(tk); if (!['Enviada', 'Ganada', 'Perdida'].includes(est)) err('Estado no válido.');
     return run(async ctx => {
@@ -620,7 +645,7 @@ const API = {
   /* reporte de seguimiento (solo administrador, solo cuando lo pide): pestaña visible «Seguimiento» en este
      libro, con una fila por fecha y ejecutivo. Es la única hoja visible que crea el sistema; la cartera no se
      toca. Se rehace completa cada vez desde _Historial y _Ordenes. Cliente efectivo: el ejecutivo marcó
-     «Contestó» ese día y el cliente tiene tipo de negocio o al menos una marca. */
+     «Gestionado» ese día y el cliente tiene tipo de negocio o al menos una marca. */
   async api_followSheet(tk, p) {
     const u = who(tk); if (!isAdm(u)) err('Solo el administrador crea el reporte de seguimiento.');
     p = p || {};
@@ -628,7 +653,7 @@ const API = {
     return run(async ctx => {
       await loadDB(ctx);
       const hs = await sheet(ctx, SH.his), his = hs ? (await readAll(ctx, hs)).slice(1) : [];
-      const efectivo = k => { const t = DB.track[k]; return !!t && t.res === 'Contestó' && (!!t.tipo || (t.brands || []).length > 0); };
+      const efectivo = k => { const t = DB.track[k]; return !!t && t.res === 'Gestionado' && (!!t.tipo || (t.brands || []).length > 0); };
       const G = {}, key = (d, w) => d + '|' + w;
       const g = (d, w) => G[key(d, w)] || (G[key(d, w)] = { d, w, cli: new Set(), ok: new Set(), okNo: new Set(), noc: new Set(), call: new Set(), wrong: new Set(), noint: new Set(), rev: new Set(), cm: 0, ct: 0, tel: 0, br: 0, tp: 0, cot: 0, ov: 0, m: 0 });
       const inRange = d => (!from || d >= from) && (!to || d <= to);
@@ -636,11 +661,9 @@ const API = {
         const k = str(a[0]), d = str(a[1]).slice(0, 10), w = str(a[2]), txt = str(a[3]), ic = str(a[4]);
         if (!k || !w || !/^\d{4}-\d{2}-\d{2}$/.test(d) || !inRange(d)) return;
         const x = g(d, w); x.cli.add(k);
-        if (txt === 'Resultado: Contestó') (efectivo(k) ? x.ok : x.okNo).add(k);
-        else if (txt === 'Resultado: No contesta') x.noc.add(k);
+        if (isGestH(txt)) (efectivo(k) ? x.ok : x.okNo).add(k);
+        else if (txt === 'Resultado: No responde' || txt === 'Resultado: No contesta') x.noc.add(k);
         else if (txt === 'Resultado: Volver a llamar') x.call.add(k);
-        else if (txt === 'Resultado: Número errado') x.wrong.add(k);
-        else if (txt === 'Resultado: No interesado') x.noint.add(k);
         else if (txt === 'Marcó revisado') x.rev.add(k);
         else if (ic === 'msg') x.cm++;
         else if (/^Contactó/.test(txt)) x.ct++;
@@ -650,8 +673,8 @@ const API = {
         else if (/^Registró cotización/.test(txt)) x.cot++;
       });
       DB.orders.forEach(o => { if (o.est === 'Anulada' || !o.by || !inRange(o.d)) return; const x = g(o.d, o.by); x.ov++; x.m += o.tot; });
-      const HEAD = ['Fecha', 'Ejecutivo', 'Clientes gestionados', 'Clientes efectivos', 'Contestó sin tipo ni marca', 'No contesta', 'Volver a llamar', 'Número errado', 'No interesado', 'Revisados', 'Comentarios', 'Intentos de contacto', 'Números corregidos', 'Marcas registradas', 'Tipos de negocio registrados', 'Cotizaciones', 'OV registradas', 'Venta sin IGV (US$)', '% efectividad'];
-      const line = x => [x.d, x.w, x.cli.size, x.ok.size, x.okNo.size, x.noc.size, x.call.size, x.wrong.size, x.noint.size, x.rev.size, x.cm, x.ct, x.tel, x.br, x.tp, x.cot, x.ov, Math.round(x.m * 100) / 100, x.cli.size ? Math.round(x.ok.size / x.cli.size * 1000) / 10 : 0];
+      const HEAD = ['Fecha', 'Ejecutivo', 'Clientes gestionados', 'Clientes efectivos', 'Gestionado sin tipo ni marca', 'No responde', 'Volver a llamar', 'Revisados', 'Comentarios', 'Intentos de contacto', 'Números corregidos', 'Marcas registradas', 'Tipos de negocio registrados', 'Cotizaciones', 'OV registradas', 'Venta sin IGV (US$)', '% efectividad'];
+      const line = x => [x.d, x.w, x.cli.size, x.ok.size, x.okNo.size, x.noc.size, x.call.size, x.rev.size, x.cm, x.ct, x.tel, x.br, x.tp, x.cot, x.ov, Math.round(x.m * 100) / 100, x.cli.size ? Math.round(x.ok.size / x.cli.size * 1000) / 10 : 0];
       const list = Object.values(G).sort((a, b) => b.d.localeCompare(a.d) || a.w.localeCompare(b.w));
       /* totales por ejecutivo en el período */
       const T = {}; list.forEach(x => { const t = T[x.w] || (T[x.w] = { d: 'Total', w: x.w, cli: new Set(), ok: new Set(), okNo: new Set(), noc: new Set(), call: new Set(), wrong: new Set(), noint: new Set(), rev: new Set(), cm: 0, ct: 0, tel: 0, br: 0, tp: 0, cot: 0, ov: 0, m: 0 });
@@ -663,7 +686,7 @@ const API = {
       const prevOf = o => { const d = new Date(o.wk + 'T12:00:00'); d.setDate(d.getDate() - 7); return W[dayStr(d) + '|' + o.w]; };
       const weeks = Object.values(W).sort((a, b) => b.wk.localeCompare(a.wk) || a.w.localeCompare(b.w)).map(o => { const pv = prevOf(o); return [o.wk, o.w, o.cli.size, o.ok.size, o.cli.size ? Math.round(o.ok.size / o.cli.size * 1000) / 10 : 0, o.ov, Math.round(o.m * 100) / 100, pv ? o.ok.size - pv.ok.size : '', pv ? Math.round((o.m - pv.m) * 100) / 100 : '']; });
       const rows = [HEAD, ...list.map(line)], tot = Object.values(T).sort((a, b) => a.w.localeCompare(b.w)).map(line);
-      const info = `Generado el ${nowStr()} por ${u.name}${from || to ? ' · período ' + (from || 'inicio') + ' a ' + (to || 'hoy') : ''}. «Clientes efectivos»: marcados «Contestó» ese día que hoy tienen tipo de negocio o al menos una marca.`;
+      const info = `Generado el ${nowStr()} por ${u.name}${from || to ? ' · período ' + (from || 'inicio') + ' a ' + (to || 'hoy') : ''}. «Clientes efectivos»: marcados «Gestionado» ese día que hoy tienen tipo de negocio o al menos una marca.`;
       const pad = r => [...r, ...Array(Math.max(0, HEAD.length - r.length)).fill('')];
       const out = [...rows, Array(HEAD.length).fill(''), pad(['Totales del período']), HEAD.map((h, i) => i === 0 ? '' : h), ...tot,
         Array(HEAD.length).fill(''), pad(['Resumen por semana (lunes a domingo)']), pad(WEEK), ...weeks.map(pad), Array(HEAD.length).fill(''), pad([info])];
@@ -691,7 +714,7 @@ const API = {
     who(tk);
     const days = Array.from({ length: 14 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() + i - 13); return dayStr(d); }), m = {};
     const e = {};
-    Object.entries(DB.track).forEach(([, t]) => { const ok = t.res === 'Contestó' && (!!t.tipo || (t.brands || []).length > 0), se = {}; t.hist.forEach(h => { const d = h.d.slice(0, 10); if (ok && h.txt === 'Resultado: Contestó' && days.includes(d) && !se[h.who + d]) { se[h.who + d] = 1; (e[h.who] = e[h.who] || {})[d] = ((e[h.who] || {})[d] || 0) + 1; } }); });
+    Object.entries(DB.track).forEach(([, t]) => { const ok = t.res === 'Gestionado' && (!!t.tipo || (t.brands || []).length > 0), se = {}; t.hist.forEach(h => { const d = h.d.slice(0, 10); if (ok && isGestH(h.txt) && days.includes(d) && !se[h.who + d]) { se[h.who + d] = 1; (e[h.who] = e[h.who] || {})[d] = ((e[h.who] || {})[d] || 0) + 1; } }); });
     Object.entries(DB.track).forEach(([, t]) => { const seen = {}; t.hist.forEach(h => { const d = h.d.slice(0, 10); if (!days.includes(d) || seen[h.who + d]) return; seen[h.who + d] = 1; (m[h.who] = m[h.who] || {})[d] = ((m[h.who] || {})[d] || 0) + 1; }); });
     return { days, m, e };
   },
