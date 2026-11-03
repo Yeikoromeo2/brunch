@@ -12,7 +12,8 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 - Cada fila es un cliente independiente. Se identifica por `Customer ID`, nunca por el número de fila, porque la hoja puede ordenarse o filtrarse.
 - `Customer ID`, `Tax Reg No` y los teléfonos se tratan como texto.
 - Antes de procesar un Excel real, validarlo con `python3 crm/estructura/validar_cartera.py <archivo.xlsx>`. Si no pasa, no procesarlo.
-- La versión final trabaja sobre el Excel en OneDrive (complemento de Excel web). Los reportes y listas se abren como **libros nuevos** (`Excel.createWorkbook`), con las 18 columnas en el mismo orden; nunca se crean hojas visibles en el archivo de la cartera ni se borran datos.
+- La versión final trabaja sobre el Excel en OneDrive (complemento de Excel web). Los reportes y listas se abren como **libros nuevos** (`Excel.createWorkbook`), con las 18 columnas en el mismo orden; no se borran datos.
+- **Única hoja visible que crea el sistema:** la pestaña `Seguimiento` (reporte de actividad por fecha y ejecutivo). Solo la crea o actualiza el administrador al pulsar el botón en Reportes; nunca de forma automática. Ninguna otra hoja visible se agrega al archivo.
 
 ## Ventas y órdenes (OV)
 
@@ -25,13 +26,16 @@ La cartera de clientes es la base de todo el CRM. Su estructura está definida e
 
 ## Tipo de negocio y marcas
 
-- Tipo de negocio de cada cliente: Tienda, Oficina o Híbrido. Se sugiere por palabras clave del comentario y se confirma en el panel; se guarda en `_Seguimiento`.
+- Tipo de negocio de cada cliente: **Reseller tienda virtual**, **Reseller tienda física**, **Oficina (B2B)** o **Híbrido** (combina lo anterior). Se sugiere por palabras clave del comentario y se confirma en el panel; se guarda en `_Seguimiento`. Los tipos anteriores (Tienda/Oficina/Híbrido) se dejaron sin tipo una sola vez (`tiposV2` en `_Config`).
+- Los resultados de contacto solo los marca la persona con un clic: copiar el contacto o abrir WhatsApp no marcan «Revisado» ni ningún resultado.
+- **Cliente efectivo:** marcado «Contestó» y con tipo de negocio o al menos una marca. Es la cifra que cuentan el reporte `Seguimiento` y las Estadísticas.
 - El catálogo de marcas está en `crm/estructura/marcas.json` (pestaña `_Marcas`). Las marcas que distribuye cada cliente van en `_ClienteMarcas`, nunca como columnas de la cartera.
 - Cada marca de un cliente lleva su relación (`habitual`, `ocasional`, `interes`), quién la registró y la fecha. Pasados 90 días se marca «por confirmar».
 
 ## Visibilidad
 
-- El ejecutivo solo ve su cartera: clientes cuyo `Ejecutivo` coincide con su usuario o con su «Nombre en cartera» (sin distinguir mayúsculas, acentos ni espacios), en sus filas reservadas o gestionados por él. El administrador ve todo, incluido el mapeo de marcas por ejecutivo.
+- **Reparto de cartera:** el administrador asigna clientes a cada ejecutivo por filas (rangos como al imprimir, `2-500, 650`) o alternados entre varios. Se guarda por Customer ID en `_Reparto`. En cuanto hay reparto, cada ejecutivo ve y trabaja **solo** lo que le asignaron.
+- Mientras no haya reparto, el ejecutivo ve su cartera según la columna `Ejecutivo` (con su «Nombre en cartera»), sus filas reservadas o los clientes que gestionó. El administrador ve todo.
 - El modelo completo de pestañas auxiliares está en `crm/estructura/modelo-datos.md`.
 
 ## Complemento de Excel (`crm/complemento/`)

@@ -19,7 +19,7 @@ Si TI registra más adelante la app de Microsoft Graph, estas mismas pestañas s
 | Intentos | Número de intentos de contacto |
 | Compra / Monto | SI y monto en soles |
 | Próximo contacto | Fecha para «Volver a llamar» |
-| Tipo de negocio | Tienda · Oficina · Híbrido (vacío = sin definir) |
+| Tipo de negocio | Reseller tienda virtual · Reseller tienda física · Oficina (B2B) · Híbrido (vacío = sin definir) |
 | Gestionado por | Ejecutivo que atiende al cliente |
 | Primera gestión / Última gestión / Último contacto | Fecha y hora |
 | Depurado | Fecha en que se marcó como depurado |
@@ -62,6 +62,9 @@ OV · Customer ID · Fecha OV · Marca · Monto sin IGV · Ejecutivo. La línea 
 ### `_Historial`: un movimiento por fila (solo se agrega, nunca se edita)
 Customer ID · Fecha y hora · Usuario · Acción (resultado, comentario, marca, tipo, número corregido…) · Detalle.
 
+### `_Reparto`: cartera asignada por el administrador
+Customer ID · Ejecutivo · Asignado por · Fecha. Una fila por cliente. Con reparto, cada ejecutivo ve solo sus clientes.
+
 ### `_Telefonos`: números corregidos
 Customer ID · Teléfono original · Teléfono corregido · Corregido por · Fecha. La columna `Cust. Telephone` de la cartera conserva el original.
 
@@ -69,6 +72,9 @@ Customer ID · Teléfono original · Teléfono corregido · Corregido por · Fec
 - `_Usuarios`: nombre, rol (admin / ejecutivo), activo, «Nombre en cartera» (cómo aparece en la columna `Ejecutivo`; se compara sin mayúsculas ni acentos y admite varios separados por `;`), PIN cifrado (SHA-256 con sal), si debe cambiar el PIN temporal, intentos fallidos y bloqueo temporal.
 - `_Asignaciones`: rangos de filas reservados por ejecutivo (las liberadas quedan con estado «Liberada», no se borran).
 - `_Config`: ajustes del equipo (meta diaria, meta mensual de venta, intentos para purga, visibilidad, WhatsApp…) y el contador `seq`, que sube con cada cambio para que los demás paneles sepan que deben recargar.
+
+## Pestaña visible `Seguimiento` (reporte del administrador)
+La crea o actualiza el administrador desde Reportes, nunca sola. Una fila por fecha y ejecutivo: Clientes gestionados · **Clientes efectivos** (marcados «Contestó» ese día que tienen tipo de negocio o al menos una marca) · Contestó sin tipo ni marca · No contesta · Volver a llamar · Número errado · No interesado · Revisados · Comentarios · Intentos de contacto · Números corregidos · Marcas registradas · Tipos de negocio registrados · OV registradas · Venta sin IGV · % efectividad. Debajo, los totales del período por ejecutivo. Se rehace completa cada vez desde `_Historial` y `_Ordenes`.
 
 ## Quién ve qué
 

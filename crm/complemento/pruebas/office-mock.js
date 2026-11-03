@@ -38,6 +38,7 @@ function range(ws, r0, c0, nr, nc, ctx) {
     numberFormat: { set(f) { alive(ctx); f.forEach((row, i) => row.forEach((x, j) => { (ws.formats[r0 + i] = ws.formats[r0 + i] || [])[c0 + j] = x; })); } }
   });
   o.select = () => { alive(ctx); book.selection = { sheet: ws.name, row: r0, col: c0 }; };
+  o.format = { font: {}, fill: {}, autofitColumns() { alive(ctx); } };
   return o;
 }
 function used(ws, ctx) {
@@ -55,6 +56,7 @@ function api(ws, ctx) {
     load() { return this; },
     getUsedRangeOrNullObject() { alive(ctx); return used(ws, ctx); },
     getRangeByIndexes(r, c, nr, nc) { alive(ctx); return range(ws, r, c, nr, nc, ctx); },
+    freezePanes: { freezeRows() { alive(ctx); } },
     activate() { alive(ctx); book.active = ws.name; }
   };
 }

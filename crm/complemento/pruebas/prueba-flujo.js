@@ -30,7 +30,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   page.on('dialog', d => d.accept());
   /* trozos chicos para que el puente de la ventana pruebe el armado de mensajes grandes */
   /* código de recuperación solo para la prueba (PRUEBA-PRUEBA-2345); el real nunca está en el repositorio */
-  await context.addInitScript(seed => { window.__seed = seed; window.GC_CHUNK = 2000; window.__gcRecoveryTest = ['fb455aa8291966a9e722399227c33ba659f454f4092eec78007caff8fef083a8']; }, SEED);
+  await context.addInitScript(seed => { window.__seed = seed; window.GC_CHUNK = 2000; /* la prueba trabaja con todas las columnas a la vista; las de por defecto se comprueban al final */ if (!localStorage.getItem('gcp:ui')) localStorage.setItem('gcp:ui', JSON.stringify({ colsV2: 1, hidden: [] })); window.__gcRecoveryTest = ['fb455aa8291966a9e722399227c33ba659f454f4092eec78007caff8fef083a8']; }, SEED);
   await context.route('**/*', route => {
     const u = new URL(route.request().url());
     if (u.hostname === 'appsforoffice.microsoft.com') return route.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(path.join(__dirname, 'office-mock.js'), 'utf8') });
@@ -52,7 +52,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.click('#suBtn');
   await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana');
   const vis = await page.evaluate(() => window.__book.raw.sheets.map(s => s.name + ':' + s.visibility));
-  ok(vis.filter(x => x.startsWith('_')).length === 10 && vis.filter(x => x.startsWith('_')).every(x => x.endsWith(':VeryHidden')), '10 pestañas internas creadas como VeryHidden');
+  ok(vis.filter(x => x.startsWith('_')).length === 11 && vis.filter(x => x.startsWith('_')).every(x => x.endsWith(':VeryHidden')), '11 pestañas internas creadas como VeryHidden');
   ok(vis.includes('Hoja1:Visible') && vis.includes('Resumen:Visible'), 'Hoja1 y hojas ajenas siguen visibles');
   ok((await aux('_Marcas')).length === 90, 'Catálogo de 89 marcas en _Marcas');
   const u0 = await aux('_Usuarios');
@@ -75,7 +75,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok((await page.$$('#gbody .row')).length === 12, 'El administrador ve los 12 clientes');
   await page.click('#gbody .row[data-i="2"]');
   await page.waitForFunction(() => document.querySelector('#panel h2').textContent.includes('Kallpa'));
-  ok((await page.textContent('#panel')).includes('Sugerido: Tienda'), 'Tipo de negocio sugerido por palabras clave');
+  ok((await page.textContent('#panel')).includes('Sugerido: Reseller tienda física'), 'Tipo de negocio sugerido por palabras clave');
   await shot('02-lista-panel');
 
   /* 4. comentario: se agrega sin borrar el anterior */
@@ -108,10 +108,10 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
 
   /* 5. resultado, tipo y marca */
   await page.click('[data-act="res"][data-n="Contestó"]'); await page.waitForTimeout(150);
-  await page.click('[data-act="tipo"][data-n="Tienda"]'); await page.waitForTimeout(150);
+  await page.click('[data-act="tipo"][data-n="Reseller tienda física"]'); await page.waitForTimeout(150);
   await page.fill('#pBrand', 'HP'); await page.press('#pBrand', 'Enter'); await page.waitForTimeout(200);
   const seg = await aux('_Seguimiento'), cm = await aux('_ClienteMarcas');
-  ok(seg.some(r => r[0] === '100103' && r[2] === 'Contestó' && r[6] === 'Tienda' && r[7] === 'Ana'), '_Seguimiento guarda resultado, tipo y gestor por Customer ID');
+  ok(seg.some(r => r[0] === '100103' && r[2] === 'Contestó' && r[6] === 'Reseller tienda física' && r[7] === 'Ana'), '_Seguimiento guarda resultado, tipo y gestor por Customer ID');
   ok(cm.some(r => r[0] === '100103' && r[1] === 'HP' && r[2] === 'habitual'), '_ClienteMarcas guarda la marca con su relación');
 
   /* 5b. WhatsApp: la primera vez pregunta web o aplicación y luego recuerda la elección */
@@ -193,11 +193,18 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.click('[data-act="phsave"]'); await page.waitForTimeout(200);
   ok((await aux('_Telefonos')).some(r => r[0] === '100106' && r[2] === '912 345 678'), 'Teléfono corregido en _Telefonos, el original se conserva');
 
-  /* 8. reserva de filas para Harold */
-  await page.click('#bResv'); await page.waitForTimeout(120);
-  await page.fill('#rvFrom', '11'); await page.fill('#rvTo', '13'); await page.selectOption('#rvUser', 'Harold');
-  await page.click('#bDoResv'); await page.waitForTimeout(300);
-  ok((await aux('_Asignaciones')).some(r => r[1] === 'Harold' && r[2] === '11' && r[3] === '13'), 'Reserva guardada en _Asignaciones');
+  /* 8. el administrador reparte la cartera: por filas (como al imprimir) y alternado */
+  await page.click('#bResv'); await page.waitForTimeout(150);
+  await page.fill('#rpSpec', '2-4, 10 - 13'); await page.selectOption('#rpUser', 'Harold'); await page.waitForTimeout(100);
+  ok(/Se asignarán 7 clientes a Harold/.test(await page.textContent('#rpPrev')), 'La vista previa del reparto cuenta las filas «2-4, 10 - 13»');
+  await page.click('#bDoResv'); await page.waitForTimeout(400);
+  const rep = await aux('_Reparto');
+  ok(rep.filter(r => r[1] === 'Harold').length === 7 && rep.some(r => r[0] === '100109' && r[1] === 'Harold'), 'Reparto guardado por Customer ID en _Reparto');
+  await page.click('#rpMode [data-m="alt"]');
+  await page.fill('#rpFrom', '5'); await page.fill('#rpTo', '8'); await page.fill('#rpBlock', '1'); await page.waitForTimeout(100);
+  ok(/Harold 4/.test(await page.textContent('#rpPrev')), 'El reparto alternado muestra cuántos le tocan a cada uno');
+  await page.click('#rpMode [data-m="rows"]');
+  ok(/Harold.*7 clientes/s.test(await page.textContent('#rvList')) && /2–4, 10–13/.test(await page.textContent('#rvList')), 'El reparto actual muestra clientes y filas por ejecutivo');
   if (await page.$('#mResv.on')) await page.click('#mResv [data-close]');
 
   /* 9. dashboard y reporte en libro nuevo */
@@ -212,6 +219,41 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok(XLSX_JS ? created === 1 : true, 'Reporte creado como libro nuevo (Excel.createWorkbook)' + (XLSX_JS ? '' : ' · omitido, falta SheetJS'));
   ok((await page.evaluate(() => window.__book.raw.sheets.length)) === before, 'La cartera no recibe hojas nuevas');
   await shot('04-reportes');
+
+  /* 9b. reporte de seguimiento: pestaña visible «Seguimiento», solo cuando el administrador la pide */
+  ok(!(await page.evaluate(() => window.__book.sheet('Seguimiento'))), 'La pestaña Seguimiento no se crea sola');
+  await page.click('#rFollow'); await page.waitForTimeout(500);
+  const fsh = await aux('Seguimiento'), fsVis = await page.evaluate(() => window.__book.sheet('Seguimiento').visibility);
+  const hoy = await page.evaluate(() => { const d = new Date(), p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); });
+  const fa = fsh && fsh.find(r => r[0] === hoy && r[1] === 'Ana');
+  ok(fsVis === 'Visible' && fsh[0][0] === 'Fecha' && fsh[0][3] === 'Clientes efectivos', 'El administrador crea la pestaña visible «Seguimiento» con sus columnas');
+  ok(fa && +fa[2] === 4 && +fa[3] === 1 && +fa[15] === 1 && +fa[16] === 3800, `Una fila por fecha y ejecutivo: gestionados, efectivos, OV y venta [${fa ? fa.slice(0, 4).concat(fa.slice(15, 17)).join(' · ') : 'sin fila'}]`);
+  ok(fsh.some(r => r[0] === 'Total' && r[1] === 'Ana'), 'Incluye los totales del período por ejecutivo');
+  const h1b = await aux('Hoja1');
+  ok(h1b.length === cartera.length && h1b[0].join('|') === COLS.join('|'), 'La hoja de clientes no cambia al crear el reporte');
+
+  /* 9c. estadísticas */
+  await page.click('#mainTabs [data-tab="stats"]'); await page.waitForTimeout(700);
+  const st = await page.textContent('#vStats');
+  ok(/Embudo de gestión/.test(st) && /Clientes efectivos/.test(st) && /Tipo de negocio/.test(st) && /Por departamento/.test(st) && /Cómo atacar/.test(st), 'La pestaña Estadísticas muestra embudo, resultados, tipo, marcas, zonas y cómo atacar');
+  await shot('14-estadisticas');
+  await page.selectOption('#stTipo', 'Reseller tienda física'); await page.waitForTimeout(300);
+  ok((await page.getAttribute('#vStats .kpis .kpi .v', 'data-count')) === '1', 'Los filtros de Estadísticas recalculan todo (tipo de negocio)');
+  await page.click('#stClear'); await page.waitForTimeout(200);
+
+  /* 9d. copiar el contacto ya no marca «Revisado» solo */
+  await page.click('#mainTabs [data-tab="list"]'); await page.waitForTimeout(200);
+  await page.click('#gbody .row[data-i="10"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(500);
+  await page.click('#panel [data-act="contact"]'); await page.waitForTimeout(400);
+  ok(!(await aux('_Seguimiento')).some(r => r[0] === '100111' && r[1] === 'SI'), 'Copiar el contacto ya no marca «Revisado» de forma automática');
+
+  /* 9e. cliente efectivo y tipos nuevos */
+  await page.click('#gbody .row[data-i="2"]', { position: { x: 20, y: 20 } }); await page.waitForTimeout(500);
+  ok(/Efectivo/.test(await page.textContent('#pBadges')), '«Contestó» con tipo o marca muestra «Efectivo»');
+  await page.evaluate(() => { const c = window.__book.sheet('_Config'); c.cells = c.cells.filter(x => !(x && x[0] === 'tiposV2')); const sg = window.__book.sheet('_Seguimiento'); sg.cells.forEach((x, i) => { if (i && x && x[0] === '100105') x[6] = 'Tienda'; }); return Excel.run(async () => {}); });
+  await page.reload(); await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Ana'); await page.waitForTimeout(300);
+  const sg2 = await aux('_Seguimiento'), cfg2 = await aux('_Config');
+  ok(sg2.slice(1).every(r => !r[6]) && cfg2.some(r => r[0] === 'tiposV2' && r[1] === 'SI'), 'Los tipos de negocio anteriores se dejan sin tipo una sola vez');
 
   /* 10. selección en la hoja → abre el cliente */
   await page.click('#mainTabs [data-tab="list"]');
@@ -324,7 +366,7 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Harold');
   await page.click('#mainTabs [data-tab="list"]');
   const n = (await page.$$('#gbody .row')).length;
-  ok(n === 7, `Harold ve solo su cartera: Ejecutivo + filas reservadas (${n} de 12)`);
+  ok(n === 7, `Harold ve solo los clientes que le asignó el administrador (${n} de 12)`);
   ok((await aux('_Usuarios')).some(r => r[0] === 'Harold' && r[5] === 'NO'), 'El PIN temporal quedó reemplazado');
 
   /* 11b. si Excel recarga el panel, la pantalla vuelve al instante desde la copia local */
@@ -347,6 +389,19 @@ const ok = (cond, msg) => { console.log((cond ? 'OK    ' : 'FALLA ') + msg); if 
   ok(diff.length === 0 && fin.length === cartera.length && fin.every(r => r.length <= 18), 'Hoja1 intacta salvo la columna «Comentario Créditos»');
   const fmt = await page.evaluate(() => window.__book.sheet('Hoja1').formats.length);
   ok(fmt === 0, 'Sin cambios de formato en Hoja1');
+
+  /* 12b. columnas de la lista: por defecto las seis pedidas; se ensanchan arrastrando el título */
+  await page.evaluate(() => { const u = JSON.parse(localStorage.getItem('gcp:ui')); delete u.colsV2; u.colW = {}; localStorage.setItem('gcp:ui', JSON.stringify(u)); });
+  await page.reload(); await page.waitForFunction(() => document.querySelector('#meName').textContent === 'Harold');
+  await page.click('#mainTabs [data-tab="list"]'); await page.waitForTimeout(300);
+  const heads = await page.$$eval('#ghead .c', l => l.map(x => x.textContent.trim()));
+  ok(JSON.stringify(heads) === JSON.stringify(['Fila', 'Customer ID', 'Legal Name', 'Tax Reg No', 'State Name', 'City Name']), 'Por defecto la lista muestra fila, Customer ID, Legal Name, Tax Reg No, State Name y City Name' + (heads.length !== 6 ? ' [' + heads.join(', ') + ']' : ''));
+  const lg = await page.$('#ghead .c:nth-child(3) .rz'), bx = await lg.boundingBox(), w0 = (await (await page.$('#ghead .c:nth-child(3)')).boundingBox()).width;
+  await page.mouse.move(bx.x + 3, bx.y + 10); await page.mouse.down(); await page.mouse.move(bx.x + 83, bx.y + 10, { steps: 4 }); await page.mouse.up(); await page.waitForTimeout(200);
+  const w1 = (await (await page.$('#ghead .c:nth-child(3)')).boundingBox()).width, saved = await page.evaluate(() => JSON.parse(localStorage.getItem('gcp:ui')).colW || {});
+  ok(w1 >= w0 + 70 && saved.legal >= w0 + 70, `Arrastrar el borde del título ensancha la columna y se recuerda (${Math.round(w0)} → ${Math.round(w1)} px)`);
+  await page.click('#bCfg'); await page.check('#cCols input[data-col="_gest"]'); await page.click('#bCfgOk'); await page.waitForTimeout(250);
+  ok((await page.$$eval('#ghead .c', l => l.map(x => x.textContent.trim()))).includes('Gestión'), 'En Ajustes se elige qué columnas ver');
 
   /* 13. panel angosto de Excel */
   await page.setViewportSize({ width: 420, height: 820 }); await page.waitForTimeout(300);

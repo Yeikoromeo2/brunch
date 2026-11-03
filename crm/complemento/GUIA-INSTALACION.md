@@ -48,6 +48,14 @@ Si «Cargar mi complemento» no aparece, la organización lo tiene bloqueado y s
 4. Cinco PIN incorrectos seguidos bloquean al usuario durante 5 minutos. Si alguien olvida su PIN, el administrador le asigna uno temporal nuevo.
 5. **Si un administrador olvida su PIN:** otro administrador le asigna uno temporal. Si no hay otro, en la pantalla de ingreso pulsa **¿Olvidaste tu PIN? (administrador)** y usa el **código de recuperación** que te entregaron (sirve una sola vez por libro; cinco intentos fallidos bloquean 15 minutos). En el código publicado solo está la versión cifrada del código, nunca el código. Conviene tener siempre **dos administradores**.
 
+## Reparto, reporte de seguimiento y estadísticas
+
+- **Repartir cartera** (solo administrador, botón arriba): asigna clientes por filas, como al imprimir (`2-500, 650, 700-900`), o **alternados** entre varios ejecutivos de a N filas por turno. Se guarda por Customer ID en la pestaña interna `_Reparto`. Desde que hay reparto, cada ejecutivo ve y trabaja solo lo suyo.
+- **Reporte de seguimiento** (Reportes → solo administrador): crea o actualiza la pestaña visible **Seguimiento** en este Excel, con una fila por fecha y ejecutivo: gestionados, **clientes efectivos**, resultados, comentarios, intentos, números corregidos, marcas, tipos, OV y venta, y los totales del período. Solo aparece cuando lo pulsas.
+- **Cliente efectivo:** marcado «Contestó» y con tipo de negocio o al menos una marca.
+- **Estadísticas** (pestaña nueva): embudo, resultados, tipo de negocio, marcas, líneas, departamentos, efectivos por día, efectividad por ejecutivo y grupos de «cómo atacar», con filtros de período, ejecutivo, tipo, línea y departamento.
+- **Lista:** por defecto muestra fila, Customer ID, Legal Name, Tax Reg No, State Name y City Name. En Ajustes eliges otras columnas (también Gestión y Comentario) y cada columna se ensancha arrastrando el borde de su título.
+
 ## Mi día y borradores
 
 - **Mi día** muestra solo tus pendientes: los clientes cuya última gestión hiciste tú y que quedaron en **Volver a llamar** (primero los vencidos y los de hoy) o **Revisados sin comentario**. Lo de tus compañeros no se mezcla. En la lista, el chip **Mis pendientes** filtra lo mismo.

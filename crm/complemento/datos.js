@@ -13,7 +13,7 @@ const KEYS = ['org', 'kam', 'exec', 'id', 'legal', 'tax', 'addr', 'state', 'city
 const C = Object.fromEntries(KEYS.map((k, i) => [k, i]));
 
 /* ---------- pestañas internas ---------- */
-const SH = { cfg: '_Config', users: '_Usuarios', asg: '_Asignaciones', seg: '_Seguimiento', cm: '_ClienteMarcas', mar: '_Marcas', ord: '_Ordenes', ven: '_Ventas', his: '_Historial', tel: '_Telefonos' };
+const SH = { cfg: '_Config', users: '_Usuarios', asg: '_Asignaciones', seg: '_Seguimiento', cm: '_ClienteMarcas', mar: '_Marcas', ord: '_Ordenes', ven: '_Ventas', his: '_Historial', tel: '_Telefonos', rep: '_Reparto' };
 const HDR = {
   cfg: ['Clave', 'Valor'],
   users: ['Nombre', 'Rol', 'Activo', 'PinHash', 'Salt', 'CambiarPin', 'Intentos', 'BloqueadoHasta', 'Nombre en cartera'],
@@ -24,13 +24,15 @@ const HDR = {
   ord: ['OV', 'Customer ID', 'Fecha OV', 'Total sin IGV', 'Estado', 'Ejecutivo', 'Fecha terminado', 'Terminado por', 'Nota'],
   ven: ['OV', 'Customer ID', 'Fecha OV', 'Marca', 'Monto sin IGV', 'Ejecutivo'],
   his: ['Customer ID', 'Fecha', 'Usuario', 'Acción', 'Icono'],
-  tel: ['Customer ID', 'Teléfono original', 'Teléfono corregido', 'Corregido por', 'Fecha']
+  tel: ['Customer ID', 'Teléfono original', 'Teléfono corregido', 'Corregido por', 'Fecha'],
+  rep: ['Customer ID', 'Ejecutivo', 'Asignado por', 'Fecha']
 };
 const S_ = Object.fromEntries(HDR.seg.map((h, i) => [h, i]));
 const CATALOGO = {"Cómputo": ["ASUS", "Dell", "HP", "Lenovo", "MSI", "Huawei"], "Gaming": ["ROG", "HyperX", "Razer", "Primus Gaming"], "Componentes": ["AMD", "Intel", "Gigabyte"], "Almacenamiento y memoria": ["A-Data", "Kingston", "PNY", "SanDisk", "Seagate", "Western Digital", "QNAP"], "Servidores y centro de datos": ["HPE", "Dell EMC"], "Redes y conectividad": ["Ubiquiti", "TP-Link", "Meraki", "Ruckus", "Nexxt Solutions Home", "Nexxt Solutions Infrastructure", "Furukawa", "Starlink", "Riverbed"], "Energía": ["APC", "Salicru", "Forza"], "Seguridad electrónica": ["Hikvision", "EZVIZ", "Hanwha", "Axis", "VideoIQ", "Honeywell", "Firelite"], "Hogar inteligente": ["Ring", "Eufy", "Philips Hue", "Wiz"], "Punto de venta y código de barras": ["Zebra", "Newland", "Unitech", "Logic Controls", "Elo", "Custom"], "Impresión": ["Epson", "Xerox"], "Colaboración y videoconferencia": ["Jabra", "Poly", "Logitech", "Screenbeam", "Promethean"], "Audio profesional": ["AKG", "JBL Pro", "Crown", "Soundcraft"], "Audio de consumo": ["JBL", "Harman Kardon", "Soundcore"], "Pantallas y monitores": ["LG", "Viewsonic", "Philips", "Haier"], "Accesorios y periféricos": ["Anker", "Belkin", "Gear4", "Zagg", "Klip Xtreme", "Xtech", "StarTech.com", "Wacom"], "Móviles y wearables": ["Motorola", "Realme", "Oura"], "Software y ciberseguridad": ["Microsoft", "Bitdefender", "ESET", "McAfee", "BitTitan"], "Por definir": ["ELISE", "Folksafe", "Cyrus", "Nebula"]};
 const CFG_DEF = { cc: '51', mobLen: 9, lockRow: true, scopeOwn: true, minInt: 2, poll: 20, goal: 40, salesGoal: 0, waMode: 'web', waMsg: '', mailMode: 'outlook', mailSubj: '' };
 const NUM_CFG = ['mobLen', 'minInt', 'poll', 'goal', 'salesGoal'], BOOL_CFG = ['lockRow', 'scopeOwn'];
 const ESTADOS = ['Despachando', 'Incidencia', 'Terminado', 'Anulada'];
+const TIPOS = ['Reseller tienda virtual', 'Reseller tienda física', 'Oficina (B2B)', 'Híbrido'];
 /* recuperación de PIN de administrador: aquí solo va el SHA-256 de cada código (el código se entrega
    aparte, nunca se publica). Cada código sirve una vez por libro: al usarlo queda anotado en _Config. */
 const RECOVERY = ['3b620d1bc57af6b04eb0cb3da7826f5cfb62b3d7aba63c87a75e107a0eaf2a21', ...((typeof window !== 'undefined' && window.__gcRecoveryTest) || [])];
@@ -137,6 +139,27 @@ async function bumpSeq(ctx) {
   if (before === KNOWN) KNOWN = num(a[1]);
   if (DB) DB.seq = num(a[1]);
 }
+/* tipos de negocio nuevos (reseller virtual / física, oficina B2B, híbrido): una sola vez por libro se dejan
+   sin tipo los clientes que tenían los tipos anteriores, como se decidió; luego se marcan de nuevo */
+async function migrateTipos(ctx) {
+  const ws = await sheet(ctx, SH.cfg); if (!ws) return;
+  if ((await findRow(ctx, 'cfg', r => str(r[0]) === 'tiposV2')).cur) return;
+  const seg = await sheet(ctx, SH.seg), kc = await keyCols(ctx, seg);
+  if (kc.n > 1) { const rg = seg.getRangeByIndexes(1, S_['Tipo de negocio'], kc.n - 1, 1); rg.numberFormat = Array.from({ length: kc.n - 1 }, () => ['@']); rg.values = Array.from({ length: kc.n - 1 }, () => ['']); await ctx.sync(); }
+  await upsert(ctx, 'cfg', r => str(r[0]) === 'tiposV2', () => ['tiposV2', 'SI']);
+  if (DB) { Object.values(DB.track).forEach(t => { t.tipo = ''; }); DB.seq = -1; }
+}
+/* «2-500, 650, 700 - 900» → [2..500, 650, 700..900] (como las páginas al imprimir) */
+function parseRows(spec) {
+  const out = new Set();
+  str(spec).replace(/\s*[-–]\s*/g, '-').split(/[,;\s]+/).map(x => x.trim()).filter(Boolean).forEach(part => {
+    const m = part.match(/^(\d+)-(\d+)$/), one = part.match(/^\d+$/);
+    if (m) { let a = +m[1], b = +m[2]; if (a > b) [a, b] = [b, a]; if (b - a > 200000) err('Rango demasiado grande: ' + part); for (let i = a; i <= b; i++) out.add(i); }
+    else if (one) out.add(+part);
+    else err('No entiendo «' + part + '». Usa números y rangos, por ejemplo: 2-500, 650.');
+  });
+  return [...out].filter(x => x >= 2).sort((a, b) => a - b);
+}
 /* el libro en memoria sigue al día si existe y el seq del libro no cambió */
 const fresh = async ctx => !!(DB && DB.users.length) && (await readSeq(ctx)) === DB.seq;
 const readSeq = async ctx => { const f = await findRow(ctx, 'cfg', r => str(r[0]) === 'seq'); return f.cur ? num(f.cur[1]) : 0; };
@@ -219,7 +242,9 @@ async function loadDB(ctx) {
   const orders = R.ord.filter(a => str(a[0])).map(ordObj);
   const sales = R.ven.filter(a => str(a[0])).map(venObj);
   orders.forEach(o => { if (o.est === 'Anulada') return; const t = T(o.k); t.buy = true; t.monto = String(num(t.monto) + o.tot); });
-  DB = { cart, cfg, seq, users, assigns, brands, track, orders, sales, setup: R.users.length > 0, at: Date.now() };
+  /* reparto de cartera del administrador: cada cliente (por Customer ID) asignado a un ejecutivo */
+  const repart = {}; R.rep.forEach(a => { const k = str(a[0]), u = str(a[1]).trim(); if (k && u) repart[k] = { user: u, by: str(a[2]), d: str(a[3]) }; });
+  DB = { cart, cfg, seq, users, assigns, brands, track, orders, sales, repart, setup: R.users.length > 0, at: Date.now() };
   return DB;
 }
 const ensureDB = async () => DB || run(ctx => loadDB(ctx));
@@ -236,7 +261,11 @@ const resvFor = n => DB.assigns.find(a => n >= a.from && n <= a.to);
    usuario o el «Nombre en cartera» que el administrador le vinculó (se aceptan varios separados por ;) */
 const execNames = u => [u.name, ...str(u.alias).split(';')].map(norm).filter(Boolean);
 const execMatch = (u, row) => { const e = norm(row.v[C.exec]); return !!e && execNames(u).includes(e); };
-const inScope = (u, row) => isAdm(u) || !DB.cfg.scopeOwn || execMatch(u, row) || (DB.track[row.k] || {}).own === u.name || (resvFor(row.r) || {}).user === u.name;
+/* si el administrador ya repartió la cartera, cada ejecutivo ve solo lo que le asignó; si aún no reparte
+   nada, se usan las reglas anteriores (columna Ejecutivo, filas reservadas o gestionados por él) */
+const hasRepart = () => Object.keys(DB.repart || {}).length > 0;
+const inScope = (u, row) => isAdm(u) || (hasRepart() ? (DB.repart[row.k] || {}).user === u.name
+  : (!DB.cfg.scopeOwn || execMatch(u, row) || (DB.track[row.k] || {}).own === u.name || (resvFor(row.r) || {}).user === u.name));
 const stateOf = row => ({ k: row.k, r: row.r, v: row.v.slice(), t: JSON.parse(JSON.stringify(DB.track[row.k] || { brands: [], bmeta: {}, hist: [] })) });
 const rowOf = k => DB.cart.rows.find(r => r.k === k);
 function segArr(k, t) {
@@ -284,7 +313,7 @@ const API = {
       }
       await ctx.sync();
       cartWs(ctx).activate();
-      await appendRows(ctx, 'cfg', [...Object.entries(CFG_DEF).map(([k, v]) => [k, typeof v === 'boolean' ? (v ? 'SI' : 'NO') : String(v)]), ['seq', '1']]);
+      await appendRows(ctx, 'cfg', [...Object.entries(CFG_DEF).map(([k, v]) => [k, typeof v === 'boolean' ? (v ? 'SI' : 'NO') : String(v)]), ['seq', '1'], ['tiposV2', 'SI']]);
       await appendRows(ctx, 'mar', Object.entries(CATALOGO).flatMap(([c, l]) => l.map(m => [m, c, 'SI'])));
       const salt = randId();
       await appendRows(ctx, 'users', [[name, 'admin', 'SI', await sha(salt + ':' + pin), salt, 'NO', '0', '0']]);
@@ -345,6 +374,7 @@ const API = {
 
   async api_load(tk, opt, have) {
     return run(async ctx => {
+      await migrateTipos(ctx);
       /* opt 'reuse': al arrancar (api_status acaba de leer) o al abrir la ventana grande se usa lo que el panel
          ya tiene en memoria si nadie escribió desde entonces. Si la pantalla ya tiene ese mismo seq (copia
          local al día), solo se le confirma sin enviarle todo otra vez. «Recargar» siempre lee todo. */
@@ -356,7 +386,7 @@ const API = {
       vis.forEach(r => { if (DB.track[r.k]) track[r.k] = DB.track[r.k]; });
       return { me: { name: u.name, role: u.role }, cfg: DB.cfg, scoped: vis.length < DB.cart.rows.length, total: DB.cart.rows.length, header: COLS, C, assigns: DB.assigns,
         users: DB.users.filter(x => x.active).map(x => x.name), seq: DB.seq, lastRow: DB.cart.rows.length + 1, today: TODAY(), sheet: DB.cart.name,
-        rows: vis.map(r => [r.k, r.r, r.v]), track, brands: DB.brands, orders: DB.orders.filter(o => ks.has(o.k)), sales: DB.sales.filter(x => ks.has(x.k)), warnings: [] };
+        rows: vis.map(r => [r.k, r.r, r.v]), track, asg: Object.fromEntries(vis.filter(r => DB.repart[r.k]).map(r => [r.k, DB.repart[r.k].user])), brands: DB.brands, orders: DB.orders.filter(o => ks.has(o.k)), sales: DB.sales.filter(x => ks.has(x.k)), warnings: [] };
     });
   },
   /* sincronización: si solo hubo cambios propios no se lee nada más; si otra persona cambió algo,
@@ -417,8 +447,8 @@ const API = {
           H.push([p.val ? 'Resultado: ' + p.val : 'Quitó el resultado', ICON[p.val] || 'x']); break;
         case 'next': t.next = str(p.val); H.push(['Reagendó para ' + (p.val || '—'), 'cal']); break;
         case 'motivo': t.motivo = str(p.val); H.push(['Motivo: ' + (p.val || '—'), 'ban']); break;
-        case 'tipo': t.tipo = str(p.val); H.push(['Tipo de negocio: ' + (p.val || 'sin definir'), 'store']); break;
-        case 'contact': t.int = (t.int || 0) + 1; t.lastc = now; t.rev = true; H.push([p.val ? 'Contactó por ' + p.val : 'Contactó', /WhatsApp/.test(p.val) ? 'wa' : /Correo/.test(p.val) ? 'mail' : 'phone']); break;
+        case 'tipo': if (p.val && !TIPOS.includes(str(p.val))) err('Tipo de negocio no válido.'); t.tipo = str(p.val); H.push(['Tipo de negocio: ' + (p.val || 'sin definir'), 'store']); break;
+        case 'contact': t.int = (t.int || 0) + 1; t.lastc = now; H.push([p.val ? 'Contactó por ' + p.val : 'Contactó', /WhatsApp/.test(p.val) ? 'wa' : /Correo/.test(p.val) ? 'mail' : 'phone']); break;
         case 'fixphone':
           await appendRows(ctx, 'tel', [[row.k, t.fix || row.v[C.phone], p.val, u.name, now]]);
           H.push(['Corrigió el número: ' + (t.fix || row.v[C.phone]) + ' → ' + p.val, 'pencil']); t.fix = str(p.val); if (t.res === 'Número errado') t.res = ''; break;
@@ -520,6 +550,66 @@ const API = {
       return { state: stateOf(row), orders: os, sales: vs };
     });
   },
+  /* reporte de seguimiento (solo administrador, solo cuando lo pide): pestaña visible «Seguimiento» en este
+     libro, con una fila por fecha y ejecutivo. Es la única hoja visible que crea el sistema; la cartera no se
+     toca. Se rehace completa cada vez desde _Historial y _Ordenes. Cliente efectivo: el ejecutivo marcó
+     «Contestó» ese día y el cliente tiene tipo de negocio o al menos una marca. */
+  async api_followSheet(tk, p) {
+    const u = who(tk); if (!isAdm(u)) err('Solo el administrador crea el reporte de seguimiento.');
+    p = p || {};
+    const from = /^\d{4}-\d{2}-\d{2}$/.test(p.from || '') ? p.from : '', to = /^\d{4}-\d{2}-\d{2}$/.test(p.to || '') ? p.to : '';
+    return run(async ctx => {
+      await loadDB(ctx);
+      const hs = await sheet(ctx, SH.his), his = hs ? (await readAll(ctx, hs)).slice(1) : [];
+      const efectivo = k => { const t = DB.track[k]; return !!t && t.res === 'Contestó' && (!!t.tipo || (t.brands || []).length > 0); };
+      const G = {}, key = (d, w) => d + '|' + w;
+      const g = (d, w) => G[key(d, w)] || (G[key(d, w)] = { d, w, cli: new Set(), ok: new Set(), okNo: new Set(), noc: new Set(), call: new Set(), wrong: new Set(), noint: new Set(), rev: new Set(), cm: 0, ct: 0, tel: 0, br: 0, tp: 0, ov: 0, m: 0 });
+      const inRange = d => (!from || d >= from) && (!to || d <= to);
+      his.forEach(a => {
+        const k = str(a[0]), d = str(a[1]).slice(0, 10), w = str(a[2]), txt = str(a[3]), ic = str(a[4]);
+        if (!k || !w || !/^\d{4}-\d{2}-\d{2}$/.test(d) || !inRange(d)) return;
+        const x = g(d, w); x.cli.add(k);
+        if (txt === 'Resultado: Contestó') (efectivo(k) ? x.ok : x.okNo).add(k);
+        else if (txt === 'Resultado: No contesta') x.noc.add(k);
+        else if (txt === 'Resultado: Volver a llamar') x.call.add(k);
+        else if (txt === 'Resultado: Número errado') x.wrong.add(k);
+        else if (txt === 'Resultado: No interesado') x.noint.add(k);
+        else if (txt === 'Marcó revisado') x.rev.add(k);
+        else if (ic === 'msg') x.cm++;
+        else if (/^Contactó/.test(txt)) x.ct++;
+        else if (/^Corrigió el número/.test(txt)) x.tel++;
+        else if (/^(Agregó la marca|Actualizó )/.test(txt)) x.br++;
+        else if (/^Tipo de negocio: /.test(txt) && !/sin definir$/.test(txt)) x.tp++;
+      });
+      DB.orders.forEach(o => { if (o.est === 'Anulada' || !o.by || !inRange(o.d)) return; const x = g(o.d, o.by); x.ov++; x.m += o.tot; });
+      const HEAD = ['Fecha', 'Ejecutivo', 'Clientes gestionados', 'Clientes efectivos', 'Contestó sin tipo ni marca', 'No contesta', 'Volver a llamar', 'Número errado', 'No interesado', 'Revisados', 'Comentarios', 'Intentos de contacto', 'Números corregidos', 'Marcas registradas', 'Tipos de negocio registrados', 'OV registradas', 'Venta sin IGV (S/)', '% efectividad'];
+      const line = x => [x.d, x.w, x.cli.size, x.ok.size, x.okNo.size, x.noc.size, x.call.size, x.wrong.size, x.noint.size, x.rev.size, x.cm, x.ct, x.tel, x.br, x.tp, x.ov, Math.round(x.m * 100) / 100, x.cli.size ? Math.round(x.ok.size / x.cli.size * 1000) / 10 : 0];
+      const list = Object.values(G).sort((a, b) => b.d.localeCompare(a.d) || a.w.localeCompare(b.w));
+      /* totales por ejecutivo en el período */
+      const T = {}; list.forEach(x => { const t = T[x.w] || (T[x.w] = { d: 'Total', w: x.w, cli: new Set(), ok: new Set(), okNo: new Set(), noc: new Set(), call: new Set(), wrong: new Set(), noint: new Set(), rev: new Set(), cm: 0, ct: 0, tel: 0, br: 0, tp: 0, ov: 0, m: 0 });
+        ['cli', 'ok', 'okNo', 'noc', 'call', 'wrong', 'noint', 'rev'].forEach(f => x[f].forEach(k => t[f].add(k))); ['cm', 'ct', 'tel', 'br', 'tp', 'ov', 'm'].forEach(f => { t[f] += x[f]; }); });
+      const rows = [HEAD, ...list.map(line)], tot = Object.values(T).sort((a, b) => a.w.localeCompare(b.w)).map(line);
+      const info = `Generado el ${nowStr()} por ${u.name}${from || to ? ' · período ' + (from || 'inicio') + ' a ' + (to || 'hoy') : ''}. «Clientes efectivos»: marcados «Contestó» ese día que hoy tienen tipo de negocio o al menos una marca.`;
+      const out = [...rows, Array(HEAD.length).fill(''), ['Totales del período', ...Array(HEAD.length - 1).fill('')], HEAD.map((h, i) => i === 0 ? '' : h), ...tot, Array(HEAD.length).fill(''), [info, ...Array(HEAD.length - 1).fill('')]];
+      let ws = await sheet(ctx, 'Seguimiento');
+      if (!ws) ws = ctx.workbook.worksheets.add('Seguimiento');
+      const old = ws.getUsedRangeOrNullObject(true); old.load('rowIndex,rowCount,columnCount'); await ctx.sync();
+      const oldR = old.isNullObject ? 0 : old.rowIndex + old.rowCount, oldC = old.isNullObject ? 0 : old.columnCount;
+      const nR = Math.max(out.length, oldR), nC = Math.max(HEAD.length, oldC);
+      const vals = Array.from({ length: nR }, (_, i) => Array.from({ length: nC }, (_, j) => (out[i] && out[i][j] != null) ? out[i][j] : ''));
+      const rg = ws.getRangeByIndexes(0, 0, nR, nC);
+      rg.values = vals;
+      try {
+        const hd = ws.getRangeByIndexes(0, 0, 1, HEAD.length); hd.format.font.bold = true; hd.format.fill.color = '#0b7f6c'; hd.format.font.color = '#ffffff';
+        const th = ws.getRangeByIndexes(rows.length + 2, 0, 2, HEAD.length); th.format.font.bold = true;
+        ws.getRangeByIndexes(0, 0, out.length, HEAD.length).format.autofitColumns();
+        ws.freezePanes.freezeRows(1);
+      } catch (e) {}
+      ws.activate();
+      await ctx.sync();
+      return { sheet: 'Seguimiento', rows: list.length, people: Object.keys(T).length };
+    });
+  },
   async api_activity(tk) {
     who(tk);
     const days = Array.from({ length: 14 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() + i - 13); return dayStr(d); }), m = {};
@@ -576,6 +666,36 @@ const API = {
       await upsert(ctx, 'asg', r => str(r[0]) === id, cur => { const x = cur.slice(); x[6] = 'Liberada'; return x; });
       await bumpSeq(ctx); await loadDB(ctx);
       return DB.assigns;
+    });
+  },
+  /* reparto (solo administrador). mode 'rows': filas «2-500, 650» para un ejecutivo; 'alt': filas desde-hasta
+     repartidas entre varios ejecutivos de a `block` filas, en turno; 'clear': quitar la asignación.
+     Se guarda por Customer ID: si alguien ordena o filtra la hoja, cada cliente sigue con su ejecutivo. */
+  async api_assign(tk, p) {
+    const u = who(tk); if (!isAdm(u)) err('Solo el administrador reparte la cartera.');
+    return run(async ctx => {
+      await loadDB(ctx);
+      const byRow = new Map(DB.cart.rows.map(r => [r.r, r.k])), now = nowStr(), map = Object.assign({}, DB.repart);
+      const names = DB.users.filter(x => x.active && x.role !== 'admin').map(x => x.name).concat(DB.users.filter(x => x.active && x.role === 'admin').map(x => x.name));
+      let n = 0;
+      if (p.mode === 'alt') {
+        const us = (p.users || []).filter(x => names.includes(x)); if (!us.length) err('Elige al menos un ejecutivo.');
+        const from = Math.max(2, parseInt(p.from, 10) || 2), to = parseInt(p.to, 10) || (DB.cart.rows.length + 1), block = Math.max(1, parseInt(p.block, 10) || 1);
+        if (to < from) err('Rango de filas no válido.');
+        for (let r = from, i = 0; r <= to; r++) { const k = byRow.get(r); if (!k) continue; map[k] = { user: us[Math.floor(i / block) % us.length], by: u.name, d: now }; i++; n++; }
+      } else {
+        const rows = parseRows(p.spec); if (!rows.length) err('Escribe las filas, por ejemplo: 2-500, 650, 700-900.');
+        if (p.mode !== 'clear' && !names.includes(p.user)) err('Elige el ejecutivo.');
+        rows.forEach(r => { const k = byRow.get(r); if (!k) return; if (p.mode === 'clear') delete map[k]; else map[k] = { user: p.user, by: u.name, d: now }; n++; });
+      }
+      let ws = await sheet(ctx, SH.rep);
+      if (!ws) { ws = ctx.workbook.worksheets.add(SH.rep); ws.visibility = 'VeryHidden'; }
+      const old = await keyCols(ctx, ws), out = [HDR.rep, ...Object.entries(map).map(([k, a]) => [k, a.user, a.by, a.d])];
+      while (out.length < old.n) out.push(['', '', '', '']);
+      const rg = ws.getRangeByIndexes(0, 0, out.length, HDR.rep.length);
+      rg.numberFormat = out.map(r => r.map(() => '@')); rg.values = out.map(r => r.map(str)); await ctx.sync();
+      await bumpSeq(ctx); await loadDB(ctx);
+      return { count: n, asg: Object.fromEntries(Object.entries(DB.repart).map(([k, a]) => [k, a.user])) };
     });
   },
   async api_users(tk) { const u = who(tk); if (!isAdm(u)) err('Solo el administrador.'); return DB.users.map(x => ({ row: x.row, name: x.name, role: x.role, active: x.active, hasPin: !!x.hash, mustChange: x.mustChange, alias: x.alias, n: DB.cart.rows.filter(r => execMatch(x, r)).length })); },

@@ -290,16 +290,9 @@ rep("""  if (b) { e.preventDefault(); if (!b.disabled) act(r, b.dataset.act, act
 rep("$('#bReload').onclick = () => { flushAll(); loadAll(false); };",
     "$('#bReload').onclick = () => { flushAll(); loadAll(false); };\n$('#bFilt').onclick = () => $('#toolbar').classList.toggle('open');")
 
-# lista angosta (panel de Excel): columnas compactas
-rep("""  const FIRST = ['id', 'legal', 'tax', 'phone', 'mail', 'state', 'city', 'exec'];""",
-    """  const narrow = innerWidth <= 760; NARROW = narrow;
-  const FIRST = narrow ? ['legal', 'id', 'phone', 'tax', 'mail', 'state', 'city', 'exec'] : ['id', 'legal', 'tax', 'phone', 'mail', 'state', 'city', 'exec'];""")
-rep("""  const w = [78, 200, ...COLS.map(c => WIDTH[c.k] || 130), 300];
-  const g = $('#grid');""",
-    """  const w = narrow ? [70, 124, ...COLS.map(c => c.k === 'legal' ? 210 : WIDTH[c.k] || 130)] : [78, 200, ...COLS.map(c => WIDTH[c.k] || 130), 300];
-  const g = $('#grid'); g.classList.toggle('narrow', narrow);""")
+# lista angosta (panel de Excel): la vuelve a armar al cruzar los 760 px
 rep("window.addEventListener('resize', () => { render(); applyPanel(); moveInd(); });",
-    "let NARROW = null;\nwindow.addEventListener('resize', () => { if (S.me && (innerWidth <= 760) !== NARROW) buildCols(); render(); applyPanel(); moveInd(); });")
+    "window.addEventListener('resize', () => { if (S.me && (innerWidth <= 760) !== NARROW) buildCols(); render(); applyPanel(); moveInd(); });")
 rep("  if (prev && prev !== S.active) {\n    if (S.cmtT[prev.k]) flushComment(prev);",
     "  if (prev && prev !== S.active) {\n    $('#panel').scrollTop = 0; if (S.cmtT[prev.k]) flushComment(prev);")
 
